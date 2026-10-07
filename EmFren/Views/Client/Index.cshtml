@@ -1,0 +1,2037 @@
+﻿@model IEnumerable<EmFren.Models.Client>
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    ```
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Clientes - EmFren</title>
+
+    <link rel="stylesheet"
+          href="~/css/Client.css" />
+    ```
+
+</head>
+
+<body>
+
+    ```
+    <!-- =========================================================
+     HEADER
+     ========================================================= -->
+
+    <header class="header">
+
+        <div class="logo">
+            EmFren
+        </div>
+
+
+        <a href="@Url.Action("HomeEnterprise", "Home")"
+           class="home-link">
+
+            Home
+
+        </a>
+
+
+        <div class="user-area">
+
+            <div class="user-icon">
+
+                @(Context.Session.GetString("Username")?.Substring(0, 1).ToUpper() ?? "U")
+
+            </div>
+
+            <span class="username">
+
+                @Context.Session.GetString("Username")
+
+            </span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================================================
+     MAIN
+     ========================================================= -->
+
+    <main class="container">
+
+
+        <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Clientes
+                </h1>
+
+                <p>
+                    Administración de clientes
+                </p>
+
+            </div>
+
+
+            <button type="button"
+                    class="btn-primary"
+                    onclick="openCreateModal()">
+
+                + Agregar cliente
+
+            </button>
+
+        </div>
+
+
+
+        <!-- =====================================================
+         SEARCH
+         ===================================================== -->
+
+        <div class="search-container">
+
+            <form method="get"
+                  asp-action="Index"
+                  asp-controller="Client"
+                  class="search-form">
+
+                <input type="text"
+                       id="clientSearch"
+                       name="search"
+                       value="@ViewBag.Search"
+                       placeholder="Buscar por nombre, documento, email, sucursal o ID..."
+                       autocomplete="off" />
+
+
+                <button type="submit"
+                        class="btn-search">
+
+                    Buscar
+
+                </button>
+
+
+                <!-- LIMPIAR -->
+
+                <a href="@Url.Action("Index", "Client")"
+                   class="btn-clear">
+
+                    Limpiar
+
+                </a>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- =====================================================
+         TABLE
+         ===================================================== -->
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+
+                        <!-- ID -->
+
+                        <th>
+
+                            <a href="@Url.Action("Index", "Client", new
+                               {
+                                   search = ViewBag.Search,
+                                   sort = ViewBag.Sort == "id_asc"
+                                                                  ? "id_desc"
+                                                                  : "id_asc",
+                                   page = ViewBag.CurrentPage
+                               })">
+
+                                ID
+
+                                @if (ViewBag.Sort == "id_asc")
+                                {
+                                    <span>↑</span>
+                                }
+                                else if (ViewBag.Sort == "id_desc")
+                                {
+                                    <span>↓</span>
+                                }
+
+                            </a>
+
+                        </th>
+
+
+
+                        <!-- NAME -->
+
+                        <th>
+
+                            <a href="@Url.Action("Index", "Client", new
+                               {
+                                   search = ViewBag.Search,
+                                   sort = ViewBag.Sort == "name_asc"
+                                                                  ? "name_desc"
+                                                                  : "name_asc",
+                                   page = ViewBag.CurrentPage
+                               })">
+
+                                Nombre
+
+                                @if (ViewBag.Sort == "name_asc")
+                                {
+                                    <span>↑</span>
+                                }
+                                else if (ViewBag.Sort == "name_desc")
+                                {
+                                    <span>↓</span>
+                                }
+
+                            </a>
+
+                        </th>
+
+
+
+                        <!-- DOCUMENT -->
+
+                        <th>
+                            Documento
+                        </th>
+
+
+
+                        <!-- EMAIL -->
+
+                        <th>
+                            Email
+                        </th>
+
+
+
+                        <!-- BRANCH -->
+
+                        <th>
+
+                            <a href="@Url.Action("Index", "Client", new
+                               {
+                                   search = ViewBag.Search,
+                                   sort = ViewBag.Sort == "branch_asc"
+                                                                  ? "branch_desc"
+                                                                  : "branch_asc",
+                                   page = ViewBag.CurrentPage
+                               })">
+
+                                Sucursal
+
+                                @if (ViewBag.Sort == "branch_asc")
+                                {
+                                    <span>↑</span>
+                                }
+                                else if (ViewBag.Sort == "branch_desc")
+                                {
+                                    <span>↓</span>
+                                }
+
+                            </a>
+
+                        </th>
+
+
+
+                        <!-- CELLPHONE -->
+
+                        <th>
+                            Celular
+                        </th>
+
+
+
+                        <!-- STATUS -->
+
+                        <th>
+                            Estado
+                        </th>
+
+
+
+                        <!-- ACTIONS -->
+
+                        <th>
+                            Acciones
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+
+                        foreach (var client in Model)
+                        {
+
+                            <tr>
+
+
+                                <!-- ID -->
+
+                                <td>
+                                    @client.Id
+                                </td>
+
+
+
+                                <!-- NAME -->
+
+                                <td>
+
+                                    <strong>
+                                        @client.Name
+                                    </strong>
+
+                                </td>
+
+
+
+                                <!-- DOCUMENT -->
+
+                                <td>
+
+                                    @(string.IsNullOrEmpty(client.DocumentNumber)
+                                        ? "-"
+                                        : client.DocumentNumber)
+
+                                </td>
+
+
+
+                                <!-- EMAIL -->
+
+                                <td>
+
+                                    @(string.IsNullOrEmpty(client.Email)
+                                        ? "-"
+                                        : client.Email)
+
+                                </td>
+
+
+
+                                <!-- BRANCH -->
+
+                                <td>
+
+                                    @if (client.BranchClient != null)
+                                    {
+                                        <span>
+                                            @client.BranchClient.CountryName
+                                            -
+                                            @client.BranchClient.City
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Sin sucursal
+                                        </span>
+                                    }
+
+                                </td>
+
+
+
+                                <!-- CELLPHONE -->
+
+                                <td>
+
+                                    @(string.IsNullOrEmpty(client.CellphoneNumber)
+                                        ? "-"
+                                        : client.CellphoneNumber)
+
+                                </td>
+
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    @if (client.ClientActive == true)
+                                    {
+
+                                        <span class="status active">
+                                            Activo
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+
+                                        <span class="status inactive">
+                                            Inactivo
+                                        </span>
+
+                                    }
+
+                                </td>
+
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="actions">
+
+
+                                        <!-- VIEW -->
+
+                                        <button type="button"
+                                                class="btn-view"
+                                                onclick="openViewModal(
+                                            '@client.Id',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.Name ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.DocumentNumber ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.Email ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.BranchClient != null ? client.BranchClient.CountryName + " - " + client.BranchClient.City : "Sin sucursal"))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.CellphoneNumber ?? ""))',
+                                            '@(client.ClientActive == true ? "Activo" : "Inactivo")'
+                                            )">
+
+                                            Ver
+
+                                        </button>
+
+
+
+                                        <!-- EDIT -->
+
+                                        <button type="button"
+                                                class="btn-edit"
+                                                onclick="openEditModal(
+                                            '@client.Id',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.Name ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.DocumentNumber ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.Email ?? ""))',
+                                            '@(client.BranchClientId?.ToString() ?? "")',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.BranchClient != null ? client.BranchClient.CountryName + " - " + client.BranchClient.City : ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.CellphoneNumber ?? ""))',
+                                            '@(client.ClientActive == true ? "true" : "false")'
+                                            )">
+
+                                            Editar
+
+                                        </button>
+
+
+
+                                        <!-- STATUS -->
+
+                                        <button type="button"
+                                                class="btn-status"
+                                                onclick="openStatusModal(
+                                            '@client.Id',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.Name ?? ""))',
+                                            '@(client.ClientActive == true ? "true" : "false")'
+                                            )">
+
+                                            @(client.ClientActive == true
+                                                ? "Desactivar"
+                                                : "Activar")
+
+                                        </button>
+
+
+
+                                        <!-- DELETE -->
+
+                                        <button type="button"
+                                                class="btn-delete"
+                                                onclick="openDeleteModal(
+                                            '@client.Id',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(client.Name ?? ""))'
+                                            )">
+
+                                            Eliminar
+
+                                        </button>
+
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    }
+                    else
+                    {
+
+                        <tr>
+
+                            <td colspan="8"
+                                class="no-results">
+
+                                No se encontraron clientes.
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+
+        <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+
+        <div class="table-footer">
+
+            <div class="client-count">
+
+                @ViewBag.TotalClients
+
+                <text>
+                    clientes encontrados
+                </text>
+
+            </div>
+
+
+            @if (ViewBag.TotalPages > 1)
+            {
+
+                <div class="pagination">
+
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+
+                        <a href="@Url.Action("Index", "Client", new
+                           {
+                               search = ViewBag.Search,
+                               sort = ViewBag.Sort,
+                               page = ViewBag.CurrentPage - 1
+                           })">
+
+                            ← Anterior
+
+                        </a>
+
+                    }
+
+
+                    <span>
+
+                        Página
+                        @ViewBag.CurrentPage
+                        de
+                        @ViewBag.TotalPages
+
+                    </span>
+
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+
+                        <a href="@Url.Action("Index", "Client", new
+                           {
+                               search = ViewBag.Search,
+                               sort = ViewBag.Sort,
+                               page = ViewBag.CurrentPage + 1
+                           })">
+
+                            Siguiente →
+
+                        </a>
+
+                    }
+
+                </div>
+
+            }
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =========================================================
+     CREATE MODAL
+     ========================================================= -->
+
+    <div id="createModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Nuevo cliente
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('createModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/Client/Create">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- NAME -->
+
+                <div class="form-group">
+
+                    <label for="Name">
+                        Nombre *
+                    </label>
+
+                    <input type="text"
+                           id="Name"
+                           name="Name"
+                           maxlength="50"
+                           required />
+
+                </div>
+
+
+                <!-- DOCUMENT -->
+
+                <div class="form-group">
+
+                    <label for="DocumentNumber">
+                        Número de documento
+                    </label>
+
+                    <input type="text"
+                           id="DocumentNumber"
+                           name="DocumentNumber"
+                           maxlength="30" />
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="Email">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           id="Email"
+                           name="Email"
+                           maxlength="50" />
+
+                </div>
+
+
+                <!-- BRANCH CLIENT -->
+
+                <div class="form-group branch-selector">
+
+                    <label for="branchSearch">
+                        Sucursal
+                    </label>
+
+                    <input type="text"
+                           id="branchSearch"
+                           placeholder="Buscar sucursal por nombre o ID..."
+                           autocomplete="off" />
+
+                    <input type="hidden"
+                           id="BranchClientId"
+                           name="BranchClientId" />
+
+
+                    <div id="selectedBranch"
+                         class="selected-branch"
+                         style="display:none;">
+
+                        <span id="selectedBranchText"></span>
+
+                        <button type="button"
+                                class="clear-branch"
+                                onclick="clearBranch()">
+
+                            ×
+
+                        </button>
+
+                    </div>
+
+
+                    <div id="branchResults"
+                         class="branch-results">
+
+                        @if (ViewBag.BranchClients != null)
+                        {
+
+                            foreach (var branch in ViewBag.BranchClients)
+                            {
+
+                                <div class="branch-result"
+                                     data-id="@branch.Id"
+                                     data-name="@branch.CountryName - @branch.City">
+
+                                    <span class="branch-id">
+                                        #@branch.Id
+                                    </span>
+
+                                    <span class="branch-name">
+                                        @branch.CountryName - @branch.City
+                                    </span>
+
+                                </div>
+
+                            }
+
+                        }
+
+                    </div>
+
+
+                    <small class="field-help">
+
+                        Busque por país, ciudad o ID y seleccione una sucursal.
+
+                    </small>
+
+
+                    <button type="button"
+                            class="btn-clear-branch"
+                            onclick="clearBranch()">
+
+                        Limpiar
+
+                    </button>
+
+                </div>
+
+
+                <!-- CELLPHONE -->
+
+                <div class="form-group">
+
+                    <label for="CellphoneNumber">
+                        Número de celular
+                    </label>
+
+                    <input type="text"
+                           id="CellphoneNumber"
+                           name="CellphoneNumber"
+                           maxlength="30" />
+
+                </div>
+
+
+                <!-- ACTIVE -->
+
+                <div class="form-group checkbox-group">
+
+                    <label>
+
+                        <input type="checkbox"
+                               name="ClientActive"
+                               value="true"
+                               checked />
+
+                        Cliente activo
+
+                    </label>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('createModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+     VIEW MODAL
+     ========================================================= -->
+
+    <div id="viewModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Información del cliente
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('viewModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="details-grid">
+
+                <div class="detail-item">
+                    <span class="detail-label">ID</span>
+                    <span id="viewId" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Nombre</span>
+                    <span id="viewName" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Documento</span>
+                    <span id="viewDocument" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span id="viewEmail" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Sucursal</span>
+                    <span id="viewBranch" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Celular</span>
+                    <span id="viewCellphone" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Estado</span>
+                    <span id="viewStatus" class="detail-value"></span>
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="closeModal('viewModal')">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+     EDIT MODAL
+     ========================================================= -->
+
+    <div id="editModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Editar cliente
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('editModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/Client/Edit">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       id="editId"
+                       name="Id" />
+
+
+                <!-- NAME -->
+
+                <div class="form-group">
+
+                    <label for="editName">
+                        Nombre *
+                    </label>
+
+                    <input type="text"
+                           id="editName"
+                           name="Name"
+                           maxlength="50"
+                           required />
+
+                </div>
+
+
+                <!-- DOCUMENT -->
+
+                <div class="form-group">
+
+                    <label for="editDocumentNumber">
+                        Número de documento
+                    </label>
+
+                    <input type="text"
+                           id="editDocumentNumber"
+                           name="DocumentNumber"
+                           maxlength="30" />
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="editEmail">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           id="editEmail"
+                           name="Email"
+                           maxlength="50" />
+
+                </div>
+
+
+                <!-- BRANCH CLIENT -->
+
+                <div class="form-group branch-selector">
+
+                    <label for="editBranchSearch">
+                        Sucursal
+                    </label>
+
+                    <input type="text"
+                           id="editBranchSearch"
+                           placeholder="Buscar sucursal por nombre o ID..."
+                           autocomplete="off" />
+
+                    <input type="hidden"
+                           id="editBranchClientId"
+                           name="BranchClientId" />
+
+
+                    <div id="editSelectedBranch"
+                         class="selected-branch"
+                         style="display:none;">
+
+                        <span id="editSelectedBranchText"></span>
+
+                        <button type="button"
+                                class="clear-branch"
+                                onclick="clearEditBranch()">
+
+                            ×
+
+                        </button>
+
+                    </div>
+
+
+                    <div id="editBranchResults"
+                         class="branch-results">
+
+                        @if (ViewBag.BranchClients != null)
+                        {
+
+                            foreach (var branch in ViewBag.BranchClients)
+                            {
+
+                                <div class="branch-result edit-branch-result"
+                                     data-id="@branch.Id"
+                                     data-name="@branch.CountryName - @branch.City">
+
+                                    <span class="branch-id">
+                                        #@branch.Id
+                                    </span>
+
+                                    <span class="branch-name">
+                                        @branch.CountryName - @branch.City
+                                    </span>
+
+                                </div>
+
+                            }
+
+                        }
+
+                    </div>
+
+
+                    <small class="field-help">
+
+                        Busque por país, ciudad o ID y seleccione una sucursal.
+
+                    </small>
+
+
+                    <button type="button"
+                            class="btn-clear-branch"
+                            onclick="clearEditBranch()">
+
+                        Limpiar
+
+                    </button>
+
+                </div>
+
+
+                <!-- CELLPHONE -->
+
+                <div class="form-group">
+
+                    <label for="editCellphoneNumber">
+                        Número de celular
+                    </label>
+
+                    <input type="text"
+                           id="editCellphoneNumber"
+                           name="CellphoneNumber"
+                           maxlength="30" />
+
+                </div>
+
+
+                <!-- ACTIVE -->
+
+                <div class="form-group checkbox-group">
+
+                    <label>
+
+                        <input type="checkbox"
+                               id="editClientActive"
+                               name="ClientActive"
+                               value="true" />
+
+                        Cliente activo
+
+                    </label>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('editModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+     STATUS MODAL
+     ========================================================= -->
+
+    <div id="statusModal"
+         class="modal">
+
+        <div class="modal-content confirmation-modal">
+
+            <div class="modal-header">
+
+                <h2 id="statusModalTitle">
+                    Cambiar estado
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('statusModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="confirmation-icon status-confirm-icon">
+                !
+            </div>
+
+
+            <p class="confirmation-message"
+               id="statusMessage">
+            </p>
+
+
+            <form method="post"
+                  action="/Client/ToggleActive">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       id="statusClientId"
+                       name="id" />
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('statusModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            id="statusConfirmButton"
+                            class="btn-status-confirm">
+
+                        Confirmar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+     DELETE MODAL
+     ========================================================= -->
+
+    <div id="deleteModal"
+         class="modal">
+
+        <div class="modal-content confirmation-modal">
+
+            <div class="modal-header">
+
+                <h2>
+                    Eliminar cliente
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('deleteModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="confirmation-icon delete-confirm-icon">
+                !
+            </div>
+
+
+            <p class="confirmation-message">
+
+                ¿Está seguro de que desea eliminar a
+
+                <strong id="deleteClientName"></strong>
+
+                ?
+
+            </p>
+
+
+            <p class="confirmation-warning">
+
+                Esta acción no se puede deshacer.
+
+            </p>
+
+
+            <form method="post"
+                  action="/Client/Delete">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       id="deleteClientId"
+                       name="id" />
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('deleteModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-delete-confirm">
+
+                        Eliminar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+    <script>
+
+            // =========================================================
+            // GENERIC MODALS
+            // =========================================================
+
+            function openModal(modalId)
+            {
+                const modal = document.getElementById(modalId);
+
+                if (modal)
+                {
+                    modal.classList.add("show");
+                }
+            }
+
+
+            function closeModal(modalId)
+            {
+                const modal = document.getElementById(modalId);
+
+                if (modal)
+                {
+                    modal.classList.remove("show");
+                }
+            }
+
+
+
+            // =========================================================
+            // CREATE
+            // =========================================================
+
+            function openCreateModal()
+            {
+                clearBranch();
+
+                openModal("createModal");
+            }
+
+
+
+            // =========================================================
+            // VIEW
+            // =========================================================
+
+            function openViewModal(
+                id,
+                name,
+                documentNumber,
+                email,
+                branch,
+                cellphone,
+                status)
+            {
+                document.getElementById("viewId").textContent =
+                    id || "-";
+
+                document.getElementById("viewName").textContent =
+                    name || "-";
+
+                document.getElementById("viewDocument").textContent =
+                    documentNumber || "-";
+
+                document.getElementById("viewEmail").textContent =
+                    email || "-";
+
+                document.getElementById("viewBranch").textContent =
+                    branch || "Sin sucursal";
+
+                document.getElementById("viewCellphone").textContent =
+                    cellphone || "-";
+
+                document.getElementById("viewStatus").textContent =
+                    status || "-";
+
+                openModal("viewModal");
+            }
+
+
+
+            // =========================================================
+            // EDIT
+            // =========================================================
+
+            function openEditModal(
+                id,
+                name,
+                documentNumber,
+                email,
+                branchId,
+                branchName,
+                cellphone,
+                active)
+            {
+                document.getElementById("editId").value =
+                    id || "";
+
+                document.getElementById("editName").value =
+                    name || "";
+
+                document.getElementById("editDocumentNumber").value =
+                    documentNumber || "";
+
+                document.getElementById("editEmail").value =
+                    email || "";
+
+                document.getElementById("editCellphoneNumber").value =
+                    cellphone || "";
+
+                document.getElementById("editClientActive").checked =
+                    active === "true";
+
+
+                // =============================================
+                // BRANCH
+                // =============================================
+
+                clearEditBranch();
+
+
+                if (branchId && branchName)
+                {
+                    document.getElementById("editBranchClientId").value =
+                        branchId;
+
+                    document.getElementById("editBranchSearch").value =
+                        branchName;
+
+                    document.getElementById("editSelectedBranchText")
+                        .textContent =
+                        "#" + branchId + " - " + branchName;
+
+                    document.getElementById("editSelectedBranch")
+                        .style.display =
+                        "flex";
+                }
+
+
+                openModal("editModal");
+            }
+
+
+
+            // =========================================================
+            // STATUS
+            // =========================================================
+
+            function openStatusModal(id, name, active)
+            {
+                document.getElementById("statusClientId").value =
+                    id;
+
+                const message =
+                    document.getElementById("statusMessage");
+
+                const title =
+                    document.getElementById("statusModalTitle");
+
+                const button =
+                    document.getElementById("statusConfirmButton");
+
+
+                if (active === "true")
+                {
+                    title.textContent =
+                        "Desactivar cliente";
+
+                    message.innerHTML =
+                        '¿Está seguro de que desea desactivar a <strong>' +
+                        escapeHtml(name) +
+                        '</strong>?';
+
+                    button.textContent =
+                        "Desactivar";
+
+                    button.className =
+                        "btn-status-confirm";
+                }
+                else
+                {
+                    title.textContent =
+                        "Activar cliente";
+
+                    message.innerHTML =
+                        '¿Desea activar nuevamente a <strong>' +
+                        escapeHtml(name) +
+                        '</strong>?';
+
+                    button.textContent =
+                        "Activar";
+
+                    button.className =
+                        "btn-activate-confirm";
+                }
+
+
+                openModal("statusModal");
+            }
+
+
+
+            // =========================================================
+            // DELETE
+            // =========================================================
+
+            function openDeleteModal(id, name)
+            {
+                document.getElementById("deleteClientId").value =
+                    id;
+
+                document.getElementById("deleteClientName").textContent =
+                    name || "";
+
+                openModal("deleteModal");
+            }
+
+
+
+            // =========================================================
+            // ESCAPE HTML
+            // =========================================================
+
+            function escapeHtml(value)
+            {
+                const div =
+                    document.createElement("div");
+
+                div.textContent =
+                    value || "";
+
+                return div.innerHTML;
+            }
+
+
+
+            // =========================================================
+            // CREATE BRANCH SEARCH
+            // =========================================================
+
+            function searchBranches()
+            {
+                const input =
+                    document.getElementById("branchSearch");
+
+                const resultsContainer =
+                    document.getElementById("branchResults");
+
+                if (!input || !resultsContainer)
+                    return;
+
+
+                const search =
+                    input.value
+                        .toLowerCase()
+                        .trim();
+
+
+                const results =
+                    document.querySelectorAll(
+                        "#branchResults .branch-result"
+                    );
+
+
+                results.forEach(function(result)
+                {
+                    const id =
+                        (result.dataset.id || "")
+                            .toLowerCase();
+
+                    const name =
+                        (result.dataset.name || "")
+                            .toLowerCase();
+
+
+                    if (
+                        search === "" ||
+                        name.includes(search) ||
+                        id.includes(search)
+                    )
+                    {
+                        result.style.display = "flex";
+                    }
+                    else
+                    {
+                        result.style.display = "none";
+                    }
+                });
+
+
+                resultsContainer.classList.add("show");
+            }
+
+
+
+            function showBranchResults()
+            {
+                const resultsContainer =
+                    document.getElementById("branchResults");
+
+                if (!resultsContainer)
+                    return;
+
+                resultsContainer.classList.add("show");
+
+                searchBranches();
+            }
+
+
+
+            function selectBranch(id, name)
+            {
+                document.getElementById("BranchClientId").value =
+                    id;
+
+                document.getElementById("branchSearch").value =
+                    name;
+
+                document.getElementById("selectedBranchText")
+                    .textContent =
+                    "#" + id + " - " + name;
+
+                document.getElementById("selectedBranch")
+                    .style.display =
+                    "flex";
+
+                document.getElementById("branchResults")
+                    .classList.remove("show");
+            }
+
+
+
+            function clearBranch()
+            {
+                const branchId =
+                    document.getElementById("BranchClientId");
+
+                const branchSearch =
+                    document.getElementById("branchSearch");
+
+                const selectedBranch =
+                    document.getElementById("selectedBranch");
+
+                const selectedBranchText =
+                    document.getElementById("selectedBranchText");
+
+                const branchResults =
+                    document.getElementById("branchResults");
+
+
+                if (branchId)
+                    branchId.value = "";
+
+
+                if (branchSearch)
+                    branchSearch.value = "";
+
+
+                if (selectedBranchText)
+                    selectedBranchText.textContent = "";
+
+
+                if (selectedBranch)
+                    selectedBranch.style.display = "none";
+
+
+                if (branchResults)
+                    branchResults.classList.remove("show");
+            }
+
+
+
+            // =========================================================
+            // EDIT BRANCH SEARCH
+            // =========================================================
+
+            function searchEditBranches()
+            {
+                const input =
+                    document.getElementById("editBranchSearch");
+
+                const resultsContainer =
+                    document.getElementById("editBranchResults");
+
+                if (!input || !resultsContainer)
+                    return;
+
+
+                const search =
+                    input.value
+                        .toLowerCase()
+                        .trim();
+
+
+                const results =
+                    document.querySelectorAll(
+                        "#editBranchResults .edit-branch-result"
+                    );
+
+
+                results.forEach(function(result)
+                {
+                    const id =
+                        (result.dataset.id || "")
+                            .toLowerCase();
+
+                    const name =
+                        (result.dataset.name || "")
+                            .toLowerCase();
+
+
+                    if (
+                        search === "" ||
+                        name.includes(search) ||
+                        id.includes(search)
+                    )
+                    {
+                        result.style.display = "flex";
+                    }
+                    else
+                    {
+                        result.style.display = "none";
+                    }
+                });
+
+
+                resultsContainer.classList.add("show");
+            }
+
+
+
+            function showEditBranchResults()
+            {
+                const resultsContainer =
+                    document.getElementById("editBranchResults");
+
+                if (!resultsContainer)
+                    return;
+
+                resultsContainer.classList.add("show");
+
+                searchEditBranches();
+            }
+
+
+
+            function selectEditBranch(id, name)
+            {
+                document.getElementById("editBranchClientId").value =
+                    id;
+
+                document.getElementById("editBranchSearch").value =
+                    name;
+
+                document.getElementById("editSelectedBranchText")
+                    .textContent =
+                    "#" + id + " - " + name;
+
+                document.getElementById("editSelectedBranch")
+                    .style.display =
+                    "flex";
+
+                document.getElementById("editBranchResults")
+                    .classList.remove("show");
+            }
+
+
+
+            function clearEditBranch()
+            {
+                const branchId =
+                    document.getElementById("editBranchClientId");
+
+                const branchSearch =
+                    document.getElementById("editBranchSearch");
+
+                const selectedBranch =
+                    document.getElementById("editSelectedBranch");
+
+                const selectedBranchText =
+                    document.getElementById(
+                        "editSelectedBranchText"
+                    );
+
+                const branchResults =
+                    document.getElementById(
+                        "editBranchResults"
+                    );
+
+
+                if (branchId)
+                    branchId.value = "";
+
+
+                if (branchSearch)
+                    branchSearch.value = "";
+
+
+                if (selectedBranchText)
+                    selectedBranchText.textContent = "";
+
+
+                if (selectedBranch)
+                    selectedBranch.style.display = "none";
+
+
+                if (branchResults)
+                    branchResults.classList.remove("show");
+            }
+
+
+
+            // =========================================================
+            // CREATE BRANCH EVENTS
+            // =========================================================
+
+            const branchSearch =
+                document.getElementById("branchSearch");
+
+
+            if (branchSearch)
+            {
+                branchSearch.addEventListener(
+                    "input",
+                    function()
+                    {
+                        searchBranches();
+                    }
+                );
+
+
+                branchSearch.addEventListener(
+                    "focus",
+                    function()
+                    {
+                        showBranchResults();
+                    }
+                );
+
+
+                branchSearch.addEventListener(
+                    "click",
+                    function()
+                    {
+                        showBranchResults();
+                    }
+                );
+            }
+
+
+
+            // =========================================================
+            // EDIT BRANCH EVENTS
+            // =========================================================
+
+            const editBranchSearch =
+                document.getElementById(
+                    "editBranchSearch"
+                );
+
+
+            if (editBranchSearch)
+            {
+                editBranchSearch.addEventListener(
+                    "input",
+                    function()
+                    {
+                        searchEditBranches();
+                    }
+                );
+
+
+                editBranchSearch.addEventListener(
+                    "focus",
+                    function()
+                    {
+                        showEditBranchResults();
+                    }
+                );
+
+
+                editBranchSearch.addEventListener(
+                    "click",
+                    function()
+                    {
+                        showEditBranchResults();
+                    }
+                );
+            }
+
+
+
+            // =========================================================
+            // BRANCH RESULT CLICK
+            // =========================================================
+
+            document.addEventListener(
+                "click",
+                function(event)
+                {
+                    const createResult =
+                        event.target.closest(
+                            "#branchResults .branch-result"
+                        );
+
+
+                    if (createResult)
+                    {
+                        selectBranch(
+                            createResult.dataset.id,
+                            createResult.dataset.name
+                        );
+
+                        return;
+                    }
+
+
+                    const editResult =
+                        event.target.closest(
+                            "#editBranchResults .edit-branch-result"
+                        );
+
+
+                    if (editResult)
+                    {
+                        selectEditBranch(
+                            editResult.dataset.id,
+                            editResult.dataset.name
+                        );
+                    }
+                }
+            );
+
+
+
+            // =========================================================
+            // CLOSE BRANCH RESULTS
+            // =========================================================
+
+            document.addEventListener(
+                "click",
+                function(event)
+                {
+                    const createSelector =
+                        document.querySelector(
+                            "#createModal .branch-selector"
+                        );
+
+                    const createResults =
+                        document.getElementById(
+                            "branchResults"
+                        );
+
+
+                    if (
+                        createSelector &&
+                        createResults &&
+                        !createSelector.contains(event.target)
+                    )
+                    {
+                        createResults.classList.remove("show");
+                    }
+
+
+                    const editSelector =
+                        document.querySelector(
+                            "#editModal .branch-selector"
+                        );
+
+                    const editResults =
+                        document.getElementById(
+                            "editBranchResults"
+                        );
+
+
+                    if (
+                        editSelector &&
+                        editResults &&
+                        !editSelector.contains(event.target)
+                    )
+                    {
+                        editResults.classList.remove("show");
+                    }
+                }
+            );
+
+
+
+            // =========================================================
+            // CLOSE MODAL WHEN CLICKING OUTSIDE
+            // =========================================================
+
+            window.addEventListener(
+                "click",
+                function(event)
+                {
+                    if (
+                        event.target.classList.contains("modal")
+                    )
+                    {
+                        event.target.classList.remove("show");
+                    }
+                }
+            );
+
+
+
+            // =========================================================
+            // ESC KEY
+            // =========================================================
+
+            document.addEventListener(
+                "keydown",
+                function(event)
+                {
+                    if (event.key === "Escape")
+                    {
+                        document
+                            .querySelectorAll(".modal.show")
+                            .forEach(
+                                function(modal)
+                                {
+                                    modal.classList.remove("show");
+                                }
+                            );
+                    }
+                }
+            );
+
+    </script>
+    ```
+
+</body>
+
+</html>

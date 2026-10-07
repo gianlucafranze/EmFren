@@ -1,0 +1,1106 @@
+﻿@model IEnumerable<EmFren.Models.Department>
+
+@{
+    string search = ViewBag.Search ?? "";
+    string sort = ViewBag.Sort ?? "id_asc";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int totalDepartments = ViewBag.TotalDepartments ?? 0;
+}
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet"
+          href="~/css/Department.css" />
+
+    <title>Departamentos - EmFren</title>
+
+</head>
+
+
+<body>
+
+
+    <!-- ============================================================
+         HEADER
+    ============================================================= -->
+
+    <header class="header">
+
+        <div class="header-title">
+            EmFren
+        </div>
+
+
+        <div class="header-center">
+
+            <a href="/Home/HomeEnterprise"
+               class="home-button">
+
+                Home
+
+            </a>
+
+        </div>
+
+
+        <div class="header-user">
+
+            <div class="user-circle">
+
+                @(
+                    ViewBag.Username != null &&
+                    ViewBag.Username.ToString().Length > 0
+                    ? ViewBag.Username.ToString()
+                        .Substring(0, 1)
+                        .ToUpper()
+                    : "U"
+                )
+
+            </div>
+
+            <span>
+                @ViewBag.Username
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- ============================================================
+         MAIN
+    ============================================================= -->
+
+    <main class="container">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <div class="page-title">
+
+                <h1>
+                    Departamentos
+                </h1>
+
+                <p>
+                    Administra los departamentos de la empresa.
+                </p>
+
+            </div>
+
+
+            <button type="button"
+                    class="btn-add"
+                    onclick="openModal('addModal')">
+
+                + Agregar departamento
+
+            </button>
+
+        </div>
+
+
+        <!-- ========================================================
+             ALERTS
+        ========================================================= -->
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+
+                @TempData["Success"]
+
+            </div>
+        }
+
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-error">
+
+                @TempData["Error"]
+
+            </div>
+        }
+
+
+        <!-- ========================================================
+             SEARCH AND SORT
+        ========================================================= -->
+
+        <div class="filter-panel">
+
+            <form method="get"
+                  asp-controller="Department"
+                  asp-action="Index"
+                  class="filter-form">
+
+
+                <div class="form-group">
+
+                    <label for="search">
+                        Buscar
+                    </label>
+
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           value="@search"
+                           placeholder="ID o nombre del departamento..." />
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="sort">
+                        Ordenar por
+                    </label>
+
+                    <select id="sort"
+                            name="sort">
+
+                        <option value="id_asc"
+                                selected="@(sort == "id_asc")">
+
+                            ID — Ascendente
+
+                        </option>
+
+                        <option value="id_desc"
+                                selected="@(sort == "id_desc")">
+
+                            ID — Descendente
+
+                        </option>
+
+                        <option value="name_asc"
+                                selected="@(sort == "name_asc")">
+
+                            Nombre — A → Z
+
+                        </option>
+
+                        <option value="name_desc"
+                                selected="@(sort == "name_desc")">
+
+                            Nombre — Z → A
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-buttons">
+
+                    <button type="submit"
+                            class="btn-search">
+
+                        Buscar
+
+                    </button>
+
+
+                    <a href="@Url.Action("Index", "Department")"
+                       class="btn-clear">
+
+                        Limpiar
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- ========================================================
+             TABLE
+        ========================================================= -->
+
+        <div class="table-card">
+
+
+            <div class="table-top">
+
+                <div class="table-top-title">
+
+                    Lista de departamentos
+
+                </div>
+
+
+                <div class="results-count">
+
+                    @totalDepartments
+                    @(totalDepartments == 1
+                        ? "departamento"
+                        : "departamentos")
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Departamento
+                            </th>
+
+                            <th>
+                                Acciones
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var department in Model)
+                            {
+                                <tr>
+
+                                    <td class="department-id">
+                                        @department.Id
+                                    </td>
+
+
+                                    <td class="department-name">
+                                        @department.DepartmentName
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            <!-- VIEW -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-view"
+                                                    data-id="@department.Id"
+                                                    data-name="@department.DepartmentName"
+                                                    onclick="openViewModalFromButton(this)">
+
+                                                Ver
+
+                                            </button>
+
+
+                                            <!-- EDIT -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-edit"
+                                                    data-id="@department.Id"
+                                                    data-name="@department.DepartmentName"
+                                                    onclick="openEditModalFromButton(this)">
+
+                                                Editar
+
+                                            </button>
+
+
+                                            <!-- DELETE -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-delete"
+                                                    data-id="@department.Id"
+                                                    data-name="@department.DepartmentName"
+                                                    onclick="openDeleteModalFromButton(this)">
+
+                                                Eliminar
+
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="3"
+                                    class="empty-row">
+
+                                    <div class="empty-icon">
+                                        🏢
+                                    </div>
+
+                                    <div class="empty-title">
+                                        No se encontraron departamentos
+                                    </div>
+
+                                    <div>
+                                        Intenta cambiar los criterios de búsqueda.
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ====================================================
+                 FOOTER
+            ===================================================== -->
+
+            <div class="table-footer">
+
+
+                <div class="pagination-info">
+
+                    @if (totalDepartments > 0)
+                    {
+                        int firstItem =
+                            ((currentPage - 1) * 10) + 1;
+
+                        int lastItem =
+                            Math.Min(
+                                currentPage * 10,
+                                totalDepartments);
+
+                        <span>
+
+                            Mostrando
+
+                            <strong>
+                                @firstItem
+                            </strong>
+
+                            -
+
+                            <strong>
+                                @lastItem
+                            </strong>
+
+                            de
+
+                            <strong>
+                                @totalDepartments
+                            </strong>
+
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            0 departamentos encontrados
+                        </span>
+                    }
+
+                </div>
+
+
+                @if (totalPages > 1)
+                {
+                    <div class="pagination">
+
+
+                        <!-- PREVIOUS -->
+
+                        @if (currentPage > 1)
+                        {
+                            <a class="page-link"
+                               href="@Url.Action(
+                                   "Index",
+                                   "Department",
+                                   new
+                                   {
+                                       search = search,
+                                       sort = sort,
+                                       page = currentPage - 1
+                                   })">
+
+                                ‹
+
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link disabled">
+                                ‹
+                            </span>
+                        }
+
+
+                        <!-- PAGE NUMBERS -->
+
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            if (i == currentPage)
+                            {
+                                <span class="page-link active">
+                                    @i
+                                </span>
+                            }
+                            else
+                            {
+                                <a class="page-link"
+                                   href="@Url.Action(
+                                       "Index",
+                                       "Department",
+                                       new
+                                       {
+                                           search = search,
+                                           sort = sort,
+                                           page = i
+                                       })">
+
+                                    @i
+
+                                </a>
+                            }
+                        }
+
+
+                        <!-- NEXT -->
+
+                        @if (currentPage < totalPages)
+                        {
+                            <a class="page-link"
+                               href="@Url.Action(
+                                   "Index",
+                                   "Department",
+                                   new
+                                   {
+                                       search = search,
+                                       sort = sort,
+                                       page = currentPage + 1
+                                   })">
+
+                                ›
+
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link disabled">
+                                ›
+
+                            </span>
+                        }
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- ============================================================
+         ADD MODAL
+    ============================================================= -->
+
+    <div id="addModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Agregar departamento
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('addModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/Department/Create">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       name="search"
+                       value="@search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@currentPage" />
+
+
+                <div class="modal-body">
+
+                    <div class="modal-form-group">
+
+                        <label for="addDepartmentName">
+                            Nombre del departamento
+                        </label>
+
+                        <input type="text"
+                               id="addDepartmentName"
+                               name="DepartmentName"
+                               maxlength="50"
+                               required
+                               placeholder="Ej. Ventas, Administración..." />
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('addModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         VIEW MODAL
+    ============================================================= -->
+
+    <div id="viewModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Ver departamento
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('viewModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="modal-form-group">
+
+                    <label for="viewDepartmentId">
+                        ID
+                    </label>
+
+                    <input type="text"
+                           id="viewDepartmentId"
+                           readonly />
+
+                </div>
+
+
+                <div class="modal-form-group">
+
+                    <label for="viewDepartmentName">
+                        Nombre del departamento
+                    </label>
+
+                    <input type="text"
+                           id="viewDepartmentName"
+                           readonly />
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="closeModal('viewModal')">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         EDIT MODAL
+    ============================================================= -->
+
+    <div id="editModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Editar departamento
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('editModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/Department/Edit">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       name="search"
+                       value="@search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@currentPage" />
+
+
+                <div class="modal-body">
+
+
+                    <div class="modal-form-group">
+
+                        <label for="editDepartmentIdDisplay">
+                            ID
+                        </label>
+
+                        <input type="text"
+                               id="editDepartmentIdDisplay"
+                               readonly />
+
+
+                        <input type="hidden"
+                               id="editDepartmentId"
+                               name="Id" />
+
+                    </div>
+
+
+                    <div class="modal-form-group">
+
+                        <label for="editDepartmentName">
+                            Nombre del departamento
+                        </label>
+
+                        <input type="text"
+                               id="editDepartmentName"
+                               name="DepartmentName"
+                               maxlength="50"
+                               required />
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('editModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         DELETE MODAL
+    ============================================================= -->
+
+    <div id="deleteModal"
+         class="modal">
+
+        <div class="modal-content delete-modal">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Eliminar departamento
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('deleteModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="delete-icon">
+                    ⚠️
+                </div>
+
+
+                <h3 class="delete-title">
+                    ¿Estás seguro?
+                </h3>
+
+
+                <p class="delete-message">
+                    Vas a eliminar el departamento:
+                </p>
+
+
+                <div class="delete-department-name"
+                     id="deleteDepartmentName">
+                </div>
+
+
+                <p class="delete-warning">
+                    Esta acción no se puede deshacer.
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="closeModal('deleteModal')">
+
+                    Cancelar
+
+                </button>
+
+
+                <form method="post"
+                      action="/Department/Delete">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <input type="hidden"
+                           name="id"
+                           id="deleteDepartmentId" />
+
+
+                    <input type="hidden"
+                           name="search"
+                           value="@search" />
+
+                    <input type="hidden"
+                           name="sort"
+                           value="@sort" />
+
+                    <input type="hidden"
+                           name="page"
+                           value="@currentPage" />
+
+
+                    <button type="submit"
+                            class="btn-delete-confirm">
+
+                        Sí, eliminar
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         JAVASCRIPT
+    ============================================================= -->
+
+    <script>
+
+        // ============================================================
+        // OPEN MODAL
+        // ============================================================
+
+        function openModal(modalId) {
+
+            const modal =
+                document.getElementById(modalId);
+
+            if (modal) {
+
+                modal.classList.add("show");
+
+                document.body.classList.add("modal-open");
+
+            }
+        }
+
+
+        // ============================================================
+        // CLOSE MODAL
+        // ============================================================
+
+        function closeModal(modalId) {
+
+            const modal =
+                document.getElementById(modalId);
+
+            if (modal) {
+
+                modal.classList.remove("show");
+
+                document.body.classList.remove("modal-open");
+
+            }
+        }
+
+
+        // ============================================================
+        // VIEW
+        // ============================================================
+
+        function openViewModalFromButton(button) {
+
+            const id =
+                button.getAttribute("data-id");
+
+            const name =
+                button.getAttribute("data-name");
+
+
+            document.getElementById(
+                "viewDepartmentId"
+            ).value = id;
+
+
+            document.getElementById(
+                "viewDepartmentName"
+            ).value = name;
+
+
+            openModal("viewModal");
+        }
+
+
+        // ============================================================
+        // EDIT
+        // ============================================================
+
+        function openEditModalFromButton(button) {
+
+            const id =
+                button.getAttribute("data-id");
+
+            const name =
+                button.getAttribute("data-name");
+
+
+            document.getElementById(
+                "editDepartmentIdDisplay"
+            ).value = id;
+
+
+            document.getElementById(
+                "editDepartmentId"
+            ).value = id;
+
+
+            document.getElementById(
+                "editDepartmentName"
+            ).value = name;
+
+
+            openModal("editModal");
+        }
+
+
+        // ============================================================
+        // DELETE
+        // ============================================================
+
+        function openDeleteModalFromButton(button) {
+
+            const id =
+                button.getAttribute("data-id");
+
+            const name =
+                button.getAttribute("data-name");
+
+
+            document.getElementById(
+                "deleteDepartmentId"
+            ).value = id;
+
+
+            document.getElementById(
+                "deleteDepartmentName"
+            ).textContent = name;
+
+
+            openModal("deleteModal");
+        }
+
+
+        // ============================================================
+        // CLOSE WHEN CLICKING OUTSIDE
+        // ============================================================
+
+        document.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target.classList.contains("modal")
+                ) {
+
+                    event.target.classList.remove("show");
+
+                    document.body.classList.remove(
+                        "modal-open"
+                    );
+                }
+
+            }
+        );
+
+
+        // ============================================================
+        // ESC KEY
+        // ============================================================
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Escape") {
+
+                    document
+                        .querySelectorAll(".modal.show")
+                        .forEach(function (modal) {
+
+                            modal.classList.remove("show");
+
+                        });
+
+
+                    document.body.classList.remove(
+                        "modal-open"
+                    );
+                }
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

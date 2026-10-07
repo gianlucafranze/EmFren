@@ -1,0 +1,719 @@
+﻿* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f6f8;
+    color: #222;
+}
+
+/* =========================================================
+HEADER
+========================================================= */
+
+.shop-header {
+    height: 70px;
+    background: #ffffff;
+    border-bottom: 1px solid #ddd;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
+    padding: 0 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-center {
+    text-align: center;
+}
+
+    .header-center h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+.header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 18px;
+}
+
+.home-link {
+    color: #222;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .home-link:hover {
+        text-decoration: underline;
+    }
+
+.username {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 600;
+}
+
+.user-icon {
+    font-size: 11px;
+}
+
+.notification-icon {
+    font-size: 22px;
+}
+
+/* =========================================================
+MAIN
+========================================================= */
+
+.purchases-container {
+    width: 95%;
+    max-width: 1450px;
+    margin: 35px auto;
+}
+
+/* =========================================================
+TITLE
+========================================================= */
+
+.page-title-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 25px;
+}
+
+    .page-title-section h2 {
+        margin: 0 0 6px 0;
+        font-size: 26px;
+    }
+
+    .page-title-section p {
+        margin: 0;
+        color: #777;
+    }
+
+.total-records {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+/* =========================================================
+FILTERS
+========================================================= */
+
+.filters-container {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.filters-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+    .filter-field label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .filter-field input {
+        height: 40px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 0 12px;
+        font-size: 14px;
+        outline: none;
+    }
+
+        .filter-field input:focus {
+            border-color: #777;
+        }
+
+.search-field {
+    flex: 1;
+    min-width: 280px;
+}
+
+    .search-field input {
+        width: 100%;
+    }
+
+.filter-button,
+.filter-clear {
+    height: 40px;
+    border-radius: 6px;
+    padding: 0 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.filter-button {
+    border: none;
+    background: #222;
+    color: #fff;
+}
+
+    .filter-button:hover {
+        background: #444;
+    }
+
+.filter-clear {
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #333;
+}
+
+    .filter-clear:hover {
+        background: #f1f1f1;
+    }
+
+/* =========================================================
+TABLE
+========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.purchases-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+    .purchases-table th {
+        background: #f1f2f4;
+        padding: 15px 14px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 700;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .purchases-table td {
+        padding: 14px;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+    }
+
+    .purchases-table tbody tr:hover {
+        background: #fafafa;
+    }
+
+    .purchases-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+/* =========================================================
+ACTIONS
+========================================================= */
+
+.actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* =========================================================
+VIEW BUTTON
+========================================================= */
+
+.view-button {
+    border: none;
+    background: #222;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.15s ease;
+}
+
+    .view-button:hover {
+        background: #444;
+    }
+
+/* =========================================================
+DEBTOR CLIENT
+========================================================= */
+
+.debtor-client-form {
+    margin: 0;
+}
+
+.debtor-button {
+    border: 1px solid #b8860b;
+    background: #fff;
+    color: #8a6800;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+    .debtor-button:hover {
+        background: #b8860b;
+        color: #fff;
+        border-color: #b8860b;
+    }
+
+/* =========================================================
+DELETE PURCHASE
+========================================================= */
+
+.delete-purchase-form {
+    margin: 0;
+}
+
+.delete-button {
+    border: 1px solid #c62828;
+    background: #fff;
+    color: #c62828;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+    .delete-button:hover {
+        background: #c62828;
+        color: #fff;
+        border-color: #c62828;
+    }
+
+/* =========================================================
+EMPTY
+========================================================= */
+
+.empty-message {
+    text-align: center !important;
+    padding: 45px !important;
+    color: #777;
+    font-size: 14px !important;
+}
+
+/* =========================================================
+PAGINATION
+========================================================= */
+
+.pagination {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.page-button {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+    .page-button:hover {
+        background: #f0f0f0;
+        border-color: #aaa;
+    }
+
+    .page-button.active {
+        background: #222;
+        color: #fff;
+        border-color: #222;
+    }
+
+.page-dots {
+    min-width: 25px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    font-size: 14px;
+    user-select: none;
+}
+
+/* =========================================================
+MODAL
+========================================================= */
+
+.purchase-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+    .purchase-modal.active {
+        display: flex;
+    }
+
+.purchase-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.purchase-modal-content {
+    position: relative;
+    width: 95%;
+    max-width: 1400px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+    z-index: 2;
+}
+
+/* =========================================================
+MODAL HEADER
+========================================================= */
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 22px 25px;
+    border-bottom: 1px solid #ddd;
+}
+
+    .modal-header h2 {
+        margin: 0 0 5px 0;
+        font-size: 22px;
+    }
+
+.order-number {
+    color: #777;
+    font-size: 14px;
+}
+
+.close-modal {
+    border: none;
+    background: transparent;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+}
+
+    .close-modal:hover {
+        color: #111;
+    }
+
+/* =========================================================
+ORDER INFORMATION
+========================================================= */
+
+.order-information {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    padding: 20px 25px;
+}
+
+.information-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 13px;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .information-card span {
+        font-size: 12px;
+        color: #777;
+    }
+
+    .information-card strong {
+        font-size: 14px;
+        word-break: break-word;
+    }
+
+.total-card {
+    background: #f3f3f3;
+}
+
+/* =========================================================
+ARTICLES
+========================================================= */
+
+.articles-section {
+    padding: 0 25px 20px 25px;
+}
+
+.articles-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+    .articles-title h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .articles-title span {
+        color: #777;
+        font-size: 13px;
+    }
+
+.details-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.details-table {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: collapse;
+}
+
+    .details-table th {
+        background: #f1f2f4;
+        padding: 12px;
+        text-align: left;
+        font-size: 12px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .details-table td {
+        padding: 11px 12px;
+        font-size: 13px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .details-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+/* =========================================================
+MODAL FOOTER
+========================================================= */
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 25px;
+    border-top: 1px solid #ddd;
+}
+
+.pdf-button,
+.close-button {
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pdf-button {
+    background: #222;
+    color: #fff;
+}
+
+    .pdf-button:hover {
+        background: #444;
+    }
+
+.close-button {
+    background: #eee;
+    color: #333;
+}
+
+    .close-button:hover {
+        background: #ddd;
+    }
+
+/* =========================================================
+RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    ```
+    .shop-header {
+        grid-template-columns: 1fr 1fr;
+        height: auto;
+        padding: 15px 20px;
+        row-gap: 10px;
+    }
+
+    .header-center {
+        text-align: right;
+    }
+
+    .header-right {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+    }
+
+    .order-information {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .actions-cell {
+        justify-content: flex-start;
+    }
+
+    ```
+}
+
+@media (max-width: 650px) {
+
+    ```
+    .purchases-container {
+        width: 94%;
+        margin-top: 20px;
+    }
+
+    .page-title-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .filters-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-field {
+        min-width: 0;
+    }
+
+    .filter-field input {
+        width: 100%;
+    }
+
+    .filter-button,
+    .filter-clear {
+        width: 100%;
+    }
+
+
+    /* ============================================
+   MOBILE ACTIONS
+   ============================================ */
+
+    .actions-cell {
+        justify-content: flex-start;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .view-button,
+    .debtor-button,
+    .delete-button {
+        width: 100%;
+    }
+
+    .debtor-client-form,
+    .delete-purchase-form {
+        width: 100%;
+    }
+
+
+    /* ============================================
+   MOBILE PAGINATION
+   ============================================ */
+
+    .pagination {
+        gap: 4px;
+        margin-top: 20px;
+        overflow-x: auto;
+        justify-content: center;
+        padding: 4px 0;
+    }
+
+    .page-button {
+        min-width: 34px;
+        height: 34px;
+        padding: 0 8px;
+        font-size: 13px;
+    }
+
+    .page-dots {
+        height: 34px;
+        min-width: 18px;
+        font-size: 13px;
+    }
+
+
+    .order-information {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .pdf-button,
+    .close-button {
+        width: 100%;
+    }
+
+}

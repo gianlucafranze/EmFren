@@ -1,0 +1,489 @@
+﻿@{
+    Layout = null;
+
+    string username = ViewBag.Username ?? "Usuario";
+
+    int unreadNotificationCount = ViewBag.UnreadNotificationCount ?? 0;
+
+    int clientCount = ViewBag.ClientCount ?? 0;
+
+    int articleCount = ViewBag.ArticleCount ?? 0;
+
+    int purchaseCount = ViewBag.PurchaseCount ?? 0;
+
+    int debtorClientCount = ViewBag.DebtorClientCount ?? 0;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmFren | Sistema Empresarial</title>
+
+    <link rel="stylesheet"
+          href="~/css/HomeEnterprise.css"
+          asp-append-version="true" />
+</head>
+
+<body>
+
+    <!-- =========================
+         SIDEBAR
+    ========================= -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div>
+                <h1>EmFren</h1>
+                <span>Gestión empresarial</span>
+            </div>
+        </div>
+
+        <nav class="menu">
+
+            <div class="menu-title">Principal</div>
+
+            <a href="#" class="active">
+                <span class="icon">⌂</span>
+                <span>Inicio</span>
+            </a>
+
+
+            <div class="menu-title">Ventas y compras</div>
+
+            <a href="/Shop/ViewShopEnterprise">
+                <span class="icon">🛒</span>
+                <span>Gestión de compras</span>
+            </a>
+
+            <a href="/Articles/Index">
+                <span class="icon">📦</span>
+                <span>Artículos</span>
+            </a>
+
+
+            <div class="menu-title">Clientes</div>
+
+            <a href="/Client/Index">
+                <span class="icon">👤</span>
+                <span>Clientes</span>
+            </a>
+
+            <a href="/DebtorClient/Index">
+                <span class="icon">⚠</span>
+                <span>Clientes deudores</span>
+            </a>
+
+            <a href="/BranchClient/Index">
+                <span class="icon">📍</span>
+                <span>Sucursales de clientes</span>
+            </a>
+
+
+            <div class="menu-title">Empresa</div>
+
+            <a href="/Staff/Index">
+                <span class="icon">👥</span>
+                <span>Personal</span>
+            </a>
+
+            <a href="/Department/Index">
+                <span class="icon">🏢</span>
+                <span>Departamentos</span>
+            </a>
+
+            <a href="/Vehicle/Index">
+                <span class="icon">🚗</span>
+                <span>Vehículos</span>
+            </a>
+
+
+            <div class="menu-title">Configuración</div>
+
+            <a href="/Users/Users">
+                <span class="icon">🔐</span>
+                <span>Usuarios</span>
+            </a>
+
+            <a href="/CoinPayment/Index">
+                <span class="icon">💰</span>
+                <span>Monedas de pago</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+    <main class="main">
+
+        <!-- =========================
+             HEADER
+        ========================= -->
+        <header class="header">
+
+            <div class="header-title">
+
+                <h2>Panel principal</h2>
+
+                <p>
+                    Administración de EmFren
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <!-- =========================
+                     NOTIFICATIONS
+                ========================= -->
+                <div class="notification-wrapper">
+
+                    <a href="/Notification/NotificationEnterprise"
+                       class="notification"
+                       aria-label="Notificaciones">
+
+                        <span class="notification-bell">
+                            🔔
+                        </span>
+
+                        @if (unreadNotificationCount > 0)
+                        {
+                            <span class="notification-number">
+                                @unreadNotificationCount
+                            </span>
+                        }
+
+                    </a>
+
+                </div>
+
+
+                <!-- =========================
+                     PROFILE
+                ========================= -->
+                <div class="profile">
+
+                    <div>
+
+                        <div class="profile-name">
+                            @username
+                        </div>
+
+                        <div class="profile-role">
+                            Usuario del sistema
+                        </div>
+
+                    </div>
+
+
+                    <form action="/Users/Logout"
+                          method="post"
+                          class="logout-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="logout-button">
+                            Cerrar sesión
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================
+             CONTENT
+        ========================= -->
+        <div class="content">
+
+            <div class="welcome">
+
+                <h1>
+                    Bienvenido a EmFren
+                </h1>
+
+                <p>
+                    Administra las operaciones de tu empresa desde un solo lugar.
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 SUMMARY
+            ========================= -->
+            <div class="summary">
+
+                <!-- CLIENTS -->
+                <div class="summary-card">
+
+                    <h3>
+                        Clientes registrados
+                    </h3>
+
+                    <div class="value">
+                        @clientCount
+                    </div>
+
+                    <p>
+                        Clientes activos
+                    </p>
+
+                </div>
+
+
+                <!-- ARTICLES -->
+                <div class="summary-card">
+
+                    <h3>
+                        Artículos
+                    </h3>
+
+                    <div class="value">
+                        @articleCount
+                    </div>
+
+                    <p>
+                        Productos registrados
+                    </p>
+
+                </div>
+
+
+                <!-- PURCHASES -->
+                <div class="summary-card">
+
+                    <h3>
+                        Compras
+                    </h3>
+
+                    <div class="value">
+                        @purchaseCount
+                    </div>
+
+                    <p>
+                        Compras realizadas
+                    </p>
+
+                </div>
+
+
+                <!-- DEBTOR CLIENTS -->
+                <div class="summary-card">
+
+                    <h3>
+                        Clientes deudores
+                    </h3>
+
+                    <div class="value">
+                        @debtorClientCount
+                    </div>
+
+                    <p>
+                        Requieren seguimiento
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 MODULES
+            ========================= -->
+            <section class="section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Módulos del sistema
+                        </h2>
+
+                        <p>
+                            Accede rápidamente a las funciones de EmFren.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modules">
+
+                    <a href="/Users/Users" class="module">
+
+                        <div class="module-icon">
+                            🔐
+                        </div>
+
+                        <h3>
+                            Usuarios
+                        </h3>
+
+                        <p>
+                            Administrar usuarios y cuentas del sistema.
+                        </p>
+
+                    </a>
+
+
+                    <a href="/CoinPayment/Index" class="module">
+
+                        <div class="module-icon">
+                            💰
+                        </div>
+
+                        <h3>
+                            Monedas de pago
+                        </h3>
+
+                        <p>
+                            Gestionar las monedas disponibles para los pagos.
+                        </p>
+
+                    </a>
+
+
+                    <a href="/Vehicle/Index" class="module">
+
+                        <div class="module-icon">
+                            🚗
+                        </div>
+
+                        <h3>
+                            Vehículos
+                        </h3>
+
+                        <p>
+                            Registrar y administrar los vehículos de la empresa.
+                        </p>
+
+                    </a>
+
+
+                    <a href="/BranchClient/Index" class="module">
+
+                        <div class="module-icon">
+                            📍
+                        </div>
+
+                        <h3>
+                            Sucursales
+                        </h3>
+
+                        <p>
+                            Gestionar las sucursales y ubicaciones de clientes.
+                        </p>
+
+                    </a>
+
+
+                    <a href="/Department/Index" class="module">
+
+                        <div class="module-icon">
+                            🏢
+                        </div>
+
+                        <h3>
+                            Departamentos
+                        </h3>
+
+                        <p>
+                            Organizar los departamentos de EmFren.
+                        </p>
+
+                    </a>
+
+
+                    <a href="/Staff/Index" class="module">
+
+                        <div class="module-icon">
+                            👥
+                        </div>
+
+                        <h3>
+                            Personal
+                        </h3>
+
+                        <p>
+                            Administrar empleados y personal de la empresa.
+                        </p>
+
+                    </a>
+
+
+                    <a href="/Client/Index" class="module">
+
+                        <div class="module-icon">
+                            👤
+                        </div>
+
+                        <h3>
+                            Clientes
+                        </h3>
+
+                        <p>
+                            Registrar y administrar los clientes de EmFren.
+                        </p>
+
+                    </a>
+
+
+                    <a href="/DebtorClient/Index" class="module">
+
+                        <div class="module-icon">
+                            ⚠
+                        </div>
+
+                        <h3>
+                            Clientes deudores
+                        </h3>
+
+                        <p>
+                            Controlar deudas y saldos pendientes.
+                        </p>
+
+                    </a>
+
+
+                    <a href="/Articles/Index" class="module">
+
+                        <div class="module-icon">
+                            📦
+                        </div>
+
+                        <h3>
+                            Artículos
+                        </h3>
+
+                        <p>
+                            Gestionar productos, precios, stock y descuentos.
+                        </p>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

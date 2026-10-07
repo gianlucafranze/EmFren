@@ -1,0 +1,2115 @@
+﻿@model IEnumerable<EmFren.Models.Staff>
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Personal - EmFren</title>
+
+    <link rel="stylesheet"
+          href="~/css/Staff.css" />
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <header class="header">
+
+        <div class="logo">
+            EmFren
+        </div>
+
+
+        <a href="@Url.Action("HomeEnterprise", "Home")"
+           class="home-link">
+
+            Home
+
+        </a>
+
+
+        <div class="user-area">
+
+            <div class="user-icon">
+
+                @(Context.Session.GetString("Username")?.Substring(0, 1).ToUpper() ?? "U")
+
+            </div>
+
+            <span class="username">
+
+                @Context.Session.GetString("Username")
+
+            </span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="container">
+
+
+        <!-- =====================================================
+             PAGE HEADER
+             ===================================================== -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Personal
+                </h1>
+
+                <p>
+                    Administración del personal
+                </p>
+
+            </div>
+
+
+            <button type="button"
+                    class="btn-primary"
+                    onclick="openCreateModal()">
+
+                + Agregar personal
+
+            </button>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             SEARCH
+             ===================================================== -->
+
+        <div class="search-container">
+
+            <form method="get"
+                  asp-action="Index"
+                  asp-controller="Staff"
+                  class="search-form">
+
+                <input type="text"
+                       id="staffSearch"
+                       name="search"
+                       value="@ViewBag.Search"
+                       placeholder="Buscar por nombre, documento, email, departamento o ID..."
+                       autocomplete="off" />
+
+
+                <button type="submit"
+                        class="btn-search">
+
+                    Buscar
+
+                </button>
+
+
+                <!-- LIMPIAR -->
+
+                <a href="@Url.Action("Index", "Staff")"
+                   class="btn-clear">
+
+                    Limpiar
+
+                </a>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             TABLE
+             ===================================================== -->
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+
+                        <!-- ID -->
+
+                        <th>
+
+                            <a href="@Url.Action("Index", "Staff", new
+                               {
+                                   search = ViewBag.Search,
+                                   sort = ViewBag.Sort == "id_asc"
+                                                                      ? "id_desc"
+                                                                      : "id_asc",
+                                   page = ViewBag.CurrentPage
+                               })">
+
+                                ID
+
+                                @if (ViewBag.Sort == "id_asc")
+                                {
+                                    <span>↑</span>
+                                }
+                                else if (ViewBag.Sort == "id_desc")
+                                {
+                                    <span>↓</span>
+                                }
+
+                            </a>
+
+                        </th>
+
+
+
+                        <!-- NAME -->
+
+                        <th>
+
+                            <a href="@Url.Action("Index", "Staff", new
+                               {
+                                   search = ViewBag.Search,
+                                   sort = ViewBag.Sort == "name_asc"
+                                                                      ? "name_desc"
+                                                                      : "name_asc",
+                                   page = ViewBag.CurrentPage
+                               })">
+
+                                Nombre
+
+                                @if (ViewBag.Sort == "name_asc")
+                                {
+                                    <span>↑</span>
+                                }
+                                else if (ViewBag.Sort == "name_desc")
+                                {
+                                    <span>↓</span>
+                                }
+
+                            </a>
+
+                        </th>
+
+
+
+                        <!-- DOCUMENT -->
+
+                        <th>
+                            Documento
+                        </th>
+
+
+
+                        <!-- EMAIL -->
+
+                        <th>
+                            Email
+                        </th>
+
+
+
+                        <!-- LOCATION -->
+
+                        <th>
+                            Ubicación
+                        </th>
+
+
+
+                        <!-- DEPARTMENT -->
+
+                        <th>
+
+                            <a href="@Url.Action("Index", "Staff", new
+                               {
+                                   search = ViewBag.Search,
+                                   sort = ViewBag.Sort == "department_asc"
+                                                                      ? "department_desc"
+                                                                      : "department_asc",
+                                   page = ViewBag.CurrentPage
+                               })">
+
+                                Departamento
+
+                                @if (ViewBag.Sort == "department_asc")
+                                {
+                                    <span>↑</span>
+                                }
+                                else if (ViewBag.Sort == "department_desc")
+                                {
+                                    <span>↓</span>
+                                }
+
+                            </a>
+
+                        </th>
+
+
+
+                        <!-- CELLPHONE -->
+
+                        <th>
+                            Celular
+                        </th>
+
+
+
+                        <!-- STATUS -->
+
+                        <th>
+                            Estado
+                        </th>
+
+
+
+                        <!-- ACTIONS -->
+
+                        <th>
+                            Acciones
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+
+                        foreach (var staff in Model)
+                        {
+
+                            <tr>
+
+
+                                <!-- ID -->
+
+                                <td>
+                                    @staff.Id
+                                </td>
+
+
+
+                                <!-- NAME -->
+
+                                <td>
+
+                                    <strong>
+                                        @staff.Name
+                                    </strong>
+
+                                </td>
+
+
+
+                                <!-- DOCUMENT -->
+
+                                <td>
+
+                                    @(string.IsNullOrEmpty(staff.DocumentNumber)
+                                        ? "-"
+                                        : staff.DocumentNumber)
+
+                                </td>
+
+
+
+                                <!-- EMAIL -->
+
+                                <td>
+
+                                    @(string.IsNullOrEmpty(staff.Email)
+                                        ? "-"
+                                        : staff.Email)
+
+                                </td>
+
+
+
+                                <!-- LOCATION -->
+
+                                <td>
+
+                                    @(string.IsNullOrEmpty(staff.Ubicacion)
+                                        ? "-"
+                                        : staff.Ubicacion)
+
+                                </td>
+
+
+
+                                <!-- DEPARTMENT -->
+
+                                <td>
+
+                                    @if (staff.Department != null)
+                                    {
+                                        <span>
+                                            @staff.Department.DepartmentName
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Sin departamento
+                                        </span>
+                                    }
+
+                                </td>
+
+
+
+                                <!-- CELLPHONE -->
+
+                                <td>
+
+                                    @(string.IsNullOrEmpty(staff.CellphoneNumber)
+                                        ? "-"
+                                        : staff.CellphoneNumber)
+
+                                </td>
+
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    @if (staff.StaffActive == true)
+                                    {
+
+                                        <span class="status active">
+                                            Activo
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+
+                                        <span class="status inactive">
+                                            Inactivo
+                                        </span>
+
+                                    }
+
+                                </td>
+
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="actions">
+
+
+                                        <!-- VIEW -->
+
+                                        <button type="button"
+                                                class="btn-view"
+                                                onclick="openViewModal(
+                                            '@staff.Id',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Name ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.DocumentNumber ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Email ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Ubicacion ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Department?.DepartmentName ?? "Sin departamento"))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.CellphoneNumber ?? ""))',
+                                            '@(staff.StaffActive == true ? "Activo" : "Inactivo")'
+                                            )">
+
+                                            Ver
+
+                                        </button>
+
+
+
+                                        <!-- EDIT -->
+
+                                        <button type="button"
+                                                class="btn-edit"
+                                                onclick="openEditModal(
+                                            '@staff.Id',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Name ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.DocumentNumber ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Email ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Ubicacion ?? ""))',
+                                            '@(staff.DepartmentId?.ToString() ?? "")',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Department?.DepartmentName ?? ""))',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.CellphoneNumber ?? ""))',
+                                            '@(staff.StaffActive == true ? "true" : "false")'
+                                            )">
+
+                                            Editar
+
+                                        </button>
+
+
+
+                                        <!-- STATUS -->
+
+                                        <button type="button"
+                                                class="btn-status"
+                                                onclick="openStatusModal(
+                                            '@staff.Id',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Name ?? ""))',
+                                            '@(staff.StaffActive == true ? "true" : "false")'
+                                            )">
+
+                                            @(staff.StaffActive == true
+                                                ? "Desactivar"
+                                                : "Activar")
+
+                                        </button>
+
+
+
+                                        <!-- DELETE -->
+
+                                        <button type="button"
+                                                class="btn-delete"
+                                                onclick="openDeleteModal(
+                                            '@staff.Id',
+                                            '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(staff.Name ?? ""))'
+                                            )">
+
+                                            Eliminar
+
+                                        </button>
+
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    }
+                    else
+                    {
+
+                        <tr>
+
+                            <td colspan="9"
+                                class="no-results">
+
+                                No se encontró personal.
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+
+        <!-- =========================================================
+             FOOTER
+             ========================================================= -->
+
+        <div class="table-footer">
+
+            <div class="staff-count">
+
+                @ViewBag.TotalStaff
+
+                <text>
+                    personal encontrado
+                </text>
+
+            </div>
+
+
+            @if (ViewBag.TotalPages > 1)
+            {
+
+                <div class="pagination">
+
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+
+                        <a href="@Url.Action("Index", "Staff", new
+                           {
+                               search = ViewBag.Search,
+                               sort = ViewBag.Sort,
+                               page = ViewBag.CurrentPage - 1
+                           })">
+
+                            ← Anterior
+
+                        </a>
+
+                    }
+
+
+                    <span>
+
+                        Página
+                        @ViewBag.CurrentPage
+                        de
+                        @ViewBag.TotalPages
+
+                    </span>
+
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+
+                        <a href="@Url.Action("Index", "Staff", new
+                           {
+                               search = ViewBag.Search,
+                               sort = ViewBag.Sort,
+                               page = ViewBag.CurrentPage + 1
+                           })">
+
+                            Siguiente →
+
+                        </a>
+
+                    }
+
+                </div>
+
+            }
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =========================================================
+         CREATE MODAL
+         ========================================================= -->
+
+    <div id="createModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Nuevo personal
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('createModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/Staff/Create">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- NAME -->
+
+                <div class="form-group">
+
+                    <label for="Name">
+                        Nombre *
+                    </label>
+
+                    <input type="text"
+                           id="Name"
+                           name="Name"
+                           maxlength="50"
+                           required />
+
+                </div>
+
+
+                <!-- DOCUMENT -->
+
+                <div class="form-group">
+
+                    <label for="DocumentNumber">
+                        Número de documento
+                    </label>
+
+                    <input type="text"
+                           id="DocumentNumber"
+                           name="DocumentNumber"
+                           maxlength="30" />
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="Email">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           id="Email"
+                           name="Email"
+                           maxlength="50" />
+
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div class="form-group">
+
+                    <label for="Ubicacion">
+                        Ubicación
+                    </label>
+
+                    <input type="text"
+                           id="Ubicacion"
+                           name="Ubicacion"
+                           maxlength="150" />
+
+                </div>
+
+
+                <!-- CREATE DEPARTMENT -->
+
+                <div class="form-group department-selector">
+
+                    <label for="departmentSearch">
+                        Departamento
+                    </label>
+
+                    <input type="text"
+                           id="departmentSearch"
+                           placeholder="Buscar departamento por nombre o ID..."
+                           autocomplete="off" />
+
+                    <input type="hidden"
+                           id="DepartmentId"
+                           name="DepartmentId" />
+
+
+                    <div id="selectedDepartment"
+                         class="selected-department"
+                         style="display:none;">
+
+                        <span id="selectedDepartmentText"></span>
+
+                        <button type="button"
+                                class="clear-department"
+                                onclick="clearDepartment()">
+
+                            ×
+
+                        </button>
+
+                    </div>
+
+
+                    <div id="departmentResults"
+                         class="department-results">
+
+                        @if (ViewBag.Departments != null)
+                        {
+
+                            foreach (var department in ViewBag.Departments)
+                            {
+
+                                <div class="department-result"
+                                     data-id="@department.Id"
+                                     data-name="@department.DepartmentName">
+
+                                    <span class="department-id">
+                                        #@department.Id
+                                    </span>
+
+                                    <span class="department-name">
+                                        @department.DepartmentName
+                                    </span>
+
+                                </div>
+
+                            }
+
+                        }
+
+                    </div>
+
+
+                    <small class="field-help">
+
+                        Busque por nombre o ID y seleccione un departamento.
+
+                    </small>
+
+
+                    <button type="button"
+                            class="btn-clear-department"
+                            onclick="clearDepartment()">
+
+                        Limpiar
+
+                    </button>
+
+                </div>
+
+
+                <!-- CELLPHONE -->
+
+                <div class="form-group">
+
+                    <label for="CellphoneNumber">
+                        Número de celular
+                    </label>
+
+                    <input type="text"
+                           id="CellphoneNumber"
+                           name="CellphoneNumber"
+                           maxlength="30" />
+
+                </div>
+
+
+                <!-- ACTIVE -->
+
+                <div class="form-group checkbox-group">
+
+                    <label>
+
+                        <input type="checkbox"
+                               name="StaffActive"
+                               value="true"
+                               checked />
+
+                        Personal activo
+
+                    </label>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('createModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+         VIEW MODAL
+         ========================================================= -->
+
+    <div id="viewModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Información del personal
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('viewModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="details-grid">
+
+                <div class="detail-item">
+                    <span class="detail-label">ID</span>
+                    <span id="viewId" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Nombre</span>
+                    <span id="viewName" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Documento</span>
+                    <span id="viewDocument" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span id="viewEmail" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Ubicación</span>
+                    <span id="viewLocation" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Departamento</span>
+                    <span id="viewDepartment" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Celular</span>
+                    <span id="viewCellphone" class="detail-value"></span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Estado</span>
+                    <span id="viewStatus" class="detail-value"></span>
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="closeModal('viewModal')">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+         EDIT MODAL
+         ========================================================= -->
+
+    <div id="editModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Editar personal
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('editModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/Staff/Edit">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       id="editId"
+                       name="Id" />
+
+
+                <!-- NAME -->
+
+                <div class="form-group">
+
+                    <label for="editName">
+                        Nombre *
+                    </label>
+
+                    <input type="text"
+                           id="editName"
+                           name="Name"
+                           maxlength="50"
+                           required />
+
+                </div>
+
+
+                <!-- DOCUMENT -->
+
+                <div class="form-group">
+
+                    <label for="editDocumentNumber">
+                        Número de documento
+                    </label>
+
+                    <input type="text"
+                           id="editDocumentNumber"
+                           name="DocumentNumber"
+                           maxlength="30" />
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="editEmail">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           id="editEmail"
+                           name="Email"
+                           maxlength="50" />
+
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div class="form-group">
+
+                    <label for="editUbicacion">
+                        Ubicación
+                    </label>
+
+                    <input type="text"
+                           id="editUbicacion"
+                           name="Ubicacion"
+                           maxlength="150" />
+
+                </div>
+
+
+                <!-- =================================================
+                     EDIT DEPARTMENT SEARCH
+                     ================================================= -->
+
+                <div class="form-group department-selector">
+
+                    <label for="editDepartmentSearch">
+                        Departamento
+                    </label>
+
+
+                    <!-- SEARCH -->
+
+                    <input type="text"
+                           id="editDepartmentSearch"
+                           placeholder="Buscar departamento por nombre o ID..."
+                           autocomplete="off" />
+
+
+                    <!-- VALUE SENT TO C# -->
+
+                    <input type="hidden"
+                           id="editDepartmentId"
+                           name="DepartmentId" />
+
+
+                    <!-- SELECTED DEPARTMENT -->
+
+                    <div id="editSelectedDepartment"
+                         class="selected-department"
+                         style="display:none;">
+
+                        <span id="editSelectedDepartmentText"></span>
+
+                        <button type="button"
+                                class="clear-department"
+                                onclick="clearEditDepartment()">
+
+                            ×
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- RESULTS -->
+
+                    <div id="editDepartmentResults"
+                         class="department-results">
+
+                        @if (ViewBag.Departments != null)
+                        {
+
+                            foreach (var department in ViewBag.Departments)
+                            {
+
+                                <div class="department-result edit-department-result"
+                                     data-id="@department.Id"
+                                     data-name="@department.DepartmentName">
+
+                                    <span class="department-id">
+                                        #@department.Id
+                                    </span>
+
+                                    <span class="department-name">
+                                        @department.DepartmentName
+                                    </span>
+
+                                </div>
+
+                            }
+
+                        }
+
+                    </div>
+
+
+                    <small class="field-help">
+
+                        Busque por nombre o ID y seleccione un departamento.
+
+                    </small>
+
+
+                    <!-- CLEAR -->
+
+                    <button type="button"
+                            class="btn-clear-department"
+                            onclick="clearEditDepartment()">
+
+                        Limpiar
+
+                    </button>
+
+                </div>
+
+
+                <!-- CELLPHONE -->
+
+                <div class="form-group">
+
+                    <label for="editCellphoneNumber">
+                        Número de celular
+                    </label>
+
+                    <input type="text"
+                           id="editCellphoneNumber"
+                           name="CellphoneNumber"
+                           maxlength="30" />
+
+                </div>
+
+
+                <!-- ACTIVE -->
+
+                <div class="form-group checkbox-group">
+
+                    <label>
+
+                        <input type="checkbox"
+                               id="editStaffActive"
+                               name="StaffActive"
+                               value="true" />
+
+                        Personal activo
+
+                    </label>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('editModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+         STATUS MODAL
+         ========================================================= -->
+
+    <div id="statusModal"
+         class="modal">
+
+        <div class="modal-content confirmation-modal">
+
+            <div class="modal-header">
+
+                <h2 id="statusModalTitle">
+                    Cambiar estado
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('statusModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="confirmation-icon status-confirm-icon">
+                !
+            </div>
+
+
+            <p class="confirmation-message"
+               id="statusMessage">
+            </p>
+
+
+            <form method="post"
+                  action="/Staff/ToggleActive">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       id="statusStaffId"
+                       name="id" />
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('statusModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            id="statusConfirmButton"
+                            class="btn-status-confirm">
+
+                        Confirmar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+         DELETE MODAL
+         ========================================================= -->
+
+    <div id="deleteModal"
+         class="modal">
+
+        <div class="modal-content confirmation-modal">
+
+            <div class="modal-header">
+
+                <h2>
+                    Eliminar personal
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        onclick="closeModal('deleteModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="confirmation-icon delete-confirm-icon">
+                !
+            </div>
+
+
+            <p class="confirmation-message">
+
+                ¿Está seguro de que desea eliminar a
+
+                <strong id="deleteStaffName"></strong>
+
+                ?
+
+            </p>
+
+
+            <p class="confirmation-warning">
+
+                Esta acción no se puede deshacer.
+
+            </p>
+
+
+            <form method="post"
+                  action="/Staff/Delete">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       id="deleteStaffId"
+                       name="id" />
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('deleteModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-delete-confirm">
+
+                        Eliminar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+         ========================================================= -->
+
+    <script>
+
+            // =========================================================
+            // GENERIC MODALS
+            // =========================================================
+
+            function openModal(modalId)
+            {
+                const modal = document.getElementById(modalId);
+
+                if (modal)
+                {
+                    modal.classList.add("show");
+                }
+            }
+
+
+            function closeModal(modalId)
+            {
+                const modal = document.getElementById(modalId);
+
+                if (modal)
+                {
+                    modal.classList.remove("show");
+                }
+            }
+
+
+
+            // =========================================================
+            // CREATE
+            // =========================================================
+
+            function openCreateModal()
+            {
+                clearDepartment();
+
+                openModal("createModal");
+            }
+
+
+
+            // =========================================================
+            // VIEW
+            // =========================================================
+
+            function openViewModal(
+                id,
+                name,
+                documentNumber,
+                email,
+                location,
+                department,
+                cellphone,
+                status)
+            {
+                document.getElementById("viewId").textContent =
+                    id || "-";
+
+                document.getElementById("viewName").textContent =
+                    name || "-";
+
+                document.getElementById("viewDocument").textContent =
+                    documentNumber || "-";
+
+                document.getElementById("viewEmail").textContent =
+                    email || "-";
+
+                document.getElementById("viewLocation").textContent =
+                    location || "-";
+
+                document.getElementById("viewDepartment").textContent =
+                    department || "Sin departamento";
+
+                document.getElementById("viewCellphone").textContent =
+                    cellphone || "-";
+
+                document.getElementById("viewStatus").textContent =
+                    status || "-";
+
+                openModal("viewModal");
+            }
+
+
+
+            // =========================================================
+            // EDIT
+            // =========================================================
+
+            function openEditModal(
+                id,
+                name,
+                documentNumber,
+                email,
+                location,
+                departmentId,
+                departmentName,
+                cellphone,
+                active)
+            {
+                document.getElementById("editId").value =
+                    id || "";
+
+                document.getElementById("editName").value =
+                    name || "";
+
+                document.getElementById("editDocumentNumber").value =
+                    documentNumber || "";
+
+                document.getElementById("editEmail").value =
+                    email || "";
+
+                document.getElementById("editUbicacion").value =
+                    location || "";
+
+                document.getElementById("editCellphoneNumber").value =
+                    cellphone || "";
+
+                document.getElementById("editStaffActive").checked =
+                    active === "true";
+
+
+                // =============================================
+                // DEPARTMENT
+                // =============================================
+
+                clearEditDepartment();
+
+
+                if (departmentId && departmentName)
+                {
+                    document.getElementById("editDepartmentId").value =
+                        departmentId;
+
+                    document.getElementById("editDepartmentSearch").value =
+                        departmentName;
+
+                    document.getElementById("editSelectedDepartmentText")
+                        .textContent =
+                        "#" + departmentId + " - " + departmentName;
+
+                    document.getElementById("editSelectedDepartment")
+                        .style.display =
+                        "flex";
+                }
+
+
+                openModal("editModal");
+            }
+
+
+
+            // =========================================================
+            // STATUS
+            // =========================================================
+
+            function openStatusModal(id, name, active)
+            {
+                document.getElementById("statusStaffId").value =
+                    id;
+
+                const message =
+                    document.getElementById("statusMessage");
+
+                const title =
+                    document.getElementById("statusModalTitle");
+
+                const button =
+                    document.getElementById("statusConfirmButton");
+
+
+                if (active === "true")
+                {
+                    title.textContent =
+                        "Desactivar personal";
+
+                    message.innerHTML =
+                        '¿Está seguro de que desea desactivar a <strong>' +
+                        escapeHtml(name) +
+                        '</strong>?';
+
+                    button.textContent =
+                        "Desactivar";
+
+                    button.className =
+                        "btn-status-confirm";
+                }
+                else
+                {
+                    title.textContent =
+                        "Activar personal";
+
+                    message.innerHTML =
+                        '¿Desea activar nuevamente a <strong>' +
+                        escapeHtml(name) +
+                        '</strong>?';
+
+                    button.textContent =
+                        "Activar";
+
+                    button.className =
+                        "btn-activate-confirm";
+                }
+
+
+                openModal("statusModal");
+            }
+
+
+
+            // =========================================================
+            // DELETE
+            // =========================================================
+
+            function openDeleteModal(id, name)
+            {
+                document.getElementById("deleteStaffId").value =
+                    id;
+
+                document.getElementById("deleteStaffName").textContent =
+                    name || "";
+
+                openModal("deleteModal");
+            }
+
+
+
+            // =========================================================
+            // ESCAPE HTML
+            // =========================================================
+
+            function escapeHtml(value)
+            {
+                const div =
+                    document.createElement("div");
+
+                div.textContent =
+                    value || "";
+
+                return div.innerHTML;
+            }
+
+
+
+            // =========================================================
+            // CREATE DEPARTMENT SEARCH
+            // =========================================================
+
+            function searchDepartments()
+            {
+                const input =
+                    document.getElementById("departmentSearch");
+
+                const resultsContainer =
+                    document.getElementById("departmentResults");
+
+                if (!input || !resultsContainer)
+                    return;
+
+
+                const search =
+                    input.value
+                        .toLowerCase()
+                        .trim();
+
+
+                const results =
+                    document.querySelectorAll(
+                        "#departmentResults .department-result"
+                    );
+
+
+                results.forEach(function(result)
+                {
+                    const id =
+                        (result.dataset.id || "")
+                            .toLowerCase();
+
+                    const name =
+                        (result.dataset.name || "")
+                            .toLowerCase();
+
+
+                    if (
+                        search === "" ||
+                        name.includes(search) ||
+                        id.includes(search)
+                    )
+                    {
+                        result.style.display = "flex";
+                    }
+                    else
+                    {
+                        result.style.display = "none";
+                    }
+                });
+
+
+                resultsContainer.classList.add("show");
+            }
+
+
+
+            function showDepartmentResults()
+            {
+                const resultsContainer =
+                    document.getElementById("departmentResults");
+
+                if (!resultsContainer)
+                    return;
+
+                resultsContainer.classList.add("show");
+
+                searchDepartments();
+            }
+
+
+
+            function selectDepartment(id, name)
+            {
+                document.getElementById("DepartmentId").value =
+                    id;
+
+                document.getElementById("departmentSearch").value =
+                    name;
+
+                document.getElementById("selectedDepartmentText")
+                    .textContent =
+                    "#" + id + " - " + name;
+
+                document.getElementById("selectedDepartment")
+                    .style.display =
+                    "flex";
+
+                document.getElementById("departmentResults")
+                    .classList.remove("show");
+            }
+
+
+
+            function clearDepartment()
+            {
+                const departmentId =
+                    document.getElementById("DepartmentId");
+
+                const departmentSearch =
+                    document.getElementById("departmentSearch");
+
+                const selectedDepartment =
+                    document.getElementById("selectedDepartment");
+
+                const selectedDepartmentText =
+                    document.getElementById("selectedDepartmentText");
+
+                const departmentResults =
+                    document.getElementById("departmentResults");
+
+
+                if (departmentId)
+                    departmentId.value = "";
+
+
+                if (departmentSearch)
+                    departmentSearch.value = "";
+
+
+                if (selectedDepartmentText)
+                    selectedDepartmentText.textContent = "";
+
+
+                if (selectedDepartment)
+                    selectedDepartment.style.display = "none";
+
+
+                if (departmentResults)
+                    departmentResults.classList.remove("show");
+            }
+
+
+
+            // =========================================================
+            // EDIT DEPARTMENT SEARCH
+            // =========================================================
+
+            function searchEditDepartments()
+            {
+                const input =
+                    document.getElementById("editDepartmentSearch");
+
+                const resultsContainer =
+                    document.getElementById("editDepartmentResults");
+
+                if (!input || !resultsContainer)
+                    return;
+
+
+                const search =
+                    input.value
+                        .toLowerCase()
+                        .trim();
+
+
+                const results =
+                    document.querySelectorAll(
+                        "#editDepartmentResults .edit-department-result"
+                    );
+
+
+                results.forEach(function(result)
+                {
+                    const id =
+                        (result.dataset.id || "")
+                            .toLowerCase();
+
+                    const name =
+                        (result.dataset.name || "")
+                            .toLowerCase();
+
+
+                    if (
+                        search === "" ||
+                        name.includes(search) ||
+                        id.includes(search)
+                    )
+                    {
+                        result.style.display = "flex";
+                    }
+                    else
+                    {
+                        result.style.display = "none";
+                    }
+                });
+
+
+                resultsContainer.classList.add("show");
+            }
+
+
+
+            function showEditDepartmentResults()
+            {
+                const resultsContainer =
+                    document.getElementById("editDepartmentResults");
+
+                if (!resultsContainer)
+                    return;
+
+                resultsContainer.classList.add("show");
+
+                searchEditDepartments();
+            }
+
+
+
+            function selectEditDepartment(id, name)
+            {
+                document.getElementById("editDepartmentId").value =
+                    id;
+
+                document.getElementById("editDepartmentSearch").value =
+                    name;
+
+                document.getElementById("editSelectedDepartmentText")
+                    .textContent =
+                    "#" + id + " - " + name;
+
+                document.getElementById("editSelectedDepartment")
+                    .style.display =
+                    "flex";
+
+                document.getElementById("editDepartmentResults")
+                    .classList.remove("show");
+            }
+
+
+
+            function clearEditDepartment()
+            {
+                const departmentId =
+                    document.getElementById("editDepartmentId");
+
+                const departmentSearch =
+                    document.getElementById("editDepartmentSearch");
+
+                const selectedDepartment =
+                    document.getElementById("editSelectedDepartment");
+
+                const selectedDepartmentText =
+                    document.getElementById(
+                        "editSelectedDepartmentText"
+                    );
+
+                const departmentResults =
+                    document.getElementById(
+                        "editDepartmentResults"
+                    );
+
+
+                if (departmentId)
+                    departmentId.value = "";
+
+
+                if (departmentSearch)
+                    departmentSearch.value = "";
+
+
+                if (selectedDepartmentText)
+                    selectedDepartmentText.textContent = "";
+
+
+                if (selectedDepartment)
+                    selectedDepartment.style.display = "none";
+
+
+                if (departmentResults)
+                    departmentResults.classList.remove("show");
+            }
+
+
+
+            // =========================================================
+            // CREATE DEPARTMENT EVENTS
+            // =========================================================
+
+            const departmentSearch =
+                document.getElementById("departmentSearch");
+
+
+            if (departmentSearch)
+            {
+                departmentSearch.addEventListener(
+                    "input",
+                    function()
+                    {
+                        searchDepartments();
+                    }
+                );
+
+
+                departmentSearch.addEventListener(
+                    "focus",
+                    function()
+                    {
+                        showDepartmentResults();
+                    }
+                );
+
+
+                departmentSearch.addEventListener(
+                    "click",
+                    function()
+                    {
+                        showDepartmentResults();
+                    }
+                );
+            }
+
+
+
+            // =========================================================
+            // EDIT DEPARTMENT EVENTS
+            // =========================================================
+
+            const editDepartmentSearch =
+                document.getElementById(
+                    "editDepartmentSearch"
+                );
+
+
+            if (editDepartmentSearch)
+            {
+                editDepartmentSearch.addEventListener(
+                    "input",
+                    function()
+                    {
+                        searchEditDepartments();
+                    }
+                );
+
+
+                editDepartmentSearch.addEventListener(
+                    "focus",
+                    function()
+                    {
+                        showEditDepartmentResults();
+                    }
+                );
+
+
+                editDepartmentSearch.addEventListener(
+                    "click",
+                    function()
+                    {
+                        showEditDepartmentResults();
+                    }
+                );
+            }
+
+
+
+            // =========================================================
+            // DEPARTMENT RESULT CLICK
+            // =========================================================
+
+            document.addEventListener(
+                "click",
+                function(event)
+                {
+                    const createResult =
+                        event.target.closest(
+                            "#departmentResults .department-result"
+                        );
+
+
+                    if (createResult)
+                    {
+                        selectDepartment(
+                            createResult.dataset.id,
+                            createResult.dataset.name
+                        );
+
+                        return;
+                    }
+
+
+                    const editResult =
+                        event.target.closest(
+                            "#editDepartmentResults .edit-department-result"
+                        );
+
+
+                    if (editResult)
+                    {
+                        selectEditDepartment(
+                            editResult.dataset.id,
+                            editResult.dataset.name
+                        );
+                    }
+                }
+            );
+
+
+
+            // =========================================================
+            // CLOSE DEPARTMENT RESULTS
+            // =========================================================
+
+            document.addEventListener(
+                "click",
+                function(event)
+                {
+                    const createSelector =
+                        document.querySelector(
+                            "#createModal .department-selector"
+                        );
+
+                    const createResults =
+                        document.getElementById(
+                            "departmentResults"
+                        );
+
+
+                    if (
+                        createSelector &&
+                        createResults &&
+                        !createSelector.contains(event.target)
+                    )
+                    {
+                        createResults.classList.remove("show");
+                    }
+
+
+                    const editSelector =
+                        document.querySelector(
+                            "#editModal .department-selector"
+                        );
+
+                    const editResults =
+                        document.getElementById(
+                            "editDepartmentResults"
+                        );
+
+
+                    if (
+                        editSelector &&
+                        editResults &&
+                        !editSelector.contains(event.target)
+                    )
+                    {
+                        editResults.classList.remove("show");
+                    }
+                }
+            );
+
+
+
+            // =========================================================
+            // CLOSE MODAL WHEN CLICKING OUTSIDE
+            // =========================================================
+
+            window.addEventListener(
+                "click",
+                function(event)
+                {
+                    if (
+                        event.target.classList.contains("modal")
+                    )
+                    {
+                        event.target.classList.remove("show");
+                    }
+                }
+            );
+
+
+
+            // =========================================================
+            // ESC KEY
+            // =========================================================
+
+            document.addEventListener(
+                "keydown",
+                function(event)
+                {
+                    if (event.key === "Escape")
+                    {
+                        document
+                            .querySelectorAll(".modal.show")
+                            .forEach(
+                                function(modal)
+                                {
+                                    modal.classList.remove("show");
+                                }
+                            );
+                    }
+                }
+            );
+
+    </script>
+
+
+</body>
+
+</html>

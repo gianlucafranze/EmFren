@@ -1,0 +1,1282 @@
+﻿/* =========================================================
+   PAGE
+========================================================= */
+
+.debtor-client-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.header-left h1 {
+    margin: 0 0 6px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.header-left p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.home-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    background: #f1f1f1;
+    color: #222;
+    transition: 0.2s ease;
+}
+
+    .home-button:hover {
+        background: #e5e5e5;
+    }
+
+    .home-button span {
+        font-size: 18px;
+    }
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.filters-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: minmax(250px, 2fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(180px, 1fr) auto;
+    gap: 16px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+    .filter-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        height: 42px;
+        border: 1px solid #d8d8d8;
+        border-radius: 8px;
+        padding: 0 12px;
+        background: #fff;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s ease;
+        box-sizing: border-box;
+    }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: #888;
+        }
+
+.search-wrapper {
+    position: relative;
+}
+
+    .search-wrapper input {
+        padding-left: 38px;
+    }
+
+.search-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #777;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   NEW FILTER STRUCTURE
+========================================================= */
+
+.filters-container {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box;
+}
+
+.filters-form {
+    display: grid;
+    grid-template-columns: minmax(240px, 2fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(180px, 1fr) auto auto;
+    gap: 16px;
+    align-items: end;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+    .filter-field label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .filter-field input,
+    .filter-field select {
+        width: 100%;
+        height: 42px;
+        border: 1px solid #d8d8d8;
+        border-radius: 8px;
+        padding: 0 12px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        box-sizing: border-box;
+    }
+
+        .filter-field input::placeholder {
+            color: #999;
+        }
+
+        .filter-field input:hover,
+        .filter-field select:hover {
+            border-color: #bcbcbc;
+        }
+
+        .filter-field input:focus,
+        .filter-field select:focus {
+            border-color: #888;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+
+/* =========================================================
+   DEBTOR FILTER SELECT
+========================================================= */
+
+#debtorFilter {
+    width: 100% !important;
+    height: 42px !important;
+    padding: 0 42px 0 14px !important;
+    border: 1px solid #d8d8d8 !important;
+    border-radius: 9px !important;
+    background-color: #fff !important;
+    color: #333 !important;
+    font-family: inherit !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    outline: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: linear-gradient(45deg, transparent 50%, #777 50%), linear-gradient(135deg, #777 50%, transparent 50%) !important;
+    background-position: calc(100% - 18px) 17px, calc(100% - 12px) 17px !important;
+    background-size: 6px 6px, 6px 6px !important;
+    background-repeat: no-repeat !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+    #debtorFilter:hover {
+        border-color: #999 !important;
+        background-color: #fcfcfc !important;
+    }
+
+    #debtorFilter:focus {
+        border-color: #555 !important;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    #debtorFilter:active {
+        transform: translateY(1px);
+    }
+
+    #debtorFilter option {
+        background: #fff !important;
+        color: #333 !important;
+        font-size: 14px;
+    }
+
+        #debtorFilter option[value="all"] {
+            color: #333;
+        }
+
+        #debtorFilter option[value="debtor"] {
+            color: #a40000;
+        }
+
+        #debtorFilter option[value="nondebtor"] {
+            color: #187536;
+        }
+
+    #debtorFilter.filter-all {
+        border-color: #d8d8d8 !important;
+        background-color: #fff !important;
+        color: #333 !important;
+    }
+
+    #debtorFilter.filter-debtor {
+        border-color: #d9a0a0 !important;
+        background-color: #fff8f8 !important;
+        color: #a40000 !important;
+    }
+
+        #debtorFilter.filter-debtor:focus {
+            border-color: #a40000 !important;
+            box-shadow: 0 0 0 3px rgba(164, 0, 0, 0.08) !important;
+        }
+
+    #debtorFilter.filter-nondebtor {
+        border-color: #9ac9a8 !important;
+        background-color: #f7fcf8 !important;
+        color: #187536 !important;
+    }
+
+        #debtorFilter.filter-nondebtor:focus {
+            border-color: #187536 !important;
+            box-shadow: 0 0 0 3px rgba(24, 117, 54, 0.08) !important;
+        }
+
+
+/* =========================================================
+   SEARCH BUTTON / CLEAR
+========================================================= */
+
+.filter-button {
+    height: 42px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 8px;
+    background: #222;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+}
+
+    .filter-button:hover {
+        background: #000;
+        transform: translateY(-1px);
+    }
+
+    .filter-button:active {
+        transform: translateY(0);
+    }
+
+.filter-clear {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 42px;
+    padding: 0 17px;
+    border-radius: 8px;
+    background: #ededed;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    box-sizing: border-box;
+    white-space: nowrap;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+    .filter-clear:hover {
+        background: #dedede;
+        transform: translateY(-1px);
+    }
+
+
+/* =========================================================
+   OLD FILTER ACTIONS
+========================================================= */
+
+.filter-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.search-button,
+.clear-button {
+    height: 42px;
+    padding: 0 17px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    white-space: nowrap;
+}
+
+.search-button {
+    background: #222;
+    color: #fff;
+}
+
+    .search-button:hover {
+        background: #000;
+    }
+
+.clear-button {
+    background: #ededed;
+    color: #333;
+}
+
+    .clear-button:hover {
+        background: #dedede;
+    }
+
+
+/* =========================================================
+   RESULTS
+========================================================= */
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.results-count {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.page-info {
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.purchases-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px;
+}
+
+    .purchases-table th {
+        background: #f7f7f7;
+        color: #444;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 14px 12px;
+        border-bottom: 1px solid #e5e5e5;
+        white-space: nowrap;
+    }
+
+    .purchases-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #eeeeee;
+        font-size: 13px;
+        color: #333;
+        white-space: nowrap;
+    }
+
+    .purchases-table tbody tr:hover {
+        background: #fafafa;
+    }
+
+    .purchases-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+.order-id {
+    font-weight: 700;
+}
+
+.client-name {
+    font-weight: 600;
+}
+
+.quantity {
+    text-align: center;
+}
+
+.price {
+    font-weight: 600;
+}
+
+.discount {
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   CLIENT TABLE
+========================================================= */
+
+.clients-table {
+    min-width: 850px;
+}
+
+    .clients-table th:last-child,
+    .clients-table td:last-child {
+        text-align: center;
+    }
+
+.purchase-count {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 32px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 20px;
+    background: #f0f0f0;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-debtor {
+    background: #ffe1e1;
+    color: #a40000;
+}
+
+.status-nondebtor {
+    background: #e3f7e8;
+    color: #187536;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+========================================================= */
+
+.actions-cell {
+    text-align: center;
+}
+
+.view-purchases-button {
+    border: none;
+    border-radius: 7px;
+    padding: 8px 13px;
+    background: #222;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .view-purchases-button:hover {
+        background: #000;
+        transform: translateY(-1px);
+    }
+
+
+/* =========================================================
+   CURRENT VIEW BUTTON
+========================================================= */
+
+.view-button {
+    border: none;
+    border-radius: 7px;
+    padding: 8px 13px;
+    background: #222;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+    .view-button:hover {
+        background: #000;
+        transform: translateY(-1px);
+    }
+
+
+/* =========================================================
+   DEBTOR STATUS
+========================================================= */
+
+.debtor-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.debtor-status-yes {
+    background: #ffe1e1;
+    color: #a40000;
+}
+
+.debtor-status-no {
+    background: #e3f7e8;
+    color: #187536;
+}
+
+
+/* =========================================================
+   DEBTOR ACTION BUTTONS
+========================================================= */
+
+.debtor-client-form {
+    display: inline-block;
+    margin: 0;
+}
+
+button.debtor-button {
+    border: 1px solid #a40000;
+    background: #a40000;
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    button.debtor-button:hover {
+        background: #820000;
+        border-color: #820000;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 5px rgba(164, 0, 0, 0.15);
+    }
+
+    button.debtor-button:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+
+    button.debtor-button:focus-visible {
+        border-color: #820000;
+        box-shadow: 0 0 0 3px rgba(164, 0, 0, 0.15);
+    }
+
+
+/* =========================================================
+   NON-DEBTOR BUTTON
+   Strong selector for #non-debtor-button
+========================================================= */
+
+button#non-debtor-button,
+button.non-debtor-button,
+button.unset-debtor-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 150px !important;
+    min-height: 38px !important;
+    padding: 8px 14px !important;
+    border: 1px solid #9ac9a8 !important;
+    border-radius: 8px !important;
+    background-color: #f7fcf8 !important;
+    color: #187536 !important;
+    font-family: inherit !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease !important;
+}
+
+    button#non-debtor-button:hover,
+    button.non-debtor-button:hover,
+    button.unset-debtor-button:hover {
+        background-color: #edf8f0 !important;
+        border-color: #187536 !important;
+        color: #145c2b !important;
+        box-shadow: 0 2px 6px rgba(24, 117, 54, 0.12) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    button#non-debtor-button:active,
+    button.non-debtor-button:active,
+    button.unset-debtor-button:active {
+        transform: translateY(1px) !important;
+        box-shadow: none !important;
+    }
+
+    button#non-debtor-button:focus,
+    button.non-debtor-button:focus,
+    button.unset-debtor-button:focus {
+        outline: none !important;
+    }
+
+    button#non-debtor-button:focus-visible,
+    button.non-debtor-button:focus-visible,
+    button.unset-debtor-button:focus-visible {
+        border-color: #187536 !important;
+        box-shadow: 0 0 0 3px rgba(24, 117, 54, 0.12) !important;
+    }
+
+    button#non-debtor-button:disabled,
+    button.non-debtor-button:disabled,
+    button.unset-debtor-button:disabled {
+        opacity: 0.55 !important;
+        cursor: not-allowed !important;
+        background-color: #f3f3f3 !important;
+        border-color: #ccc !important;
+        color: #888 !important;
+        box-shadow: none !important;
+    }
+
+
+/* =========================================================
+   DELETE BUTTON
+========================================================= */
+
+.delete-purchase-form {
+    display: inline-block;
+    margin: 0;
+}
+
+button.delete-button {
+    border: 1px solid #d0d0d0;
+    background: #fff;
+    color: #555;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+    button.delete-button:hover {
+        background: #f1f1f1;
+        color: #222;
+        border-color: #aaa;
+        transform: translateY(-1px);
+    }
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    text-align: center !important;
+    padding: 60px 20px !important;
+    white-space: normal !important;
+}
+
+.empty-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #aaa;
+}
+
+.empty-state h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.empty-state p {
+    margin: 0;
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   CURRENT EMPTY MESSAGE
+========================================================= */
+
+.empty-message {
+    text-align: center !important;
+    padding: 40px 20px !important;
+    color: #777 !important;
+    white-space: normal !important;
+}
+
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 22px;
+}
+
+.page-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 7px;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    box-sizing: border-box;
+}
+
+    .page-button:hover {
+        background: #f1f1f1;
+    }
+
+    .page-button.active {
+        background: #222;
+        color: #fff;
+        border-color: #222;
+    }
+
+    .page-button.disabled {
+        color: #aaa;
+        cursor: default;
+        background: #f7f7f7;
+    }
+
+.page-dots {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 25px;
+    color: #777;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.purchase-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+}
+
+    .purchase-modal.active {
+        display: block;
+    }
+
+    .purchase-modal.open {
+        display: block;
+    }
+
+.purchase-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.58);
+    backdrop-filter: blur(2px);
+}
+
+.purchase-modal-content {
+    position: relative;
+    z-index: 2;
+    width: calc(100% - 40px);
+    max-width: 1500px;
+    max-height: calc(100vh - 50px);
+    margin: 25px auto;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.modal-header,
+.purchase-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 22px 25px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+    .modal-header h2,
+    .purchase-modal-header h2 {
+        margin: 0 0 6px;
+        font-size: 24px;
+    }
+
+.order-number,
+.modal-order-id {
+    color: #777;
+    font-size: 12px;
+}
+
+.close-modal,
+.modal-close {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #f0f0f0;
+    color: #333;
+    font-size: 25px;
+    line-height: 1;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .close-modal:hover,
+    .modal-close:hover {
+        background: #e1e1e1;
+    }
+
+
+/* =========================================================
+   MODAL ORDER INFORMATION
+========================================================= */
+
+.order-information {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    padding: 20px 25px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.information-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 13px;
+    border: 1px solid #e5e5e5;
+    border-radius: 9px;
+    background: #fafafa;
+}
+
+    .information-card span {
+        color: #888;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .information-card strong {
+        color: #222;
+        font-size: 13px;
+    }
+
+.total-card {
+    background: #f5f5f5;
+}
+
+
+/* =========================================================
+   MODAL STATUS
+========================================================= */
+
+.modal-status-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.modal-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #444;
+}
+
+
+/* =========================================================
+   DEBTOR ACTIONS
+========================================================= */
+
+.debtor-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 25px;
+    background: #fafafa;
+    border-bottom: 1px solid #eeeeee;
+}
+
+    .debtor-actions form {
+        margin: 0;
+    }
+
+
+/* =========================================================
+   MODAL PURCHASES
+========================================================= */
+
+.modal-purchases-section {
+    padding: 20px 25px 25px;
+    overflow: hidden;
+}
+
+.articles-section {
+    padding: 20px 25px 25px;
+    overflow: hidden;
+}
+
+.modal-section-header,
+.articles-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+    .modal-section-header > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .articles-title h3 {
+        margin: 0;
+        font-size: 17px;
+    }
+
+.modal-purchase-counter,
+#modalArticleCount {
+    color: #777;
+    font-size: 12px;
+}
+
+.modal-purchases-table-wrapper,
+.details-table-container {
+    max-height: 440px;
+    overflow: auto;
+    border: 1px solid #e5e5e5;
+    border-radius: 9px;
+}
+
+.modal-purchases-table,
+.details-table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+}
+
+    .modal-purchases-table th,
+    .details-table th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #f6f6f6;
+        padding: 11px 10px;
+        border-bottom: 1px solid #ddd;
+        color: #444;
+        font-size: 11px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .modal-purchases-table td,
+    .details-table td {
+        padding: 11px 10px;
+        border-bottom: 1px solid #eeeeee;
+        color: #333;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .modal-purchases-table tbody tr:last-child td,
+    .details-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .modal-purchases-table tbody tr:hover,
+    .details-table tbody tr:hover {
+        background: #fafafa;
+    }
+
+.modal-price {
+    font-weight: 600;
+}
+
+.modal-discount {
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 25px;
+    border-top: 1px solid #e8e8e8;
+    background: #fafafa;
+}
+
+.pdf-button,
+.close-button {
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.pdf-button {
+    border: none;
+    background: #222;
+    color: #fff;
+}
+
+    .pdf-button:hover {
+        background: #000;
+    }
+
+.close-button {
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #333;
+}
+
+    .close-button:hover {
+        background: #f1f1f1;
+    }
+
+
+/* =========================================================
+   BODY LOCK
+========================================================= */
+
+body.modal-open {
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1250px) {
+
+    .filters-form {
+        grid-template-columns: minmax(220px, 2fr) minmax(140px, 1fr) minmax(140px, 1fr) minmax(160px, 1fr) auto auto;
+    }
+
+    .order-information {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+
+@media (max-width: 1050px) {
+
+    .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filters-form {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filter-button,
+    .filter-clear {
+        width: 100%;
+    }
+
+    .filter-actions {
+        grid-column: 1 / -1;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .debtor-client-page {
+        padding: 18px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-form {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-actions {
+        grid-column: auto;
+        width: 100%;
+    }
+
+    .search-button,
+    .clear-button {
+        flex: 1;
+    }
+
+    .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .purchase-modal-content {
+        width: calc(100% - 20px);
+        max-height: calc(100vh - 20px);
+        margin: 10px auto;
+    }
+
+    .modal-header,
+    .purchase-modal-header {
+        padding: 18px;
+    }
+
+    .order-information {
+        grid-template-columns: 1fr;
+        padding: 18px;
+    }
+
+    .modal-status-section,
+    .debtor-actions,
+    .modal-purchases-section,
+    .articles-section {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .debtor-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .debtor-actions form,
+        .set-debtor-button,
+        .unset-debtor-button,
+        .non-debtor-button {
+            width: 100%;
+        }
+
+    /* Keep the ID button responsive on mobile */
+    button#non-debtor-button {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px 18px;
+    }
+
+    .pdf-button,
+    .close-button {
+        width: 100%;
+    }
+}
+
+button#non-debtor-button {
+    border: 1px solid #b8860b;
+    background: #fff;
+    color: #8a6800;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}

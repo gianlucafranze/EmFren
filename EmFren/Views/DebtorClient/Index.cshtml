@@ -1,0 +1,2046 @@
+﻿@using System.Globalization
+@model IEnumerable<EmFren.Models.ViewShopUser>
+
+@{
+    ViewData["Title"] = "Gestión de compras";
+
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var totalResults = ViewBag.TotalResults ?? 0;
+    var username = ViewBag.Username ?? "U";
+
+    var search = ViewBag.Search ?? "";
+    var dateFrom = ViewBag.DateFrom ?? "";
+    var dateTo = ViewBag.DateTo ?? "";
+
+    var debtorFilter = ViewBag.DebtorFilter ?? "all";
+}
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Gestión de compras - EmFren
+    </title>
+
+    <link rel="stylesheet"
+          href="~/css/ViewShopEnterprise.css"
+          asp-append-version="true" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        button#non-debtor-button {
+            border: 1px solid #b8860b;
+            background: #fff;
+            color: #8a6800;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <header class="shop-header">
+
+        <div class="header-left">
+
+            <a href="/Home/HomeEnterprise"
+               class="home-link">
+
+                Home
+
+            </a>
+
+        </div>
+
+        <div class="header-center">
+
+            <h1>
+
+                Gestión de compras
+
+            </h1>
+
+        </div>
+
+        <div class="header-right">
+
+            <span class="username">
+
+                <span class="user-icon">
+
+                    ●
+
+                </span>
+
+                @username
+
+            </span>
+
+            <span class="notification-icon">
+
+                ♢
+
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="purchases-container">
+
+
+        <!-- =====================================================
+             PAGE TITLE
+             ===================================================== -->
+
+        <div class="page-title-section">
+
+            <div>
+
+                <h2>
+
+                    Historial de compras
+
+                </h2>
+
+                <p>
+
+                    Consulta y administra las compras realizadas por los usuarios.
+
+                </p>
+
+            </div>
+
+            <div class="total-records">
+
+                @totalResults registro(s)
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             FILTERS
+             ===================================================== -->
+
+        <div class="filters-container">
+
+            <form method="get"
+                  action="@Url.Action("Index", "DebtorClient")"
+                  class="filters-form"
+                  id="purchaseFiltersForm">
+
+
+                <!-- =================================================
+                     SEARCH USER
+                     ================================================= -->
+
+                <div class="filter-field search-field">
+
+                    <label for="search">
+
+                        Usuario o ID
+
+                    </label>
+
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           value="@search"
+                           placeholder="Buscar usuario o ID..."
+                           autocomplete="off" />
+
+                </div>
+
+
+                <!-- =================================================
+                     DATE FROM
+                     ================================================= -->
+
+                <div class="filter-field">
+
+                    <label for="dateFrom">
+
+                        Fecha desde
+
+                    </label>
+
+                    <input type="date"
+                           id="dateFrom"
+                           name="dateFrom"
+                           value="@dateFrom" />
+
+                </div>
+
+
+                <!-- =================================================
+                     DATE TO
+                     ================================================= -->
+
+                <div class="filter-field">
+
+                    <label for="dateTo">
+
+                        Fecha hasta
+
+                    </label>
+
+                    <input type="date"
+                           id="dateTo"
+                           name="dateTo"
+                           value="@dateTo" />
+
+                </div>
+
+
+                <!-- =================================================
+                     DEBTOR FILTER
+                     ================================================= -->
+
+                <div class="filter-field">
+
+                    <label for="debtorFilter">
+
+                        Estado del cliente
+
+                    </label>
+
+                    <select id="debtorFilter"
+                            name="debtorFilter">
+
+                        <option value="all"
+                                selected="@(debtorFilter == "all")">
+
+                            Todos los clientes
+
+                        </option>
+
+                        <option value="debtor"
+                                selected="@(debtorFilter == "debtor")">
+
+                            Deudores
+
+                        </option>
+
+                        <option value="nondebtor"
+                                selected="@(debtorFilter == "nondebtor")">
+
+                            No deudores
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =================================================
+                     SEARCH BUTTON
+                     ================================================= -->
+
+                <button type="submit"
+                        class="filter-button">
+
+                    Buscar
+
+                </button>
+
+
+                <!-- =================================================
+                     CLEAR
+                     ================================================= -->
+
+                <a href="@Url.Action("Index", "DebtorClient")"
+                   class="filter-clear">
+
+                    Limpiar
+
+                </a>
+
+            </form>
+
+        </div>
+
+
+        <!-- =====================================================
+             PURCHASE TABLE
+             ===================================================== -->
+
+        <div class="table-container">
+
+            <table class="purchases-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+
+                            ID Usuario
+
+                        </th>
+
+                        <th>
+
+                            Usuario
+
+                        </th>
+
+                        <th>
+
+                            Fecha del pedido
+
+                        </th>
+
+                        <th>
+
+                            Estado del cliente
+
+                        </th>
+
+                        <th>
+
+                            Acción
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+
+                        var orders =
+                            Model
+                                .GroupBy(x => x.OrderId)
+                                .OrderByDescending(x =>
+                                    x.First().DateOrder)
+                                .ThenByDescending(x =>
+                                    x.Key);
+
+
+                        foreach (var order in orders)
+                        {
+
+                            var first =
+                                order.First();
+
+
+                            <tr>
+
+
+                                <!-- =================================================
+                                     USER ID
+                                     ================================================= -->
+
+                                <td>
+
+                                    @first.UserId
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     USERNAME
+                                     ================================================= -->
+
+                                <td>
+
+                                    @first.Username
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     ORDER DATE
+                                     ================================================= -->
+
+                                <td>
+
+                                    @(first.DateOrder.HasValue
+                                        ? first.DateOrder.Value.ToString(
+                                            "dd/MM/yyyy",
+                                            CultureInfo.InvariantCulture)
+                                        : "-")
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     DEBTOR STATUS
+                                     ================================================= -->
+
+                                <td>
+
+                                    @if (first.IsDebtorClient == true)
+                                    {
+
+                                        <span class="debtor-status debtor-status-yes">
+
+                                            Deudor
+
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+
+                                        <span class="debtor-status debtor-status-no">
+
+                                            No deudor
+
+                                        </span>
+
+                                    }
+
+                                </td>
+
+
+                                <!-- =================================================
+                                     ACTIONS
+                                     ================================================= -->
+
+                                <td class="actions-cell">
+
+
+                                    <!-- =============================================
+                                         VIEW
+                                         ============================================= -->
+
+                                    <button type="button"
+                                            class="view-button"
+                                            data-order-id="@first.OrderId">
+
+                                        Ver
+
+                                    </button>
+
+
+                                    <!-- =============================================
+                                         DEBTOR ACTION
+                                         ============================================= -->
+                                    @if (first.IsDebtorClient == true)
+                                    {
+
+                                        <form method="post"
+                                              action="@Url.Action(
+                                                                                              "UnsetClientDebtor",
+                                                                                              "DebtorClient"
+                                                                                          )"
+                                              class="debtor-client-form"
+                                              onsubmit="return confirmUnsetClientDebtor(@first.OrderId);">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="userId"
+                                                   value="@first.UserId" />
+
+                                            <input type="hidden"
+                                                   name="orderId"
+                                                   value="@first.OrderId" />
+
+                                            <button type="submit"
+                                                    class="non-debtor-button" id="non-debtor-button">
+
+                                                Quitar estado deudor
+
+                                            </button>
+
+                                        </form>
+
+                                    }
+                                    else
+                                    {
+
+                                        <form method="post"
+                                              action="@Url.Action(
+                                                                                              "SetClientDebtor",
+                                                                                              "DebtorClient"
+                                                                                          )"
+                                              class="debtor-client-form"
+                                              onsubmit="return confirmSetClientDebtor(@first.OrderId);">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="userId"
+                                                   value="@first.UserId" />
+
+                                            <input type="hidden"
+                                                   name="orderId"
+                                                   value="@first.OrderId" />
+
+                                            <button type="submit"
+                                                    class="debtor-button">
+
+                                                Marcar como deudor
+
+                                            </button>
+
+                                        </form>
+
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    }
+                    else
+                    {
+
+                        <tr>
+
+                            <td colspan="5"
+                                class="empty-message">
+
+                                No se encontraron compras
+                                para los filtros seleccionados.
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             PAGINATION
+             ===================================================== -->
+        @if (totalPages > 1)
+        {
+
+            <div class="pagination">
+
+
+                <!-- =================================================
+                     PREVIOUS
+                     ================================================= -->
+                @if (currentPage > 1)
+                {
+
+                    <a href="@Url.Action(
+                                               "Index",
+                                               "DebtorClient",
+                                               new
+                                               {
+                                                   page = currentPage - 1,
+                                                   search = search,
+                                                   dateFrom = dateFrom,
+                                                   dateTo = dateTo,
+                                                   debtorFilter = debtorFilter
+                                               })"
+                       class="page-button"
+                       aria-label="Página anterior">
+
+                        ‹
+
+                    </a>
+
+                }
+
+
+                @{
+
+                    int startPage =
+                        Math.Max(
+                            1,
+                            currentPage - 2
+                        );
+
+                    int endPage =
+                        Math.Min(
+                            totalPages,
+                            currentPage + 2
+                        );
+
+                }
+
+
+                <!-- =================================================
+                     FIRST PAGE
+                     ================================================= -->
+                @if (startPage > 1)
+                {
+
+                    <a href="@Url.Action(
+                                               "Index",
+                                               "DebtorClient",
+                                               new
+                                               {
+                                                   page = 1,
+                                                   search = search,
+                                                   dateFrom = dateFrom,
+                                                   dateTo = dateTo,
+                                                   debtorFilter = debtorFilter
+                                               })"
+                       class="page-button">
+
+                        1
+
+                    </a>
+
+
+                    @if (startPage > 2)
+                    {
+
+                        <span class="page-dots">
+
+                            ...
+
+                        </span>
+
+                    }
+
+                }
+
+
+                <!-- =================================================
+                     PAGE NUMBERS
+                     ================================================= -->
+                @for (
+                                    int i = startPage;
+                                    i <= endPage;
+                                    i++
+                                )
+                {
+
+                    if (i == currentPage)
+                    {
+
+                        <span class="page-button active">
+
+                            @i
+
+                        </span>
+
+                    }
+                    else
+                    {
+
+                        <a href="@Url.Action(
+                                                       "Index",
+                                                       "DebtorClient",
+                                                       new
+                                                       {
+                                                           page = i,
+                                                           search = search,
+                                                           dateFrom = dateFrom,
+                                                           dateTo = dateTo,
+                                                           debtorFilter = debtorFilter
+                                                       })"
+                           class="page-button">
+
+                            @i
+
+                        </a>
+
+                    }
+
+                }
+
+
+                <!-- =================================================
+                     LAST PAGE
+                     ================================================= -->
+                @if (endPage < totalPages)
+                {
+
+                    @if (endPage < totalPages - 1)
+                    {
+
+                        <span class="page-dots">
+
+                            ...
+
+                        </span>
+
+                    }
+
+
+                    <a href="@Url.Action(
+                                               "Index",
+                                               "DebtorClient",
+                                               new
+                                               {
+                                                   page = totalPages,
+                                                   search = search,
+                                                   dateFrom = dateFrom,
+                                                   dateTo = dateTo,
+                                                   debtorFilter = debtorFilter
+                                               })"
+                       class="page-button">
+
+                        @totalPages
+
+                    </a>
+
+                }
+
+
+                <!-- =================================================
+                     NEXT
+                     ================================================= -->
+                @if (currentPage < totalPages)
+                {
+
+                    <a href="@Url.Action(
+                                               "Index",
+                                               "DebtorClient",
+                                               new
+                                               {
+                                                   page = currentPage + 1,
+                                                   search = search,
+                                                   dateFrom = dateFrom,
+                                                   dateTo = dateTo,
+                                                   debtorFilter = debtorFilter
+                                               })"
+                       class="page-button"
+                       aria-label="Página siguiente">
+
+                        ›
+
+                    </a>
+
+                }
+
+            </div>
+
+        }
+
+
+        <!-- =====================================================
+             PURCHASE DETAILS MODAL
+             ===================================================== -->
+
+        <div id="purchaseModal"
+             class="purchase-modal">
+
+            <div id="purchaseModalOverlay"
+                 class="purchase-modal-overlay">
+            </div>
+
+
+            <div class="purchase-modal-content">
+
+
+                <!-- =================================================
+                     MODAL HEADER
+                     ================================================= -->
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <h2>
+
+                            Detalles de la compra
+
+                        </h2>
+
+                        <span id="modalOrderId"
+                              class="order-number">
+                        </span>
+
+                    </div>
+
+
+                    <button type="button"
+                            id="closePurchaseModal"
+                            class="close-modal">
+
+                        &times;
+
+                    </button>
+
+                </div>
+
+
+                <!-- =================================================
+                     ORDER INFORMATION
+                     ================================================= -->
+
+                <div class="order-information">
+
+
+                    <div class="information-card">
+
+                        <span>
+
+                            ID Pedido
+
+                        </span>
+
+                        <strong id="modalOrderIdInfo">
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <span>
+
+                            ID Usuario
+
+                        </span>
+
+                        <strong id="modalUserId">
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <span>
+
+                            Usuario
+
+                        </span>
+
+                        <strong id="modalUsername">
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <span>
+
+                            Fecha del pedido
+
+                        </span>
+
+                        <strong id="modalDate">
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <span>
+
+                            Moneda de pago
+
+                        </span>
+
+                        <strong id="modalCurrency">
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card total-card">
+
+                        <span>
+
+                            Total de compra
+
+                        </span>
+
+                        <strong id="modalTotal">
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ARTICLES
+                     ================================================= -->
+
+                <div class="articles-section">
+
+                    <div class="articles-title">
+
+                        <h3>
+
+                            Artículos de la compra
+
+                        </h3>
+
+                        <span id="modalArticleCount">
+
+                            0 artículos
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="details-table-container">
+
+                        <table class="details-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Código</th>
+
+                                    <th>Vehículo</th>
+
+                                    <th>Medida</th>
+
+                                    <th>Tipo</th>
+
+                                    <th>Fricción</th>
+
+                                    <th>Cantidad</th>
+
+                                    <th>Precio unitario</th>
+
+                                    <th>Descuento</th>
+
+                                    <th>Stock</th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="articlesTableBody">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     FOOTER
+                     ================================================= -->
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            id="downloadPurchasePdf"
+                            class="pdf-button">
+
+                        Descargar PDF
+
+                    </button>
+
+
+                    <button type="button"
+                            id="closePurchaseModalBottom"
+                            class="close-button">
+
+                        Cerrar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             HIDDEN PURCHASE DATA
+             ===================================================== -->
+
+        <div id="purchaseData"
+             style="display: none;">
+
+            @if (Model != null)
+            {
+
+                foreach (
+                    var orderGroup
+                    in Model.GroupBy(x => x.OrderId)
+                )
+                {
+
+                    var first =
+                        orderGroup.First();
+
+
+                    var totalPurchase =
+                        first.TotalPurchase.HasValue
+                            ? first.TotalPurchase.Value.ToString(
+                                "N2",
+                                CultureInfo.InvariantCulture)
+                            : "0.00";
+
+
+                    <div class="purchase-data"
+                         data-order-id="@first.OrderId"
+                         data-user-id="@first.UserId"
+                         data-username="@first.Username"
+                         data-date="@(first.DateOrder.HasValue
+                                                     ? first.DateOrder.Value.ToString(
+                                                         "dd/MM/yyyy",
+                                                         CultureInfo.InvariantCulture)
+                                                 : "-")"
+                         data-total="@totalPurchase"
+                         data-currency="@first.PaymentCurrency"
+                         data-debtor="@(first.IsDebtorClient == true
+                                                     ? "true"
+                                                     : "false")">
+
+
+                        @foreach (var item in orderGroup)
+                        {
+
+                            var unitPrice =
+                                item.UnitPrice.HasValue
+                                    ? item.UnitPrice.Value.ToString(
+                                        "N2",
+                                        CultureInfo.InvariantCulture)
+                                    : "0.00";
+
+
+                            var discount =
+                                item.Discount.HasValue
+                                    ? item.Discount.Value.ToString(
+                                        "N2",
+                                        CultureInfo.InvariantCulture)
+                                    : "0.00";
+
+
+                            <div class="article-data"
+                                 data-quantity="@item.Quantity"
+                                 data-article-code="@item.ArticleCode"
+                                 data-vehicle="@item.VehicleBrand"
+                                 data-measure="@item.Measure"
+                                 data-type="@item.Type"
+                                 data-friction="@item.Friction"
+                                 data-price="@unitPrice"
+                                 data-discount="@discount"
+                                 data-stock="@(item.Stock == true
+                                                                     ? "Disponible"
+                                                                     : "Sin stock")">
+                            </div>
+
+                        }
+
+                    </div>
+
+                }
+
+            }
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+         ========================================================= -->
+
+    <script>
+
+            document.addEventListener(
+                "DOMContentLoaded",
+                function () {
+
+                    // =================================================
+                    // ELEMENTS
+                    // =================================================
+
+                    const modal =
+                        document.getElementById(
+                            "purchaseModal"
+                        );
+
+                    const overlay =
+                        document.getElementById(
+                            "purchaseModalOverlay"
+                        );
+
+                    const closeButton =
+                        document.getElementById(
+                            "closePurchaseModal"
+                        );
+
+                    const closeBottomButton =
+                        document.getElementById(
+                            "closePurchaseModalBottom"
+                        );
+
+                    const downloadPdfButton =
+                        document.getElementById(
+                            "downloadPurchasePdf"
+                        );
+
+                    const viewButtons =
+                        document.querySelectorAll(
+                            ".view-button"
+                        );
+
+                    const purchaseData =
+                        document.querySelectorAll(
+                            ".purchase-data"
+                        );
+
+
+                    const modalOrderId =
+                        document.getElementById(
+                            "modalOrderId"
+                        );
+
+                    const modalOrderIdInfo =
+                        document.getElementById(
+                            "modalOrderIdInfo"
+                        );
+
+                    const modalUserId =
+                        document.getElementById(
+                            "modalUserId"
+                        );
+
+                    const modalUsername =
+                        document.getElementById(
+                            "modalUsername"
+                        );
+
+                    const modalDate =
+                        document.getElementById(
+                            "modalDate"
+                        );
+
+                    const modalCurrency =
+                        document.getElementById(
+                            "modalCurrency"
+                        );
+
+                    const modalTotal =
+                        document.getElementById(
+                            "modalTotal"
+                        );
+
+                    const modalArticleCount =
+                        document.getElementById(
+                            "modalArticleCount"
+                        );
+
+                    const articlesTableBody =
+                        document.getElementById(
+                            "articlesTableBody"
+                        );
+
+
+                    const dateFromInput =
+                        document.getElementById(
+                            "dateFrom"
+                        );
+
+                    const dateToInput =
+                        document.getElementById(
+                            "dateTo"
+                        );
+
+
+                    const debtorFilter =
+                        document.getElementById(
+                            "debtorFilter"
+                        );
+
+
+                    const filtersForm =
+                        document.getElementById(
+                            "purchaseFiltersForm"
+                        );
+
+
+                    let currentPurchase =
+                        null;
+
+
+                    // =================================================
+                    // DEBTOR FILTER STYLE
+                    // =================================================
+
+                    function updateDebtorFilterStyle() {
+
+                        if (!debtorFilter) {
+                            return;
+                        }
+
+
+                        debtorFilter.classList.remove(
+                            "filter-all",
+                            "filter-debtor",
+                            "filter-nondebtor"
+                        );
+
+
+                        if (
+                            debtorFilter.value ===
+                            "debtor"
+                        ) {
+
+                            debtorFilter.classList.add(
+                                "filter-debtor"
+                            );
+
+                        }
+                        else if (
+                            debtorFilter.value ===
+                            "nondebtor"
+                        ) {
+
+                            debtorFilter.classList.add(
+                                "filter-nondebtor"
+                            );
+
+                        }
+                        else {
+
+                            debtorFilter.classList.add(
+                                "filter-all"
+                            );
+
+                        }
+
+                    }
+
+
+                    if (debtorFilter) {
+
+                        updateDebtorFilterStyle();
+
+
+                        debtorFilter.addEventListener(
+                            "change",
+                            updateDebtorFilterStyle
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // FILTER VALIDATION
+                    // =================================================
+
+                    if (
+                        filtersForm &&
+                        dateFromInput &&
+                        dateToInput
+                    ) {
+
+                        filtersForm.addEventListener(
+                            "submit",
+                            function (event) {
+
+                                if (
+                                    dateFromInput.value &&
+                                    dateToInput.value &&
+                                    dateFromInput.value >
+                                    dateToInput.value
+                                ) {
+
+                                    event.preventDefault();
+
+
+                                    alert(
+                                        "La fecha desde no puede ser posterior a la fecha hasta."
+                                    );
+
+
+                                    dateToInput.focus();
+
+
+                                    return;
+
+                                }
+
+                            }
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // DATE FROM
+                    // =================================================
+
+                    if (dateFromInput && dateToInput) {
+
+                        dateFromInput.addEventListener(
+                            "change",
+                            function () {
+
+                                if (
+                                    dateToInput.value &&
+                                    this.value &&
+                                    this.value >
+                                    dateToInput.value
+                                ) {
+
+                                    dateToInput.value =
+                                        this.value;
+
+                                }
+
+                            }
+                        );
+
+
+                        dateToInput.addEventListener(
+                            "change",
+                            function () {
+
+                                if (
+                                    dateFromInput.value &&
+                                    this.value &&
+                                    this.value <
+                                    dateFromInput.value
+                                ) {
+
+                                    dateFromInput.value =
+                                        this.value;
+
+                                }
+
+                            }
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // OPEN PURCHASE MODAL
+                    // =================================================
+
+                    function openPurchaseModal(orderId) {
+
+                        let selectedPurchase =
+                            null;
+
+
+                        purchaseData.forEach(
+                            function (purchase) {
+
+                                if (
+                                    purchase.dataset.orderId ===
+                                    String(orderId)
+                                ) {
+
+                                    selectedPurchase =
+                                        purchase;
+
+                                }
+
+                            }
+                        );
+
+
+                        if (!selectedPurchase) {
+
+                            return;
+
+                        }
+
+
+                        currentPurchase =
+                            selectedPurchase;
+
+
+                        // =============================================
+                        // ORDER
+                        // =============================================
+
+                        const selectedOrderId =
+                            selectedPurchase.dataset.orderId ||
+                            "-";
+
+
+                        modalOrderId.textContent =
+                            "Pedido #" +
+                            selectedOrderId;
+
+
+                        modalOrderIdInfo.textContent =
+                            selectedOrderId;
+
+
+                        // =============================================
+                        // USER
+                        // =============================================
+
+                        modalUserId.textContent =
+                            selectedPurchase.dataset.userId ||
+                            "-";
+
+
+                        modalUsername.textContent =
+                            selectedPurchase.dataset.username ||
+                            "-";
+
+
+                        // =============================================
+                        // DATE
+                        // =============================================
+
+                        modalDate.textContent =
+                            selectedPurchase.dataset.date ||
+                            "-";
+
+
+                        // =============================================
+                        // CURRENCY
+                        // =============================================
+
+                        modalCurrency.textContent =
+                            selectedPurchase.dataset.currency ||
+                            "-";
+
+
+                        // =============================================
+                        // TOTAL
+                        // =============================================
+
+                        modalTotal.textContent =
+                            selectedPurchase.dataset.total ||
+                            "0.00";
+
+
+                        // =============================================
+                        // ARTICLES
+                        // =============================================
+
+                        articlesTableBody.innerHTML =
+                            "";
+
+
+                        const articles =
+                            selectedPurchase.querySelectorAll(
+                                ".article-data"
+                            );
+
+
+                        modalArticleCount.textContent =
+                            articles.length +
+                            (
+                                articles.length === 1
+                                    ? " artículo"
+                                    : " artículos"
+                            );
+
+
+                        articles.forEach(
+                            function (article) {
+
+                                const row =
+                                    document.createElement(
+                                        "tr"
+                                    );
+
+
+                                const values =
+                                [
+
+                                    article.dataset.articleCode ||
+                                    "-",
+
+                                    article.dataset.vehicle ||
+                                    "-",
+
+                                    article.dataset.measure ||
+                                    "-",
+
+                                    article.dataset.type ||
+                                    "-",
+
+                                    article.dataset.friction ||
+                                    "-",
+
+                                    article.dataset.quantity ||
+                                    "0",
+
+                                    article.dataset.price ||
+                                    "0.00",
+
+                                    (
+                                        article.dataset.discount ||
+                                        "0.00"
+                                    ) + "%",
+
+                                    article.dataset.stock ||
+                                    "-"
+
+                                ];
+
+
+                                values.forEach(
+                                    function (value) {
+
+                                        const cell =
+                                            document.createElement(
+                                                "td"
+                                            );
+
+
+                                        cell.textContent =
+                                            value;
+
+
+                                        row.appendChild(
+                                            cell
+                                        );
+
+                                    }
+                                );
+
+
+                                articlesTableBody.appendChild(
+                                    row
+                                );
+
+                            }
+                        );
+
+
+                        // =============================================
+                        // SHOW MODAL
+                        // =============================================
+
+                        modal.classList.add(
+                            "active"
+                        );
+
+
+                        document.body.style.overflow =
+                            "hidden";
+
+                    }
+
+
+                    // =================================================
+                    // PDF
+                    // =================================================
+
+                    function downloadPurchasePdf() {
+
+                        if (!currentPurchase) {
+
+                            return;
+
+                        }
+
+
+                        if (
+                            typeof window.jspdf ===
+                            "undefined"
+                        ) {
+
+                            alert(
+                                "No se pudo cargar el generador de PDF."
+                            );
+
+                            return;
+
+                        }
+
+
+                        const {
+                            jsPDF
+                        } = window.jspdf;
+
+
+                        const doc =
+                            new jsPDF(
+                                {
+                                    orientation: "landscape",
+                                    unit: "mm",
+                                    format: "a4"
+                                }
+                            );
+
+
+                        const orderId =
+                            currentPurchase.dataset.orderId ||
+                            "-";
+
+                        const userId =
+                            currentPurchase.dataset.userId ||
+                            "-";
+
+                        const username =
+                            currentPurchase.dataset.username ||
+                            "-";
+
+                        const date =
+                            currentPurchase.dataset.date ||
+                            "-";
+
+                        const currency =
+                            currentPurchase.dataset.currency ||
+                            "-";
+
+                        const total =
+                            currentPurchase.dataset.total ||
+                            "0.00";
+
+
+                        doc.setFontSize(20);
+
+                        doc.setFont(
+                            "helvetica",
+                            "bold"
+                        );
+
+                        doc.text(
+                            "EmFren",
+                            14,
+                            18
+                        );
+
+
+                        doc.setFontSize(15);
+
+                        doc.text(
+                            "Detalle de compra",
+                            14,
+                            28
+                        );
+
+
+                        doc.setFontSize(10);
+
+                        doc.setFont(
+                            "helvetica",
+                            "normal"
+                        );
+
+
+                        doc.text(
+                            "Pedido: #" + orderId,
+                            14,
+                            39
+                        );
+
+                        doc.text(
+                            "ID Usuario: " + userId,
+                            14,
+                            46
+                        );
+
+                        doc.text(
+                            "Usuario: " + username,
+                            14,
+                            53
+                        );
+
+                        doc.text(
+                            "Fecha del pedido: " + date,
+                            14,
+                            60
+                        );
+
+                        doc.text(
+                            "Moneda de pago: " + currency,
+                            120,
+                            39
+                        );
+
+                        doc.text(
+                            "Total de compra: " + total,
+                            120,
+                            46
+                        );
+
+
+                        // =============================================
+                        // ARTICLES
+                        // =============================================
+
+                        const articles =
+                            currentPurchase.querySelectorAll(
+                                ".article-data"
+                            );
+
+
+                        const tableRows = [];
+
+
+                        articles.forEach(
+                            function (article) {
+
+                                tableRows.push(
+                                    [
+
+                                        article.dataset.articleCode ||
+                                        "-",
+
+                                        article.dataset.vehicle ||
+                                        "-",
+
+                                        article.dataset.measure ||
+                                        "-",
+
+                                        article.dataset.type ||
+                                        "-",
+
+                                        article.dataset.friction ||
+                                        "-",
+
+                                        article.dataset.quantity ||
+                                        "0",
+
+                                        article.dataset.price ||
+                                        "0.00",
+
+                                        (
+                                            article.dataset.discount ||
+                                            "0.00"
+                                        ) + "%",
+
+                                        article.dataset.stock ||
+                                        "-"
+
+                                    ]
+                                );
+
+                            }
+                        );
+
+
+                        // =============================================
+                        // PDF TABLE
+                        // =============================================
+
+                        doc.autoTable(
+                            {
+
+                                startY: 70,
+
+                                head:
+                                [
+                                    [
+
+                                        "Código",
+                                        "Vehículo",
+                                        "Medida",
+                                        "Tipo",
+                                        "Fricción",
+                                        "Cantidad",
+                                        "Precio unitario",
+                                        "Descuento",
+                                        "Stock"
+
+                                    ]
+                                ],
+
+                                body:
+                                    tableRows,
+
+                                theme:
+                                    "grid",
+
+                                styles:
+                                {
+
+                                    fontSize: 8,
+
+                                    cellPadding: 2,
+
+                                    overflow:
+                                        "linebreak",
+
+                                    valign:
+                                        "middle"
+
+                                },
+
+                                headStyles:
+                                {
+
+                                    fontStyle:
+                                        "bold"
+
+                                },
+
+                                margin:
+                                {
+
+                                    left: 10,
+
+                                    right: 10
+
+                                }
+
+                            }
+                        );
+
+
+                        // =============================================
+                        // PDF FOOTER
+                        // =============================================
+
+                        const pageCount =
+                            doc.internal.getNumberOfPages();
+
+
+                        for (
+                            let i = 1;
+                            i <= pageCount;
+                            i++
+                        ) {
+
+                            doc.setPage(i);
+
+
+                            doc.setFontSize(8);
+
+
+                            doc.setFont(
+                                "helvetica",
+                                "normal"
+                            );
+
+
+                            doc.text(
+                                "EmFren - Gestión de compras",
+                                14,
+                                202
+                            );
+
+
+                            doc.text(
+                                "Página " +
+                                i +
+                                " de " +
+                                pageCount,
+                                250,
+                                202
+                            );
+
+                        }
+
+
+                        doc.save(
+                            "EmFren_Pedido_" +
+                            orderId +
+                            ".pdf"
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // CLOSE MODAL
+                    // =================================================
+
+                    function closePurchaseModal() {
+
+                        modal.classList.remove(
+                            "active"
+                        );
+
+
+                        document.body.style.overflow =
+                            "";
+
+
+                        currentPurchase =
+                            null;
+
+                    }
+
+
+                    // =================================================
+                    // VIEW BUTTONS
+                    // =================================================
+
+                    viewButtons.forEach(
+                        function (button) {
+
+                            button.addEventListener(
+                                "click",
+                                function () {
+
+                                    openPurchaseModal(
+                                        this.dataset.orderId
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    // =================================================
+                    // PDF BUTTON
+                    // =================================================
+
+                    if (downloadPdfButton) {
+
+                        downloadPdfButton.addEventListener(
+                            "click",
+                            downloadPurchasePdf
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // CLOSE BUTTON
+                    // =================================================
+
+                    if (closeButton) {
+
+                        closeButton.addEventListener(
+                            "click",
+                            closePurchaseModal
+                        );
+
+                    }
+
+
+                    if (closeBottomButton) {
+
+                        closeBottomButton.addEventListener(
+                            "click",
+                            closePurchaseModal
+                        );
+
+                    }
+
+
+                    if (overlay) {
+
+                        overlay.addEventListener(
+                            "click",
+                            closePurchaseModal
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // ESCAPE
+                    // =================================================
+
+                    document.addEventListener(
+                        "keydown",
+                        function (event) {
+
+                            if (
+                                event.key === "Escape" &&
+                                modal.classList.contains(
+                                    "active"
+                                )
+                            ) {
+
+                                closePurchaseModal();
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+            // =========================================================
+            // SET CLIENT DEBTOR
+            // =========================================================
+
+            function confirmSetClientDebtor(
+                orderId
+            ) {
+
+                return confirm(
+                    "¿Está seguro de que desea marcar el pedido #" +
+                    orderId +
+                    " como deudor?\n\n" +
+                    "Esta acción registrará este pedido como perteneciente a un cliente deudor."
+                );
+
+            }
+
+
+            // =========================================================
+            // UNSET CLIENT DEBTOR
+            // =========================================================
+
+            function confirmUnsetClientDebtor(
+                orderId
+            ) {
+
+                return confirm(
+                    "¿Está seguro de que desea quitar el estado deudor del pedido #" +
+                    orderId +
+                    "?\n\n" +
+                    "El pedido dejará de estar registrado como perteneciente a un cliente deudor."
+                );
+
+            }
+
+
+            // =========================================================
+            // DELETE PURCHASE
+            // =========================================================
+
+            function confirmDeletePurchase(
+                orderId
+            ) {
+
+                return confirm(
+                    "¿Está seguro de que desea eliminar el pedido #" +
+                    orderId +
+                    "?\n\n" +
+                    "Se eliminarán todos los artículos asociados a esta compra."
+                );
+
+            }
+
+    </script>
+
+</body>
+
+</html>

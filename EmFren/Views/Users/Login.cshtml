@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet"
+          href="~/css/login.css" />
+
+    <title>EmFren | Iniciar sesión</title>
+
+</head>
+
+<body>
+
+
+    <!-- =========================================================
+         LOGIN LOADING OVERLAY
+         ========================================================= -->
+
+    <div id="loginLoader"
+         class="login-loader" hidden>
+
+        <div class="loader-box">
+
+            <div class="loader-logo">
+                EmFren
+            </div>
+
+            <div class="loader-text">
+                Iniciando sesión...
+            </div>
+
+            <div class="loader-bar">
+
+                <div class="loader-progress"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         LOGIN CONTAINER
+         ========================================================= -->
+
+    <div class="login-container">
+
+
+        <!-- =====================================================
+             BRAND
+             ===================================================== -->
+
+        <div class="brand">
+
+            <h1>
+                EmFren
+            </h1>
+
+            <p>
+                Sistema de gestión empresarial
+            </p>
+
+        </div>
+
+
+        <!-- =====================================================
+             LOGIN CARD
+             ===================================================== -->
+
+        <div class="login-card">
+
+            <h2>
+                Iniciar sesión
+            </h2>
+
+            <p class="login-description">
+                Ingresa tus datos para acceder al sistema.
+            </p>
+
+
+            <!-- =================================================
+                 LOGIN FORM
+                 ================================================= -->
+
+            <form asp-controller="Users"
+                  asp-action="Login"
+                  method="post"
+                  id="loginForm">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- USER / EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="Email">
+                        Correo electrónico
+                    </label>
+
+                    <input type="email"
+                           id="Email"
+                           name="Email"
+                           class="input"
+                           placeholder="Ingresa tu correo electrónico"
+                           autocomplete="email"
+                           required>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Contraseña
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               class="input password-input"
+                               placeholder="Ingresa tu contraseña"
+                               autocomplete="current-password"
+                               required>
+
+                        <button type="button"
+                                class="show-password"
+                                onclick="togglePassword()"
+                                aria-label="Mostrar contraseña">
+
+                            👁
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     OPTIONS
+                     ================================================= -->
+
+                <div class="form-options">
+
+                    <a href="/Users/ForgotPassword"
+                       class="forgot">
+
+                        ¿Olvidaste tu contraseña?
+                        ¿La querés resetear?
+
+                    </a>
+
+                </div>
+
+
+                <!-- =================================================
+                     LOGIN BUTTON
+                     ================================================= -->
+
+                <button type="submit"
+                        class="login-button"
+                        id="loginButton">
+
+                    Iniciar sesión
+
+                </button>
+
+            </form>
+
+
+            <!-- =================================================
+                 DIVIDER
+                 ================================================= -->
+
+            <div class="divider">
+
+                <span>
+                    ¿No tienes una cuenta?
+                </span>
+
+                <a href="/Users/CreateAccount">
+                    Crear una cuenta
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 REGISTER
+                 ================================================= -->
+
+            <div class="register">
+
+                <p>
+                    Crea una cuenta para comenzar.
+                </p>
+
+                <a href="/Users/CreateAccount">
+                    Crear una cuenta
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         LOGIN JAVASCRIPT
+         ========================================================= -->
+
+    <script src="~/js/login.js"></script>
+
+
+    <!-- =========================================================
+         LOGIN LOADING SCRIPT
+         ========================================================= -->
+
+    <script>
+
+        const loginForm = document.getElementById("loginForm");
+
+        const loginLoader = document.getElementById("loginLoader");
+
+        const loginButton = document.getElementById("loginButton");
+
+
+        if (loginForm)
+        {
+            loginForm.addEventListener("submit", function ()
+            {
+
+                /*
+                 * Show loading screen
+                 */
+
+                loginLoader.classList.add("show");
+
+
+                /*
+                 * Prevent multiple clicks
+                 */
+
+                loginButton.disabled = true;
+
+                loginButton.innerText = "Iniciando sesión...";
+
+
+            });
+        }
+
+    </script>
+
+
+</body>
+
+</html>

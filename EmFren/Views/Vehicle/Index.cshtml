@@ -1,0 +1,1106 @@
+﻿@model IEnumerable<EmFren.Models.Vehicle>
+
+@{
+    string search = ViewBag.Search ?? "";
+    string sort = ViewBag.Sort ?? "id_asc";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int totalVehicles = ViewBag.TotalVehicles ?? 0;
+}
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet"
+          href="~/css/Vehicle.css" />
+
+    <title>Vehículos - EmFren</title>
+
+</head>
+
+
+<body>
+
+
+    <!-- ============================================================
+         HEADER
+    ============================================================= -->
+
+    <header class="header">
+
+        <div class="header-title">
+            EmFren
+        </div>
+
+
+        <div class="header-center">
+
+            <a href="/Home/HomeEnterprise"
+               class="home-button">
+
+                Home
+
+            </a>
+
+        </div>
+
+
+        <div class="header-user">
+
+            <div class="user-circle">
+
+                @(
+                    ViewBag.Username != null &&
+                    ViewBag.Username.ToString().Length > 0
+                    ? ViewBag.Username.ToString()
+                        .Substring(0, 1)
+                        .ToUpper()
+                    : "U"
+                )
+
+            </div>
+
+            <span>
+                @ViewBag.Username
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- ============================================================
+         MAIN
+    ============================================================= -->
+
+    <main class="container">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <div class="page-title">
+
+                <h1>
+                    Vehículos
+                </h1>
+
+                <p>
+                    Administra los vehículos de la empresa.
+                </p>
+
+            </div>
+
+
+            <button type="button"
+                    class="btn-add"
+                    onclick="openModal('addModal')">
+
+                + Agregar vehículo
+
+            </button>
+
+        </div>
+
+
+        <!-- ========================================================
+             ALERTS
+        ========================================================= -->
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+
+                @TempData["Success"]
+
+            </div>
+        }
+
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-error">
+
+                @TempData["Error"]
+
+            </div>
+        }
+
+
+        <!-- ========================================================
+             SEARCH AND SORT
+        ========================================================= -->
+
+        <div class="filter-panel">
+
+            <form method="get"
+                  asp-controller="Vehicle"
+                  asp-action="Index"
+                  class="filter-form">
+
+
+                <div class="form-group">
+
+                    <label for="search">
+                        Buscar
+                    </label>
+
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           value="@search"
+                           placeholder="ID o marca del vehículo..." />
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="sort">
+                        Ordenar por
+                    </label>
+
+                    <select id="sort"
+                            name="sort">
+
+                        <option value="id_asc"
+                                selected="@(sort == "id_asc")">
+
+                            ID — Ascendente
+
+                        </option>
+
+                        <option value="id_desc"
+                                selected="@(sort == "id_desc")">
+
+                            ID — Descendente
+
+                        </option>
+
+                        <option value="brand_asc"
+                                selected="@(sort == "brand_asc")">
+
+                            Marca — A → Z
+
+                        </option>
+
+                        <option value="brand_desc"
+                                selected="@(sort == "brand_desc")">
+
+                            Marca — Z → A
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-buttons">
+
+                    <button type="submit"
+                            class="btn-search">
+
+                        Buscar
+
+                    </button>
+
+
+                    <a href="@Url.Action("Index", "Vehicle")"
+                       class="btn-clear">
+
+                        Limpiar
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- ========================================================
+             TABLE
+        ========================================================= -->
+
+        <div class="table-card">
+
+
+            <div class="table-top">
+
+                <div class="table-top-title">
+
+                    Lista de vehículos
+
+                </div>
+
+
+                <div class="results-count">
+
+                    @totalVehicles
+                    @(totalVehicles == 1
+                        ? "vehículo"
+                        : "vehículos")
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Marca
+                            </th>
+
+                            <th>
+                                Acciones
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var vehicle in Model)
+                            {
+                                <tr>
+
+                                    <td class="vehicle-id">
+                                        @vehicle.Id
+                                    </td>
+
+
+                                    <td class="vehicle-brand">
+                                        @vehicle.Brand
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            <!-- VIEW -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-view"
+                                                    data-id="@vehicle.Id"
+                                                    data-brand="@vehicle.Brand"
+                                                    onclick="openViewModalFromButton(this)">
+
+                                                Ver
+
+                                            </button>
+
+
+                                            <!-- EDIT -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-edit"
+                                                    data-id="@vehicle.Id"
+                                                    data-brand="@vehicle.Brand"
+                                                    onclick="openEditModalFromButton(this)">
+
+                                                Editar
+
+                                            </button>
+
+
+                                            <!-- DELETE -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-delete"
+                                                    data-id="@vehicle.Id"
+                                                    data-brand="@vehicle.Brand"
+                                                    onclick="openDeleteModalFromButton(this)">
+
+                                                Eliminar
+
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="3"
+                                    class="empty-row">
+
+                                    <div class="empty-icon">
+                                        🚗
+                                    </div>
+
+                                    <div class="empty-title">
+                                        No se encontraron vehículos
+                                    </div>
+
+                                    <div>
+                                        Intenta cambiar los criterios de búsqueda.
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ====================================================
+                 FOOTER
+            ===================================================== -->
+
+            <div class="table-footer">
+
+
+                <div class="pagination-info">
+
+                    @if (totalVehicles > 0)
+                    {
+                        int firstItem =
+                            ((currentPage - 1) * 10) + 1;
+
+                        int lastItem =
+                            Math.Min(
+                                currentPage * 10,
+                                totalVehicles);
+
+                        <span>
+
+                            Mostrando
+
+                            <strong>
+                                @firstItem
+                            </strong>
+
+                            -
+
+                            <strong>
+                                @lastItem
+                            </strong>
+
+                            de
+
+                            <strong>
+                                @totalVehicles
+                            </strong>
+
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            0 vehículos encontrados
+                        </span>
+                    }
+
+                </div>
+
+
+                @if (totalPages > 1)
+                {
+                    <div class="pagination">
+
+
+                        <!-- PREVIOUS -->
+
+                        @if (currentPage > 1)
+                        {
+                            <a class="page-link"
+                               href="@Url.Action(
+                                   "Index",
+                                   "Vehicle",
+                                   new
+                                   {
+                                       search = search,
+                                       sort = sort,
+                                       page = currentPage - 1
+                                   })">
+
+                                ‹
+
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link disabled">
+                                ‹
+                            </span>
+                        }
+
+
+                        <!-- PAGE NUMBERS -->
+
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            if (i == currentPage)
+                            {
+                                <span class="page-link active">
+                                    @i
+                                </span>
+                            }
+                            else
+                            {
+                                <a class="page-link"
+                                   href="@Url.Action(
+                                       "Index",
+                                       "Vehicle",
+                                       new
+                                       {
+                                           search = search,
+                                           sort = sort,
+                                           page = i
+                                       })">
+
+                                    @i
+
+                                </a>
+                            }
+                        }
+
+
+                        <!-- NEXT -->
+
+                        @if (currentPage < totalPages)
+                        {
+                            <a class="page-link"
+                               href="@Url.Action(
+                                   "Index",
+                                   "Vehicle",
+                                   new
+                                   {
+                                       search = search,
+                                       sort = sort,
+                                       page = currentPage + 1
+                                   })">
+
+                                ›
+
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link disabled">
+                                ›
+
+                            </span>
+                        }
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- ============================================================
+         ADD MODAL
+    ============================================================= -->
+
+    <div id="addModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Agregar vehículo
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('addModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/Vehicle/Create">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       name="search"
+                       value="@search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@currentPage" />
+
+
+                <div class="modal-body">
+
+                    <div class="modal-form-group">
+
+                        <label for="addBrand">
+                            Marca del vehículo
+                        </label>
+
+                        <input type="text"
+                               id="addBrand"
+                               name="Brand"
+                               maxlength="50"
+                               required
+                               placeholder="Ej. Toyota, Ford, Volkswagen..." />
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('addModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         VIEW MODAL
+    ============================================================= -->
+
+    <div id="viewModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Ver vehículo
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('viewModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="modal-form-group">
+
+                    <label for="viewVehicleId">
+                        ID
+                    </label>
+
+                    <input type="text"
+                           id="viewVehicleId"
+                           readonly />
+
+                </div>
+
+
+                <div class="modal-form-group">
+
+                    <label for="viewBrand">
+                        Marca del vehículo
+                    </label>
+
+                    <input type="text"
+                           id="viewBrand"
+                           readonly />
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="closeModal('viewModal')">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         EDIT MODAL
+    ============================================================= -->
+
+    <div id="editModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Editar vehículo
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('editModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/Vehicle/Edit">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       name="search"
+                       value="@search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@currentPage" />
+
+
+                <div class="modal-body">
+
+
+                    <div class="modal-form-group">
+
+                        <label for="editVehicleIdDisplay">
+                            ID
+                        </label>
+
+                        <input type="text"
+                               id="editVehicleIdDisplay"
+                               readonly />
+
+
+                        <input type="hidden"
+                               id="editVehicleId"
+                               name="Id" />
+
+                    </div>
+
+
+                    <div class="modal-form-group">
+
+                        <label for="editBrand">
+                            Marca del vehículo
+                        </label>
+
+                        <input type="text"
+                               id="editBrand"
+                               name="Brand"
+                               maxlength="50"
+                               required />
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('editModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         DELETE MODAL
+    ============================================================= -->
+
+    <div id="deleteModal"
+         class="modal">
+
+        <div class="modal-content delete-modal">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Eliminar vehículo
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('deleteModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="delete-icon">
+                    ⚠️
+                </div>
+
+
+                <h3 class="delete-title">
+                    ¿Estás seguro?
+                </h3>
+
+
+                <p class="delete-message">
+                    Vas a eliminar el vehículo:
+                </p>
+
+
+                <div class="delete-vehicle-brand"
+                     id="deleteVehicleBrand">
+                </div>
+
+
+                <p class="delete-warning">
+                    Esta acción no se puede deshacer.
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="closeModal('deleteModal')">
+
+                    Cancelar
+
+                </button>
+
+
+                <form method="post"
+                      action="/Vehicle/Delete">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <input type="hidden"
+                           name="id"
+                           id="deleteVehicleId" />
+
+
+                    <input type="hidden"
+                           name="search"
+                           value="@search" />
+
+                    <input type="hidden"
+                           name="sort"
+                           value="@sort" />
+
+                    <input type="hidden"
+                           name="page"
+                           value="@currentPage" />
+
+
+                    <button type="submit"
+                            class="btn-delete-confirm">
+
+                        Sí, eliminar
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         JAVASCRIPT
+    ============================================================= -->
+
+    <script>
+
+        // ============================================================
+        // OPEN MODAL
+        // ============================================================
+
+        function openModal(modalId) {
+
+            const modal =
+                document.getElementById(modalId);
+
+            if (modal) {
+
+                modal.classList.add("show");
+
+                document.body.classList.add("modal-open");
+
+            }
+        }
+
+
+        // ============================================================
+        // CLOSE MODAL
+        // ============================================================
+
+        function closeModal(modalId) {
+
+            const modal =
+                document.getElementById(modalId);
+
+            if (modal) {
+
+                modal.classList.remove("show");
+
+                document.body.classList.remove("modal-open");
+
+            }
+        }
+
+
+        // ============================================================
+        // VIEW
+        // ============================================================
+
+        function openViewModalFromButton(button) {
+
+            const id =
+                button.getAttribute("data-id");
+
+            const brand =
+                button.getAttribute("data-brand");
+
+
+            document.getElementById(
+                "viewVehicleId"
+            ).value = id;
+
+
+            document.getElementById(
+                "viewBrand"
+            ).value = brand;
+
+
+            openModal("viewModal");
+        }
+
+
+        // ============================================================
+        // EDIT
+        // ============================================================
+
+        function openEditModalFromButton(button) {
+
+            const id =
+                button.getAttribute("data-id");
+
+            const brand =
+                button.getAttribute("data-brand");
+
+
+            document.getElementById(
+                "editVehicleIdDisplay"
+            ).value = id;
+
+
+            document.getElementById(
+                "editVehicleId"
+            ).value = id;
+
+
+            document.getElementById(
+                "editBrand"
+            ).value = brand;
+
+
+            openModal("editModal");
+        }
+
+
+        // ============================================================
+        // DELETE
+        // ============================================================
+
+        function openDeleteModalFromButton(button) {
+
+            const id =
+                button.getAttribute("data-id");
+
+            const brand =
+                button.getAttribute("data-brand");
+
+
+            document.getElementById(
+                "deleteVehicleId"
+            ).value = id;
+
+
+            document.getElementById(
+                "deleteVehicleBrand"
+            ).textContent = brand;
+
+
+            openModal("deleteModal");
+        }
+
+
+        // ============================================================
+        // CLOSE WHEN CLICKING OUTSIDE
+        // ============================================================
+
+        document.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target.classList.contains("modal")
+                ) {
+
+                    event.target.classList.remove("show");
+
+                    document.body.classList.remove(
+                        "modal-open"
+                    );
+                }
+
+            }
+        );
+
+
+        // ============================================================
+        // ESC KEY
+        // ============================================================
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Escape") {
+
+                    document
+                        .querySelectorAll(".modal.show")
+                        .forEach(function (modal) {
+
+                            modal.classList.remove("show");
+
+                        });
+
+
+                    document.body.classList.remove(
+                        "modal-open"
+                    );
+                }
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

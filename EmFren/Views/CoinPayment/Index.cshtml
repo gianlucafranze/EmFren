@@ -1,0 +1,1076 @@
+﻿```cshtml
+@model IEnumerable<EmFren.Models.CoinPayment>
+
+@{
+    string search = ViewBag.Search ?? "";
+    string sort = ViewBag.Sort ?? "id_asc";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int totalCoins = ViewBag.TotalCoins ?? 0;
+}
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="~/css/CoinPayment.css" />
+
+    <title>Monedas de Pago - EmFren</title>
+
+</head>
+
+
+<body>
+
+
+    <!-- ============================================================
+         HEADER
+    ============================================================= -->
+
+    <header class="header">
+
+        <div class="header-title">
+            EmFren
+        </div>
+
+        <div class="header-center">
+
+            <a href="/Home/HomeEnterprise"
+               class="home-button">
+
+                Home
+
+            </a>
+
+        </div>
+
+        <div class="header-user">
+
+            <div class="user-circle">
+
+                @(
+                    ViewBag.Username != null &&
+                    ViewBag.Username.ToString().Length > 0
+                    ? ViewBag.Username.ToString().Substring(0, 1).ToUpper()
+                    : "U"
+                )
+
+            </div>
+
+            <span>
+                @ViewBag.Username
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- ============================================================
+         MAIN
+    ============================================================= -->
+
+    <main class="container">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <div class="page-title">
+
+                <h1>
+                    Monedas de Pago
+                </h1>
+
+                <p>
+                    Administra las monedas disponibles para los pagos.
+                </p>
+
+            </div>
+
+
+            <button type="button"
+                    class="btn-add"
+                    onclick="openModal('addModal')">
+
+                + Agregar moneda
+
+            </button>
+
+        </div>
+
+
+        <!-- ========================================================
+             ALERTS
+        ========================================================= -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+
+                @TempData["Success"]
+
+            </div>
+        }
+
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-error">
+
+                @TempData["Error"]
+
+            </div>
+        }
+
+
+        <!-- ========================================================
+             SEARCH AND FILTER
+        ========================================================= -->
+
+        <div class="filter-panel">
+
+            <form method="get"
+                  asp-controller="CoinPayment"
+                  asp-action="Index"
+                  class="filter-form">
+
+
+                <!-- SEARCH -->
+
+                <div class="form-group">
+
+                    <label for="search">
+                        Buscar
+                    </label>
+
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           value="@search"
+                           placeholder="ID o nombre de moneda..." />
+
+                </div>
+
+
+                <!-- SORT -->
+
+                <div class="form-group">
+
+                    <label for="sort">
+                        Ordenar por
+                    </label>
+
+                    <select id="sort"
+                            name="sort">
+
+                        <option value="id_asc"
+                                selected="@(sort == "id_asc")">
+
+                            ID — Ascendente
+
+                        </option>
+
+                        <option value="id_desc"
+                                selected="@(sort == "id_desc")">
+
+                            ID — Descendente
+
+                        </option>
+
+                        <option value="name_asc"
+                                selected="@(sort == "name_asc")">
+
+                            Nombre — A → Z
+
+                        </option>
+
+                        <option value="name_desc"
+                                selected="@(sort == "name_desc")">
+
+                            Nombre — Z → A
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="filter-buttons">
+
+                    <button type="submit"
+                            class="btn-search">
+
+                        Buscar
+
+                    </button>
+
+
+                    <a href="@Url.Action("Index", "CoinPayment")"
+                       class="btn-clear">
+
+                        Limpiar
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- ========================================================
+             TABLE
+        ========================================================= -->
+
+        <div class="table-card">
+
+
+            <div class="table-top">
+
+                <div class="table-top-title">
+
+                    Lista de monedas
+
+                </div>
+
+
+                <div class="results-count">
+
+                    @totalCoins
+                    @(totalCoins == 1 ? "moneda" : "monedas")
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Moneda
+                            </th>
+
+                            <th>
+                                Acciones
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var coin in Model)
+                            {
+                                <tr>
+
+                                    <td class="coin-id">
+                                        @coin.Id
+                                    </td>
+
+
+                                    <td class="coin-name">
+                                        @coin.CoinName
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            <!-- ====================================================
+                                                 VIEW BUTTON
+                                            ===================================================== -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-view"
+                                                    data-id="@coin.Id"
+                                                    data-name="@coin.CoinName"
+                                                    onclick="openViewModalFromButton(this)">
+
+                                                Ver
+
+                                            </button>
+
+
+                                            <!-- ====================================================
+                                                 EDIT BUTTON
+                                            ===================================================== -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-edit"
+                                                    data-id="@coin.Id"
+                                                    data-name="@coin.CoinName"
+                                                    onclick="openEditModalFromButton(this)">
+
+                                                Editar
+
+                                            </button>
+
+
+                                            <!-- ====================================================
+                                                 DELETE BUTTON
+                                            ===================================================== -->
+
+                                            <button type="button"
+                                                    class="action-btn btn-delete"
+                                                    data-id="@coin.Id"
+                                                    data-name="@coin.CoinName"
+                                                    onclick="openDeleteModalFromButton(this)">
+
+                                                Eliminar
+
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="3"
+                                    class="empty-row">
+
+                                    <div class="empty-icon">
+                                        💰
+                                    </div>
+
+                                    <div class="empty-title">
+                                        No se encontraron monedas
+                                    </div>
+
+                                    <div>
+                                        Intenta cambiar los criterios de búsqueda.
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ====================================================
+                 FOOTER / PAGINATION
+            ===================================================== -->
+
+            <div class="table-footer">
+
+
+                <div class="pagination-info">
+
+                    @if (totalCoins > 0)
+                    {
+                        int firstItem =
+                            ((currentPage - 1) * 10) + 1;
+
+                        int lastItem =
+                            Math.Min(currentPage * 10, totalCoins);
+
+                        <span>
+
+                            Mostrando
+
+                            <strong>
+                                @firstItem
+                            </strong>
+
+                            -
+
+                            <strong>
+                                @lastItem
+                            </strong>
+
+                            de
+
+                            <strong>
+                                @totalCoins
+                            </strong>
+
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            0 monedas encontradas
+                        </span>
+                    }
+
+                </div>
+
+
+                @if (totalPages > 1)
+                {
+                    <div class="pagination">
+
+
+                        <!-- PREVIOUS -->
+                        @if (currentPage > 1)
+                        {
+                            <a class="page-link"
+                               href="@Url.Action(
+                                                                  "Index",
+                                                                  "CoinPayment",
+                                                                  new
+                                                                  {
+                                                                      search = search,
+                                                                      sort = sort,
+                                                                      page = currentPage - 1
+                                                                  })">
+
+                                ‹
+
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link disabled">
+                                ‹
+                            </span>
+                        }
+
+
+                        <!-- PAGE NUMBERS -->
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            if (i == currentPage)
+                            {
+                                <span class="page-link active">
+                                    @i
+                                </span>
+                            }
+                            else
+                            {
+                                <a class="page-link"
+                                   href="@Url.Action(
+                                                                          "Index",
+                                                                          "CoinPayment",
+                                                                          new
+                                                                          {
+                                                                              search = search,
+                                                                              sort = sort,
+                                                                              page = i
+                                                                          })">
+
+                                    @i
+
+                                </a>
+                            }
+                        }
+
+
+                        <!-- NEXT -->
+                        @if (currentPage < totalPages)
+                        {
+                            <a class="page-link"
+                               href="@Url.Action(
+                                                                  "Index",
+                                                                  "CoinPayment",
+                                                                  new
+                                                                  {
+                                                                      search = search,
+                                                                      sort = sort,
+                                                                      page = currentPage + 1
+                                                                  })">
+
+                                ›
+
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link disabled">
+                                ›
+                            </span>
+                        }
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- ============================================================
+         ADD MODAL
+    ============================================================= -->
+
+    <div id="addModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Agregar moneda
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('addModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/CoinPayment/Create">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       name="search"
+                       value="@search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@currentPage" />
+
+
+                <div class="modal-body">
+
+                    <div class="modal-form-group">
+
+                        <label for="addCoinName">
+                            Nombre de la moneda
+                        </label>
+
+                        <input type="text"
+                               id="addCoinName"
+                               name="CoinName"
+                               maxlength="50"
+                               required
+                               placeholder="Ej. Mercado Pago, Tarjeta de Crédito..." />
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('addModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         VIEW MODAL
+    ============================================================= -->
+
+    <div id="viewModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Ver moneda
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('viewModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+
+                <div class="modal-form-group">
+
+                    <label for="viewCoinId">
+                        ID
+                    </label>
+
+                    <input type="text"
+                           id="viewCoinId"
+                           readonly />
+
+                </div>
+
+
+                <div class="modal-form-group">
+
+                    <label for="viewCoinName">
+                        Nombre de la moneda
+                    </label>
+
+                    <input type="text"
+                           id="viewCoinName"
+                           readonly />
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="closeModal('viewModal')">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         EDIT MODAL
+    ============================================================= -->
+
+    <div id="editModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Editar moneda
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('editModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/CoinPayment/Edit">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       name="search"
+                       value="@search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@currentPage" />
+
+
+                <div class="modal-body">
+
+
+                    <div class="modal-form-group">
+
+                        <label for="editCoinIdDisplay">
+                            ID
+                        </label>
+
+                        <input type="text"
+                               id="editCoinIdDisplay"
+                               readonly />
+
+
+                        <input type="hidden"
+                               id="editCoinId"
+                               name="Id" />
+
+                    </div>
+
+
+                    <div class="modal-form-group">
+
+                        <label for="editCoinName">
+                            Nombre de la moneda
+                        </label>
+
+                        <input type="text"
+                               id="editCoinName"
+                               name="CoinName"
+                               maxlength="50"
+                               required />
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-cancel"
+                            onclick="closeModal('editModal')">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-save">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         DELETE MODAL
+    ============================================================= -->
+
+    <div id="deleteModal"
+         class="modal">
+
+        <div class="modal-content delete-modal">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Eliminar moneda
+                </h2>
+
+                <button type="button"
+                        class="close-modal"
+                        onclick="closeModal('deleteModal')">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+
+                <div class="delete-icon">
+                    ⚠️
+                </div>
+
+
+                <h3 class="delete-title">
+                    ¿Estás seguro?
+                </h3>
+
+
+                <p class="delete-message">
+
+                    Vas a eliminar la moneda:
+
+                </p>
+
+
+                <div class="delete-coin-name"
+                     id="deleteCoinName">
+                </div>
+
+
+                <p class="delete-warning">
+
+                    Esta acción no se puede deshacer.
+
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="closeModal('deleteModal')">
+
+                    Cancelar
+
+                </button>
+
+
+                <form method="post"
+                      action="/CoinPayment/Delete"
+                      id="deleteForm">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <input type="hidden"
+                           name="id"
+                           id="deleteCoinId" />
+
+
+                    <input type="hidden"
+                           name="search"
+                           value="@search" />
+
+
+                    <input type="hidden"
+                           name="sort"
+                           value="@sort" />
+
+
+                    <input type="hidden"
+                           name="page"
+                           value="@currentPage" />
+
+
+                    <button type="submit"
+                            class="btn-delete-confirm">
+
+                        Sí, eliminar
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         JAVASCRIPT
+    ============================================================= -->
+
+    <script>
+
+            /*
+             * OPEN MODAL
+             */
+
+            function openModal(modalId) {
+
+                const modal = document.getElementById(modalId);
+
+                if (modal) {
+
+                    modal.classList.add("show");
+
+                    document.body.classList.add("modal-open");
+
+                }
+
+            }
+
+
+            /*
+             * CLOSE MODAL
+             */
+
+            function closeModal(modalId) {
+
+                const modal = document.getElementById(modalId);
+
+                if (modal) {
+
+                    modal.classList.remove("show");
+
+                    document.body.classList.remove("modal-open");
+
+                }
+
+            }
+
+
+            /*
+             * VIEW MODAL
+             */
+
+            function openViewModalFromButton(button) {
+
+                const id = button.getAttribute("data-id");
+
+                const name = button.getAttribute("data-name");
+
+                document.getElementById("viewCoinId").value = id;
+
+                document.getElementById("viewCoinName").value = name;
+
+                openModal("viewModal");
+
+            }
+
+
+            /*
+             * EDIT MODAL
+             */
+
+            function openEditModalFromButton(button) {
+
+                const id = button.getAttribute("data-id");
+
+                const name = button.getAttribute("data-name");
+
+                document.getElementById("editCoinIdDisplay").value = id;
+
+                document.getElementById("editCoinId").value = id;
+
+                document.getElementById("editCoinName").value = name;
+
+                openModal("editModal");
+
+            }
+
+
+            /*
+             * DELETE MODAL
+             */
+
+            function openDeleteModalFromButton(button) {
+
+                const id = button.getAttribute("data-id");
+
+                const name = button.getAttribute("data-name");
+
+                document.getElementById("deleteCoinId").value = id;
+
+                document.getElementById("deleteCoinName").textContent = name;
+
+                openModal("deleteModal");
+
+            }
+
+
+            /*
+             * CLOSE WHEN CLICKING OUTSIDE MODAL
+             */
+
+            document.addEventListener("click", function (event) {
+
+                if (event.target.classList.contains("modal")) {
+
+                    event.target.classList.remove("show");
+
+                    document.body.classList.remove("modal-open");
+
+                }
+
+            });
+
+
+            /*
+             * CLOSE WITH ESC
+             */
+
+            document.addEventListener("keydown", function (event) {
+
+                if (event.key === "Escape") {
+
+                    document.querySelectorAll(".modal.show")
+                        .forEach(function (modal) {
+
+                            modal.classList.remove("show");
+
+                        });
+
+                    document.body.classList.remove("modal-open");
+
+                }
+
+            });
+
+    </script>
+
+
+</body>
+
+</html>
+`

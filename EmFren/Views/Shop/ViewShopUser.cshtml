@@ -1,0 +1,1644 @@
+﻿@using System.Globalization
+@model IEnumerable<EmFren.Models.ViewShopUser>
+
+@{
+    ViewData["Title"] = "Mis compras";
+
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var totalRecords = ViewBag.TotalRecords ?? 0;
+    var username = ViewBag.Username ?? "U";
+
+    var dateFrom = ViewBag.DateFrom ?? "";
+    var dateTo = ViewBag.DateTo ?? "";
+}
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Mis compras - EmFren
+    </title>
+
+    <link rel="stylesheet"
+          href="~/css/ViewShopUser.css"
+          asp-append-version="true" />
+
+    <!-- =========================================================
+         JSPDF
+         ========================================================= -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- =========================================================
+         JSPDF AUTOTABLE
+         ========================================================= -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+
+<body>
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <header class="shop-header">
+
+        <div class="header-left">
+
+            <a href="/Home/HomeBuyer"
+               class="home-link">
+
+                Home
+
+            </a>
+
+        </div>
+
+
+        <div class="header-center">
+
+            <h1>
+                Mis compras
+            </h1>
+
+        </div>
+
+
+        <div class="header-right">
+
+            <span class="username">
+
+                <span class="user-icon">
+                    ●
+                </span>
+
+                @username
+
+            </span>
+
+            <span class="notification-icon">
+                ♢
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="purchases-container">
+
+
+        <!-- =====================================================
+             TITLE
+             ===================================================== -->
+
+        <div class="page-title-section">
+
+            <div>
+
+                <h2>
+                    Historial de compras
+                </h2>
+
+                <p>
+                    Consulta la información de tus pedidos.
+                </p>
+
+            </div>
+
+
+            <div class="total-records">
+
+                @totalRecords registro(s)
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             DATE RANGE FILTER
+             ===================================================== -->
+
+        <div class="date-filter-container">
+
+            <form method="get"
+                  action="@Url.Action("ViewShopUser", "Shop")"
+                  class="date-filter-form">
+
+                <div class="date-filter-field">
+
+                    <label for="dateFrom">
+                        Fecha desde
+                    </label>
+
+                    <input type="date"
+                           id="dateFrom"
+                           name="dateFrom"
+                           value="@dateFrom" />
+
+                </div>
+
+
+                <div class="date-filter-field">
+
+                    <label for="dateTo">
+                        Fecha hasta
+                    </label>
+
+                    <input type="date"
+                           id="dateTo"
+                           name="dateTo"
+                           value="@dateTo" />
+
+                </div>
+
+
+                <button type="submit"
+                        class="date-filter-button">
+
+                    Buscar
+
+                </button>
+
+
+                <a href="@Url.Action(
+                    "ViewShopUser",
+                    "Shop"
+                )"
+                   class="date-filter-clear">
+
+                    Limpiar
+
+                </a>
+
+            </form>
+
+        </div>
+
+
+        <!-- =====================================================
+             PURCHASE TABLE
+             ===================================================== -->
+
+        <div class="table-container">
+
+            <table class="purchases-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID Usuario
+                        </th>
+
+                        <th>
+                            Usuario
+                        </th>
+
+                        <th>
+                            Fecha del pedido
+                        </th>
+
+                        <th>
+                            Acción
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        var orders = Model
+                            .GroupBy(x => x.OrderId)
+                            .OrderByDescending(x =>
+                                x.First().DateOrder
+                            )
+                            .ThenByDescending(x => x.Key);
+
+                        foreach (var order in orders)
+                        {
+                            var first = order.First();
+
+                            <tr>
+
+                                <td>
+                                    @first.UserId
+                                </td>
+
+                                <td>
+                                    @first.Username
+                                </td>
+
+                                <td>
+
+                                    @(first.DateOrder.HasValue
+                                        ? first.DateOrder.Value.ToString(
+                                            "dd/MM/yyyy",
+                                            CultureInfo.InvariantCulture)
+                                        : "-")
+
+                                </td>
+
+                                <td>
+
+                                    <button type="button"
+                                            class="view-button"
+                                            data-order-id="@first.OrderId">
+
+                                        Ver
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="4"
+                                class="empty-message">
+
+                                No tienes compras registradas
+                                para el período seleccionado.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             PAGINATION
+             ===================================================== -->
+
+        @if (totalPages > 1)
+        {
+            <div class="pagination">
+
+                @if (currentPage > 1)
+                {
+                    <a href="@Url.Action(
+                        "ViewShopUser",
+                        "Shop",
+                        new
+                        {
+                            page = currentPage - 1,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo
+                        })"
+                       class="page-button">
+
+                        ‹
+
+                    </a>
+                }
+
+
+                @{
+                    int startPage = Math.Max(
+                        1,
+                        currentPage - 2
+                    );
+
+                    int endPage = Math.Min(
+                        totalPages,
+                        currentPage + 2
+                    );
+                }
+
+
+                @if (startPage > 1)
+                {
+                    <a href="@Url.Action(
+                        "ViewShopUser",
+                        "Shop",
+                        new
+                        {
+                            page = 1,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo
+                        })"
+                       class="page-button">
+
+                        1
+
+                    </a>
+
+
+                    @if (startPage > 2)
+                    {
+                        <span class="page-dots">
+                            ...
+                        </span>
+                    }
+                }
+
+
+                @for (
+                    int i = startPage;
+                    i <= endPage;
+                    i++
+                )
+                {
+                    if (i == currentPage)
+                    {
+                        <span class="page-button active">
+                            @i
+                        </span>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action(
+                            "ViewShopUser",
+                            "Shop",
+                            new
+                            {
+                                page = i,
+                                dateFrom = dateFrom,
+                                dateTo = dateTo
+                            })"
+                           class="page-button">
+
+                            @i
+
+                        </a>
+                    }
+                }
+
+
+                @if (endPage < totalPages)
+                {
+                    @if (endPage < totalPages - 1)
+                    {
+                        <span class="page-dots">
+                            ...
+                        </span>
+                    }
+
+
+                    <a href="@Url.Action(
+                        "ViewShopUser",
+                        "Shop",
+                        new
+                        {
+                            page = totalPages,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo
+                        })"
+                       class="page-button">
+
+                        @totalPages
+
+                    </a>
+                }
+
+
+                @if (currentPage < totalPages)
+                {
+                    <a href="@Url.Action(
+                        "ViewShopUser",
+                        "Shop",
+                        new
+                        {
+                            page = currentPage + 1,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo
+                        })"
+                       class="page-button">
+
+                        ›
+
+                    </a>
+                }
+
+            </div>
+        }
+
+    </main>
+
+
+    <!-- =========================================================
+         PURCHASE DETAILS MODAL
+         ========================================================= -->
+
+    <div id="purchaseModal"
+         class="purchase-modal">
+
+        <!-- =====================================================
+             OVERLAY
+             ===================================================== -->
+
+        <div id="purchaseModalOverlay"
+             class="purchase-modal-overlay">
+        </div>
+
+
+        <!-- =====================================================
+             MODAL CONTENT
+             ===================================================== -->
+
+        <div class="purchase-modal-content">
+
+
+            <!-- =================================================
+                 MODAL HEADER
+                 ================================================= -->
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h2>
+                        Detalles de la compra
+                    </h2>
+
+                    <span id="modalOrderIdHeader"
+                          class="order-number">
+                    </span>
+
+                </div>
+
+
+                <button type="button"
+                        id="closePurchaseModal"
+                        class="close-modal">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 ORDER INFORMATION
+                 ================================================= -->
+
+            <div class="order-information">
+
+
+                <!-- =================================================
+                     ORDER ID
+                     ================================================= -->
+
+                <div class="information-card">
+
+                    <span>
+                        ID del pedido
+                    </span>
+
+                    <strong id="modalOrderId">
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     USER ID
+                     ================================================= -->
+
+                <div class="information-card">
+
+                    <span>
+                        ID Usuario
+                    </span>
+
+                    <strong id="modalUserId">
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     USERNAME
+                     ================================================= -->
+
+                <div class="information-card">
+
+                    <span>
+                        Usuario
+                    </span>
+
+                    <strong id="modalUsername">
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     DATE
+                     ================================================= -->
+
+                <div class="information-card">
+
+                    <span>
+                        Fecha del pedido
+                    </span>
+
+                    <strong id="modalDate">
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     PAYMENT CURRENCY
+                     ================================================= -->
+
+                <div class="information-card">
+
+                    <span>
+                        Moneda de pago
+                    </span>
+
+                    <strong id="modalCurrency">
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     TOTAL
+                     ================================================= -->
+
+                <div class="information-card total-card">
+
+                    <span>
+                        Total de compra
+                    </span>
+
+                    <strong id="modalTotal">
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ARTICLES
+                 ================================================= -->
+
+            <div class="articles-section">
+
+                <div class="articles-title">
+
+                    <h3>
+                        Artículos de la compra
+                    </h3>
+
+                    <span id="modalArticleCount">
+                        0 artículo(s)
+                    </span>
+
+                </div>
+
+
+                <div class="details-table-container">
+
+                    <table class="details-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Código
+                                </th>
+
+                                <th>
+                                    Vehículo
+                                </th>
+
+                                <th>
+                                    Medida
+                                </th>
+
+                                <th>
+                                    Tipo
+                                </th>
+
+                                <th>
+                                    Fricción
+                                </th>
+
+                                <th>
+                                    Cantidad
+                                </th>
+
+                                <th>
+                                    Precio unitario
+                                </th>
+
+                                <th>
+                                    Descuento
+                                </th>
+
+                                <th>
+                                    Stock
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="articlesTableBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 MODAL FOOTER
+                 ================================================= -->
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        id="downloadPurchasePdf"
+                        class="pdf-button">
+
+                    Descargar PDF
+
+                </button>
+
+
+                <button type="button"
+                        id="closePurchaseModalBottom"
+                        class="close-button">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         HIDDEN PURCHASE DATA
+         ========================================================= -->
+
+    <div id="purchaseData"
+         style="display: none;">
+
+        @if (Model != null)
+        {
+            foreach (var orderGroup in Model.GroupBy(x => x.OrderId))
+            {
+                var first = orderGroup.First();
+
+                <div class="purchase-data"
+                     data-order-id="@first.OrderId"
+                     data-user-id="@first.UserId"
+                     data-username="@first.Username"
+                     data-date="@(first.DateOrder.HasValue
+                         ? first.DateOrder.Value.ToString(
+                             "dd/MM/yyyy",
+                             CultureInfo.InvariantCulture)
+                         : "-")"
+                     data-total="@(first.TotalPurchase.HasValue
+                         ? first.TotalPurchase.Value.ToString(
+                             "N2",
+                             CultureInfo.InvariantCulture)
+                         : "0.00")"
+                     data-currency="@first.PaymentCurrency">
+
+                    @foreach (var item in orderGroup)
+                    {
+                        <div class="article-data"
+                             data-quantity="@item.Quantity"
+                             data-article-code="@item.ArticleCode"
+                             data-vehicle="@item.VehicleBrand"
+                             data-measure="@item.Measure"
+                             data-type="@item.Type"
+                             data-friction="@item.Friction"
+                             data-price="@(item.UnitPrice.HasValue
+                                 ? item.UnitPrice.Value.ToString(
+                                     "N2",
+                                     CultureInfo.InvariantCulture)
+                                 : "0.00")"
+                             data-discount="@(item.Discount.HasValue
+                                 ? item.Discount.Value.ToString(
+                                     "N2",
+                                     CultureInfo.InvariantCulture)
+                                 : "0.00")"
+                             data-stock="@(item.Stock.HasValue
+                                 ? (item.Stock.Value
+                                     ? "Disponible"
+                                     : "Sin stock")
+                                 : "-")">
+                        </div>
+                    }
+
+                </div>
+            }
+        }
+
+    </div>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+         ========================================================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                // =================================================
+                // ELEMENTS
+                // =================================================
+
+                const modal =
+                    document.getElementById(
+                        "purchaseModal"
+                    );
+
+                const overlay =
+                    document.getElementById(
+                        "purchaseModalOverlay"
+                    );
+
+                const closeButton =
+                    document.getElementById(
+                        "closePurchaseModal"
+                    );
+
+                const closeBottomButton =
+                    document.getElementById(
+                        "closePurchaseModalBottom"
+                    );
+
+                const downloadPdfButton =
+                    document.getElementById(
+                        "downloadPurchasePdf"
+                    );
+
+                const viewButtons =
+                    document.querySelectorAll(
+                        ".view-button"
+                    );
+
+                const purchaseData =
+                    document.querySelectorAll(
+                        ".purchase-data"
+                    );
+
+
+                // =================================================
+                // MODAL FIELDS
+                // =================================================
+
+                const modalOrderIdHeader =
+                    document.getElementById(
+                        "modalOrderIdHeader"
+                    );
+
+                const modalOrderId =
+                    document.getElementById(
+                        "modalOrderId"
+                    );
+
+                const modalUserId =
+                    document.getElementById(
+                        "modalUserId"
+                    );
+
+                const modalUsername =
+                    document.getElementById(
+                        "modalUsername"
+                    );
+
+                const modalDate =
+                    document.getElementById(
+                        "modalDate"
+                    );
+
+                const modalCurrency =
+                    document.getElementById(
+                        "modalCurrency"
+                    );
+
+                const modalTotal =
+                    document.getElementById(
+                        "modalTotal"
+                    );
+
+                const modalArticleCount =
+                    document.getElementById(
+                        "modalArticleCount"
+                    );
+
+                const articlesTableBody =
+                    document.getElementById(
+                        "articlesTableBody"
+                    );
+
+
+                // =================================================
+                // DATE FILTER ELEMENTS
+                // =================================================
+
+                const dateFromInput =
+                    document.getElementById(
+                        "dateFrom"
+                    );
+
+                const dateToInput =
+                    document.getElementById(
+                        "dateTo"
+                    );
+
+
+                // =================================================
+                // CURRENT PURCHASE
+                // =================================================
+
+                let currentPurchase = null;
+
+
+                // =================================================
+                // DATE VALIDATION
+                // =================================================
+
+                if (dateFromInput && dateToInput) {
+
+                    dateFromInput.addEventListener(
+                        "change",
+                        function () {
+
+                            if (
+                                dateToInput.value &&
+                                this.value &&
+                                this.value >
+                                dateToInput.value
+                            ) {
+
+                                dateToInput.value =
+                                    this.value;
+
+                            }
+
+                        }
+                    );
+
+
+                    dateToInput.addEventListener(
+                        "change",
+                        function () {
+
+                            if (
+                                dateFromInput.value &&
+                                this.value &&
+                                this.value <
+                                dateFromInput.value
+                            ) {
+
+                                dateFromInput.value =
+                                    this.value;
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                // =================================================
+                // OPEN PURCHASE MODAL
+                // =================================================
+
+                function openPurchaseModal(orderId) {
+
+                    let selectedPurchase = null;
+
+
+                    purchaseData.forEach(
+                        function (purchase) {
+
+                            if (
+                                purchase.dataset.orderId ===
+                                String(orderId)
+                            ) {
+
+                                selectedPurchase =
+                                    purchase;
+
+                            }
+
+                        }
+                    );
+
+
+                    if (!selectedPurchase) {
+                        return;
+                    }
+
+
+                    // =================================================
+                    // SAVE CURRENT PURCHASE
+                    // =================================================
+
+                    currentPurchase =
+                        selectedPurchase;
+
+
+                    // =================================================
+                    // ORDER INFORMATION
+                    // =================================================
+
+                    const selectedOrderId =
+                        selectedPurchase.dataset.orderId ||
+                        "-";
+
+
+                    modalOrderIdHeader.textContent =
+                        "Pedido #" +
+                        selectedOrderId;
+
+
+                    modalOrderId.textContent =
+                        selectedOrderId;
+
+
+                    modalUserId.textContent =
+                        selectedPurchase.dataset.userId ||
+                        "-";
+
+
+                    modalUsername.textContent =
+                        selectedPurchase.dataset.username ||
+                        "-";
+
+
+                    modalDate.textContent =
+                        selectedPurchase.dataset.date ||
+                        "-";
+
+
+                    modalCurrency.textContent =
+                        selectedPurchase.dataset.currency ||
+                        "-";
+
+
+                    modalTotal.textContent =
+                        selectedPurchase.dataset.total ||
+                        "0.00";
+
+
+                    // =================================================
+                    // CLEAR ARTICLES
+                    // =================================================
+
+                    articlesTableBody.innerHTML =
+                        "";
+
+
+                    // =================================================
+                    // GET ARTICLES
+                    // =================================================
+
+                    const articles =
+                        selectedPurchase.querySelectorAll(
+                            ".article-data"
+                        );
+
+
+                    modalArticleCount.textContent =
+                        articles.length +
+                        (
+                            articles.length === 1
+                                ? " artículo"
+                                : " artículos"
+                        );
+
+
+                    // =================================================
+                    // CREATE ARTICLE ROWS
+                    // =================================================
+
+                    articles.forEach(
+                        function (article) {
+
+                            const row =
+                                document.createElement(
+                                    "tr"
+                                );
+
+
+                            const articleCode =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            articleCode.textContent =
+                                article.dataset.articleCode ||
+                                "-";
+
+
+                            const vehicle =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            vehicle.textContent =
+                                article.dataset.vehicle ||
+                                "-";
+
+
+                            const measure =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            measure.textContent =
+                                article.dataset.measure ||
+                                "-";
+
+
+                            const type =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            type.textContent =
+                                article.dataset.type ||
+                                "-";
+
+
+                            const friction =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            friction.textContent =
+                                article.dataset.friction ||
+                                "-";
+
+
+                            const quantity =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            quantity.textContent =
+                                article.dataset.quantity ||
+                                "0";
+
+
+                            const price =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            price.textContent =
+                                article.dataset.price ||
+                                "0.00";
+
+
+                            const discount =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            discount.textContent =
+                                (
+                                    article.dataset.discount ||
+                                    "0.00"
+                                ) + "%";
+
+
+                            const stock =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            stock.textContent =
+                                article.dataset.stock ||
+                                "-";
+
+
+                            // =================================================
+                            // ADD CELLS TO ROW
+                            // =================================================
+
+                            row.appendChild(
+                                articleCode
+                            );
+
+                            row.appendChild(
+                                vehicle
+                            );
+
+                            row.appendChild(
+                                measure
+                            );
+
+                            row.appendChild(
+                                type
+                            );
+
+                            row.appendChild(
+                                friction
+                            );
+
+                            row.appendChild(
+                                quantity
+                            );
+
+                            row.appendChild(
+                                price
+                            );
+
+                            row.appendChild(
+                                discount
+                            );
+
+                            row.appendChild(
+                                stock
+                            );
+
+
+                            articlesTableBody.appendChild(
+                                row
+                            );
+
+                        }
+                    );
+
+
+                    // =================================================
+                    // SHOW MODAL
+                    // =================================================
+
+                    modal.classList.add(
+                        "active"
+                    );
+
+                    document.body.style.overflow =
+                        "hidden";
+
+                }
+
+
+                // =================================================
+                // DOWNLOAD PURCHASE PDF
+                // =================================================
+
+                function downloadPurchasePdf() {
+
+                    if (!currentPurchase) {
+                        return;
+                    }
+
+
+                    if (
+                        typeof window.jspdf ===
+                        "undefined"
+                    ) {
+
+                        alert(
+                            "No se pudo cargar el generador de PDF."
+                        );
+
+                        return;
+
+                    }
+
+
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+
+
+                    const doc =
+                        new jsPDF(
+                            {
+                                orientation: "landscape",
+                                unit: "mm",
+                                format: "a4"
+                            }
+                        );
+
+
+                    // =================================================
+                    // PURCHASE DATA
+                    // =================================================
+
+                    const orderId =
+                        currentPurchase.dataset.orderId ||
+                        "-";
+
+                    const userId =
+                        currentPurchase.dataset.userId ||
+                        "-";
+
+                    const username =
+                        currentPurchase.dataset.username ||
+                        "-";
+
+                    const date =
+                        currentPurchase.dataset.date ||
+                        "-";
+
+                    const currency =
+                        currentPurchase.dataset.currency ||
+                        "-";
+
+                    const total =
+                        currentPurchase.dataset.total ||
+                        "0.00";
+
+
+                    // =================================================
+                    // TITLE
+                    // =================================================
+
+                    doc.setFontSize(20);
+
+                    doc.setFont(
+                        "helvetica",
+                        "bold"
+                    );
+
+                    doc.text(
+                        "EmFren",
+                        14,
+                        18
+                    );
+
+
+                    doc.setFontSize(15);
+
+                    doc.text(
+                        "Detalle de compra",
+                        14,
+                        28
+                    );
+
+
+                    // =================================================
+                    // ORDER INFORMATION
+                    // =================================================
+
+                    doc.setFontSize(10);
+
+                    doc.setFont(
+                        "helvetica",
+                        "normal"
+                    );
+
+                    doc.text(
+                        "Pedido: #" + orderId,
+                        14,
+                        39
+                    );
+
+                    doc.text(
+                        "ID Usuario: " + userId,
+                        14,
+                        46
+                    );
+
+                    doc.text(
+                        "Usuario: " + username,
+                        14,
+                        53
+                    );
+
+                    doc.text(
+                        "Fecha del pedido: " + date,
+                        14,
+                        60
+                    );
+
+                    doc.text(
+                        "Moneda de pago: " + currency,
+                        100,
+                        39
+                    );
+
+                    doc.text(
+                        "Total de compra: " + total,
+                        100,
+                        46
+                    );
+
+
+                    // =================================================
+                    // ARTICLE DATA
+                    // =================================================
+
+                    const articles =
+                        currentPurchase.querySelectorAll(
+                            ".article-data"
+                        );
+
+
+                    const tableRows = [];
+
+
+                    articles.forEach(
+                        function (article) {
+
+                            tableRows.push(
+                                [
+                                    article.dataset.articleCode ||
+                                    "-",
+
+                                    article.dataset.vehicle ||
+                                    "-",
+
+                                    article.dataset.measure ||
+                                    "-",
+
+                                    article.dataset.type ||
+                                    "-",
+
+                                    article.dataset.friction ||
+                                    "-",
+
+                                    article.dataset.quantity ||
+                                    "0",
+
+                                    article.dataset.price ||
+                                    "0.00",
+
+                                    (
+                                        article.dataset.discount ||
+                                        "0.00"
+                                    ) + "%",
+
+                                    article.dataset.stock ||
+                                    "-"
+                                ]
+                            );
+
+                        }
+                    );
+
+
+                    // =================================================
+                    // ARTICLE TABLE
+                    // =================================================
+
+                    doc.autoTable(
+                        {
+                            startY: 70,
+
+                            head:
+                            [
+                                [
+                                    "Código",
+                                    "Vehículo",
+                                    "Medida",
+                                    "Tipo",
+                                    "Fricción",
+                                    "Cantidad",
+                                    "Precio unitario",
+                                    "Descuento",
+                                    "Stock"
+                                ]
+                            ],
+
+                            body:
+                                tableRows,
+
+                            theme:
+                                "grid",
+
+                            styles:
+                            {
+                                fontSize: 8,
+
+                                cellPadding: 2,
+
+                                overflow:
+                                    "linebreak",
+
+                                valign:
+                                    "middle"
+                            },
+
+                            headStyles:
+                            {
+                                fontStyle:
+                                    "bold"
+                            },
+
+                            margin:
+                            {
+                                left: 10,
+
+                                right: 10
+                            }
+                        }
+                    );
+
+
+                    // =================================================
+                    // FOOTER
+                    // =================================================
+
+                    const pageCount =
+                        doc.internal.getNumberOfPages();
+
+
+                    for (
+                        let i = 1;
+                        i <= pageCount;
+                        i++
+                    ) {
+
+                        doc.setPage(i);
+
+                        doc.setFontSize(8);
+
+                        doc.setFont(
+                            "helvetica",
+                            "normal"
+                        );
+
+                        doc.text(
+                            "EmFren - Mis compras",
+                            14,
+                            202
+                        );
+
+                        doc.text(
+                            "Página " +
+                            i +
+                            " de " +
+                            pageCount,
+                            250,
+                            202
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // DOWNLOAD
+                    // =================================================
+
+                    doc.save(
+                        "EmFren_Pedido_" +
+                        orderId +
+                        ".pdf"
+                    );
+
+                }
+
+
+                // =================================================
+                // CLOSE MODAL
+                // =================================================
+
+                function closePurchaseModal() {
+
+                    modal.classList.remove(
+                        "active"
+                    );
+
+                    document.body.style.overflow =
+                        "";
+
+                    currentPurchase =
+                        null;
+
+                }
+
+
+                // =================================================
+                // VIEW BUTTON
+                // =================================================
+
+                viewButtons.forEach(
+                    function (button) {
+
+                        button.addEventListener(
+                            "click",
+                            function () {
+
+                                const orderId =
+                                    this.dataset.orderId;
+
+                                openPurchaseModal(
+                                    orderId
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                // =================================================
+                // PDF BUTTON
+                // =================================================
+
+                downloadPdfButton.addEventListener(
+                    "click",
+                    function () {
+
+                        downloadPurchasePdf();
+
+                    }
+                );
+
+
+                // =================================================
+                // CLOSE BUTTONS
+                // =================================================
+
+                closeButton.addEventListener(
+                    "click",
+                    closePurchaseModal
+                );
+
+
+                closeBottomButton.addEventListener(
+                    "click",
+                    closePurchaseModal
+                );
+
+
+                overlay.addEventListener(
+                    "click",
+                    closePurchaseModal
+                );
+
+
+                // =================================================
+                // ESC KEY
+                // =================================================
+
+                document.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            event.key === "Escape" &&
+                            modal.classList.contains(
+                                "active"
+                            )
+                        ) {
+
+                            closePurchaseModal();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

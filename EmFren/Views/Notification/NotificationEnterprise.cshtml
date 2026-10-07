@@ -1,0 +1,278 @@
+﻿@{
+    Layout = null;
+
+    string username = ViewBag.Username ?? "Usuario";
+
+    var notifications = ViewBag.Notifications
+        as IEnumerable<dynamic>
+        ?? Enumerable.Empty<dynamic>();
+}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EmFren | Notificaciones</title>
+
+    <link rel="stylesheet"
+          href="~/css/Notification.css"
+          asp-append-version="true" />
+
+</head>
+
+<body>
+
+    <main class="notifications-page">
+
+        <!-- =========================
+             HEADER
+        ========================= -->
+
+        <header class="notifications-header">
+
+            <div class="header-left">
+
+                <a href="/Home/HomeEnterprise"
+                   class="back-button">
+
+                    ←
+
+                </a>
+
+                <div>
+
+                    <h1>
+                        Notificaciones
+                    </h1>
+
+                    <p>
+                        Notificaciones del sistema
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="header-user">
+
+                <span class="user-icon">
+                    👤
+                </span>
+
+                <span>
+                    @username
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================
+             NOTIFICATIONS
+        ========================= -->
+
+        <section class="notifications-container">
+
+            @if (!notifications.Any())
+            {
+                <!-- =========================
+                     EMPTY
+                ========================= -->
+
+                <div class="empty-notifications">
+
+                    <div class="empty-icon">
+                        🔔
+                    </div>
+
+                    <h2>
+                        No tienes notificaciones
+                    </h2>
+
+                    <p>
+                        Las nuevas notificaciones aparecerán aquí.
+                    </p>
+
+                </div>
+            }
+            else
+            {
+                <!-- =========================
+                     NOTIFICATION LIST
+                ========================= -->
+
+                <div class="notifications-list">
+
+                    @foreach (var notification in notifications)
+                    {
+                        bool isRead = notification.IsRead;
+
+                        <div class="notification-item @(isRead ? "read" : "unread")">
+
+                            <!-- =========================
+                                 ICON
+                            ========================= -->
+
+                            <div class="notification-icon">
+
+                                @if (notification.OrderId != null)
+                                {
+                                    <span>🛒</span>
+                                }
+                                else
+                                {
+                                    <span>🔔</span>
+                                }
+
+                            </div>
+
+
+                            <!-- =========================
+                                 CONTENT
+                            ========================= -->
+
+                            <div class="notification-body">
+
+                                <div class="notification-title-row">
+
+                                    <h3>
+                                        @notification.Title
+                                    </h3>
+
+                                    @if (!isRead)
+                                    {
+                                        <span class="new-badge">
+                                            Nueva
+                                        </span>
+                                    }
+
+                                </div>
+
+
+                                <!-- =========================
+                                     MESSAGE
+                                ========================= -->
+
+                                <p class="notification-message">
+                                    @notification.Message
+                                </p>
+
+
+                                <!-- =========================
+                                     USERNAME
+                                ========================= -->
+
+                                <div class="notification-user">
+
+                                    <span class="user-label">
+                                        Usuario:
+                                    </span>
+
+                                    <span class="user-name">
+                                        @notification.UsernameNotification
+                                    </span>
+
+                                </div>
+
+
+                                <!-- =========================
+                                     ORDER
+                                ========================= -->
+
+                                @if (notification.OrderId != null)
+                                {
+                                    <div class="notification-order">
+
+                                        <span class="order-label">
+                                            Orden
+                                        </span>
+
+                                        <span class="order-number">
+                                            #@notification.OrderId
+                                        </span>
+
+                                    </div>
+                                }
+
+
+                                <!-- =========================
+                                     DATE
+                                ========================= -->
+
+                                <div class="notification-date">
+
+                                    @notification.CreatedAt.ToString(
+                                        "dd/MM/yyyy HH:mm"
+                                    )
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =========================
+                                 MARK AS READ
+                            ========================= -->
+
+                            <div class="notification-action">
+
+                                @if (!isRead)
+                                {
+                                    <form action="/Notification/MarkAsRead"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="notificationId"
+                                               value="@notification.Id" />
+
+                                        <button type="submit"
+                                                class="read-button">
+
+                                            Marcar como leída
+
+                                        </button>
+
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="read-label">
+                                        Leída
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <!-- =========================
+                                 UNREAD INDICATOR
+                            ========================= -->
+
+                            @if (!isRead)
+                            {
+                                <div class="unread-indicator"></div>
+                            }
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,265 @@
+﻿/* =========================================================
+   RESET
+   ========================================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    color: #1f2937;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+    height: 70px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+
+/* PAGE TITLE */
+
+.header-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+
+/* HOME */
+
+.home-link {
+    position: absolute;
+    left: 30px;
+    text-decoration: none;
+    color: #374151;
+    font-size: 15px;
+    transition: color 0.2s ease;
+}
+
+
+    .home-link:hover {
+        color: #111827;
+    }
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.account-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+
+/* =========================================================
+   ACCOUNT CARD
+   ========================================================= */
+
+.account-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+    /* TITLE */
+
+    .account-card h2 {
+        margin-bottom: 8px;
+        font-size: 24px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+
+/* DESCRIPTION */
+
+.description {
+    color: #6b7280;
+    margin-bottom: 30px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SUCCESS MESSAGE
+   ========================================================= */
+
+.success-message {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   VALIDATION
+   ========================================================= */
+
+.validation-summary {
+    color: #dc2626;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+
+.field-error {
+    display: block;
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+
+    /* LABEL */
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+
+/* INPUT */
+
+.form-control {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+    .form-control:focus {
+        border-color: #6b7280;
+        box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1);
+    }
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+
+/* SAVE BUTTON */
+
+.save-button {
+    border: none;
+    background: #111827;
+    color: #ffffff;
+    padding: 11px 22px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+
+    .save-button:hover {
+        background: #374151;
+    }
+
+
+    .save-button:active {
+        transform: scale(0.98);
+    }
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .header {
+        height: 60px;
+    }
+
+
+    .header-title {
+        font-size: 19px;
+    }
+
+
+    .home-link {
+        left: 15px;
+        font-size: 14px;
+    }
+
+
+    .account-container {
+        margin: 30px auto;
+        padding: 0 15px;
+    }
+
+
+    .account-card {
+        padding: 22px;
+    }
+
+
+        .account-card h2 {
+            font-size: 21px;
+        }
+
+
+    .buttons {
+        justify-content: stretch;
+    }
+
+
+    .save-button {
+        width: 100%;
+    }
+}

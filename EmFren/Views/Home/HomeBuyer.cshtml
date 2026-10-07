@@ -1,0 +1,273 @@
+﻿@{
+    Layout = null;
+
+    string username = ViewBag.Username ?? "Usuario";
+
+    int unreadNotificationCount = ViewBag.UnreadNotificationCount ?? 0;
+}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EmFren - Inicio</title>
+    <link rel="stylesheet"
+          href="~/css/HomeBuyer.css" />
+
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            Em<span>Fren</span>
+        </div>
+
+        <ul class="menu">
+
+            <li>
+                <a href="/" class="active">
+                    <span class="icon">⌂</span>
+                    <span>Inicio</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/MyAccount/Edit">
+                    <span class="icon">👤</span>
+                    <span>Mi cuenta</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/Shop/ViewShopUser">
+                    <span class="icon">🛒</span>
+                    <span>Productos comprados</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/Shop/Articles">
+                    <span class="icon">🛍</span>
+                    <span>Comprar productos</span>
+                </a>
+            </li>
+
+        </ul>
+
+        <!-- LOGOUT -->
+        <div class="logout">
+
+            <form action="/Users/Logout"
+                  method="post"
+                  class="logout-form">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="logout-button">
+
+                    <span class="icon">↪</span>
+
+                    <span>Cerrar sesión</span>
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <!-- PAGE TITLE -->
+            <h1>Inicio</h1>
+
+
+            <!-- RIGHT SIDE -->
+            <div class="header-right">
+
+                <!-- NOTIFICATION -->
+                    <a href="/Notification/NotificationBuyer"
+                       class="notification"
+                       aria-label="Notificaciones">
+
+                        <span class="notification-bell">
+                            🔔
+                        </span>
+
+                        @if (unreadNotificationCount > 0)
+                        {
+                            <span class="notification-number">
+                                @unreadNotificationCount
+                            </span>
+                        }
+
+                    </a>
+
+
+                <!-- USER -->
+                <div class="user-info">
+
+                    <div class="user-name">
+                        @username
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+        <div class="content">
+
+            <div class="welcome">
+
+                <h2>
+                    ¡Bienvenido a EmFren!
+                </h2>
+
+                <p>
+                    Administra tu cuenta, consulta tus compras
+                    y encuentra nuevos productos.
+                </p>
+
+            </div>
+
+
+            <!-- MAIN OPTIONS -->
+            <div class="cards">
+
+                <!-- MY ACCOUNT -->
+                <div class="card">
+
+                    <div class="card-icon">
+                        👤
+                    </div>
+
+                    <h3>
+                        Mi cuenta
+                    </h3>
+
+                    <p>
+                        Consulta y actualiza tus datos personales,
+                        información de contacto y configuración
+                        de tu cuenta.
+                    </p>
+
+                    <a href="/MyAccount/Edit" class="button">
+                        Ver mi cuenta
+                    </a>
+
+                </div>
+
+
+                <!-- PURCHASED PRODUCTS -->
+                <div class="card">
+
+                    <div class="card-icon">
+                        🛒
+                    </div>
+
+                    <h3>
+                        Productos comprados
+                    </h3>
+
+                    <p>
+                        Consulta tus compras anteriores, los productos
+                        adquiridos, cantidades y el total de cada compra.
+                    </p>
+
+                    <a href="/Shop/ViewShopUser" class="button">
+                        Ver mis compras
+                    </a>
+
+                </div>
+
+
+                <!-- BUY PRODUCTS -->
+                <div class="card">
+
+                    <div class="card-icon">
+                        🛍
+                    </div>
+
+                    <h3>
+                        Comprar productos
+                    </h3>
+
+                    <p>
+                        Explora los productos disponibles, selecciona
+                        los artículos que deseas y realiza una nueva compra.
+                    </p>
+
+                    <a href="/Shop/Articles" class="button primary">
+                        Comprar productos
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT PURCHASES -->
+            <!--<section class="section">
+
+                <div class="section-header">
+
+                    <h2>
+                        Mis compras recientes
+                    </h2>
+
+                    <a href="/purchased-products">
+                        Ver todas
+                    </a>
+
+                </div>
+
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        🛍
+                    </div>
+
+                    <h3>
+                        Aún no tienes compras
+                    </h3>
+
+                    <p>
+                        Cuando realices una compra,
+                        tus productos aparecerán aquí.
+                    </p>
+
+                    <br>
+
+                    <a href="/Shop/Articles"
+                       class="button primary">
+
+                        Comprar productos
+
+                    </a>
+
+                </div>
+
+            </section>-->
+
+        </div>
+
+    </main>
+
+</body>
+</html>

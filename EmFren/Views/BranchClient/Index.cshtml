@@ -1,0 +1,879 @@
+﻿@model IEnumerable<EmFren.Models.BranchClient>
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Sucursales - EmFren</title>
+
+    <link rel="stylesheet"
+          href="~/css/BranchClient.css" />
+
+</head>
+
+
+<body>
+
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
+    <header class="header">
+
+        <div class="logo">
+            EmFren
+        </div>
+
+
+        <a href="/Home/HomeEnterprise"
+           class="home-link">
+
+            Home
+
+        </a>
+
+
+        <div class="user-area">
+
+            <div class="user-circle">
+                @(ViewBag.Username?.ToString()?.Substring(0, 1).ToUpper() ?? "U")
+            </div>
+
+            <span>
+                @ViewBag.Username
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- ===================================================== -->
+    <!-- MAIN -->
+    <!-- ===================================================== -->
+
+    <main class="container">
+
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Sucursales
+                </h1>
+
+                <p>
+                    Gestión de sucursales de clientes
+                </p>
+
+            </div>
+
+
+            <button class="add-button"
+                    type="button"
+                    onclick="openAddModal()">
+
+                + Nueva sucursal
+
+            </button>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ALERTS -->
+        <!-- ================================================= -->
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert success">
+                @TempData["Success"]
+            </div>
+        }
+
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert error">
+                @TempData["Error"]
+            </div>
+        }
+
+
+        <!-- ================================================= -->
+        <!-- SEARCH / SORT -->
+        <!-- ================================================= -->
+
+        <form method="get"
+              action="/BranchClient/Index"
+              class="filters">
+
+
+            <div class="search-box">
+
+                <input type="text"
+                       name="search"
+                       value="@ViewBag.Search"
+                       placeholder="Buscar país, ciudad o ID..." />
+
+                <button type="submit"
+                        class="search-button">
+
+                    Buscar
+
+                </button>
+
+
+                <!-- LIMPIAR -->
+
+                <a href="/BranchClient/Index"
+                   class="clear-button">
+
+                    Limpiar
+
+                </a>
+
+            </div>
+
+
+            <div class="sort-box">
+
+                <select name="sort"
+                        onchange="this.form.submit()">
+
+                    <option value="id_asc"
+                            selected="@(ViewBag.Sort == "id_asc")">
+
+                        ID ↑
+
+                    </option>
+
+                    <option value="id_desc"
+                            selected="@(ViewBag.Sort == "id_desc")">
+
+                        ID ↓
+
+                    </option>
+
+                    <option value="country_asc"
+                            selected="@(ViewBag.Sort == "country_asc")">
+
+                        País A-Z
+
+                    </option>
+
+                    <option value="country_desc"
+                            selected="@(ViewBag.Sort == "country_desc")">
+
+                        País Z-A
+
+                    </option>
+
+                    <option value="city_asc"
+                            selected="@(ViewBag.Sort == "city_asc")">
+
+                        Ciudad A-Z
+
+                    </option>
+
+                    <option value="city_desc"
+                            selected="@(ViewBag.Sort == "city_desc")">
+
+                        Ciudad Z-A
+
+                    </option>
+
+                </select>
+
+            </div>
+
+        </form>
+
+
+        <!-- ================================================= -->
+        <!-- TABLE -->
+        <!-- ================================================= -->
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            País
+                        </th>
+
+                        <th>
+                            Ciudad
+                        </th>
+
+                        <th>
+                            Acciones
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model.Any())
+                    {
+                        foreach (var branch in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @branch.Id
+                                </td>
+
+                                <td>
+                                    @branch.CountryName
+                                </td>
+
+                                <td>
+                                    @branch.City
+                                </td>
+
+                                <td class="actions">
+
+                                    <button type="button"
+                                            class="action view"
+                                            data-id="@branch.Id"
+                                            data-country="@branch.CountryName"
+                                            data-city="@branch.City"
+                                            onclick="openViewModal(this)">
+
+                                        Ver
+
+                                    </button>
+
+
+                                    <button type="button"
+                                            class="action edit"
+                                            data-id="@branch.Id"
+                                            data-country="@branch.CountryName"
+                                            data-city="@branch.City"
+                                            onclick="openEditModal(this)">
+
+                                        Editar
+
+                                    </button>
+
+
+                                    <button type="button"
+                                            class="action delete"
+                                            data-id="@branch.Id"
+                                            data-city="@branch.City"
+                                            onclick="openDeleteModal(this)">
+
+                                        Eliminar
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="4"
+                                class="empty">
+
+                                No se encontraron sucursales.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- FOOTER / PAGINATION -->
+        <!-- ================================================= -->
+
+        <div class="table-footer">
+
+            <div class="users-count">
+
+                @ViewBag.TotalBranches
+
+                <span>
+                    sucursales encontradas
+                </span>
+
+            </div>
+
+
+            @if (ViewBag.TotalPages > 1)
+            {
+                <div class="pagination">
+
+
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <a href="@Url.Action(
+                            "Index",
+                            "BranchClient",
+                            new {
+                                search = ViewBag.Search,
+                                sort = ViewBag.Sort,
+                                page = ViewBag.CurrentPage - 1
+                            })">
+
+                            ←
+
+                        </a>
+                    }
+
+
+                    @for (
+                        int i = 1;
+                        i <= ViewBag.TotalPages;
+                        i++)
+                    {
+                        <a class="@(i == ViewBag.CurrentPage ? "active" : "")"
+                           href="@Url.Action(
+                               "Index",
+                               "BranchClient",
+                               new {
+                                   search = ViewBag.Search,
+                                   sort = ViewBag.Sort,
+                                   page = i
+                               })">
+
+                            @i
+
+                        </a>
+                    }
+
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <a href="@Url.Action(
+                            "Index",
+                            "BranchClient",
+                            new {
+                                search = ViewBag.Search,
+                                sort = ViewBag.Sort,
+                                page = ViewBag.CurrentPage + 1
+                            })">
+
+                            →
+
+                        </a>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+    </main>
+
+
+    <!-- ===================================================== -->
+    <!-- ADD MODAL -->
+    <!-- ===================================================== -->
+
+    <div id="addModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Nueva sucursal
+                </h2>
+
+                <button type="button"
+                        class="close"
+                        onclick="closeModal('addModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/BranchClient/Create">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="search"
+                       value="@ViewBag.Search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@ViewBag.Sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@ViewBag.CurrentPage" />
+
+
+                <div class="form-group">
+
+                    <label>
+                        País
+                    </label>
+
+                    <input type="text"
+                           name="CountryName"
+                           maxlength="100"
+                           required />
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Ciudad
+                    </label>
+
+                    <input type="text"
+                           name="City"
+                           maxlength="50"
+                           required />
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="cancel-button"
+                            onclick="closeModal('addModal')">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                            class="save-button">
+
+                        Crear
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- VIEW MODAL -->
+    <!-- ===================================================== -->
+
+    <div id="viewModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Ver sucursal
+                </h2>
+
+                <button type="button"
+                        class="close"
+                        onclick="closeModal('viewModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="details">
+
+                <div>
+
+                    <span>
+                        ID
+                    </span>
+
+                    <strong id="viewId"></strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        País
+                    </span>
+
+                    <strong id="viewCountry"></strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Ciudad
+                    </span>
+
+                    <strong id="viewCity"></strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button type="button"
+                        class="cancel-button"
+                        onclick="closeModal('viewModal')">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- EDIT MODAL -->
+    <!-- ===================================================== -->
+
+    <div id="editModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Editar sucursal
+                </h2>
+
+                <button type="button"
+                        class="close"
+                        onclick="closeModal('editModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <form method="post"
+                  action="/BranchClient/Edit">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       id="editId"
+                       name="Id" />
+
+                <input type="hidden"
+                       name="search"
+                       value="@ViewBag.Search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@ViewBag.Sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@ViewBag.CurrentPage" />
+
+
+                <div class="form-group">
+
+                    <label>
+                        País
+                    </label>
+
+                    <input type="text"
+                           id="editCountry"
+                           name="CountryName"
+                           maxlength="100"
+                           required />
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Ciudad
+                    </label>
+
+                    <input type="text"
+                           id="editCity"
+                           name="City"
+                           maxlength="50"
+                           required />
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="cancel-button"
+                            onclick="closeModal('editModal')">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                            class="save-button">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- DELETE MODAL -->
+    <!-- ===================================================== -->
+
+    <div id="deleteModal"
+         class="modal">
+
+        <div class="modal-content delete-content">
+
+            <div class="modal-header">
+
+                <h2>
+                    Eliminar sucursal
+                </h2>
+
+                <button type="button"
+                        class="close"
+                        onclick="closeModal('deleteModal')">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <p class="delete-message">
+
+                ¿Está seguro de que desea eliminar la sucursal de
+
+                <strong id="deleteCity"></strong>?
+
+            </p>
+
+
+            <form method="post"
+                  action="/BranchClient/Delete">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       id="deleteId"
+                       name="id" />
+
+                <input type="hidden"
+                       name="search"
+                       value="@ViewBag.Search" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@ViewBag.Sort" />
+
+                <input type="hidden"
+                       name="page"
+                       value="@ViewBag.CurrentPage" />
+
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="cancel-button"
+                            onclick="closeModal('deleteModal')">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                            class="delete-confirm-button">
+
+                        Eliminar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- JAVASCRIPT -->
+    <!-- ===================================================== -->
+
+    <script>
+
+        function openAddModal() {
+
+            document.getElementById("addModal")
+                .classList.add("show");
+
+        }
+
+
+        function openViewModal(button) {
+
+            document.getElementById("viewId")
+                .textContent =
+                button.dataset.id;
+
+            document.getElementById("viewCountry")
+                .textContent =
+                button.dataset.country;
+
+            document.getElementById("viewCity")
+                .textContent =
+                button.dataset.city;
+
+            document.getElementById("viewModal")
+                .classList.add("show");
+
+        }
+
+
+        function openEditModal(button) {
+
+            document.getElementById("editId")
+                .value =
+                button.dataset.id;
+
+            document.getElementById("editCountry")
+                .value =
+                button.dataset.country;
+
+            document.getElementById("editCity")
+                .value =
+                button.dataset.city;
+
+            document.getElementById("editModal")
+                .classList.add("show");
+
+        }
+
+
+        function openDeleteModal(button) {
+
+            document.getElementById("deleteId")
+                .value =
+                button.dataset.id;
+
+            document.getElementById("deleteCity")
+                .textContent =
+                button.dataset.city;
+
+            document.getElementById("deleteModal")
+                .classList.add("show");
+
+        }
+
+
+        function closeModal(id) {
+
+            document.getElementById(id)
+                .classList.remove("show");
+
+        }
+
+
+        window.onclick = function(event) {
+
+            if (event.target.classList.contains("modal")) {
+
+                event.target.classList.remove("show");
+
+            }
+
+        };
+
+
+        document.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (event.key === "Escape") {
+
+                    document
+                        .querySelectorAll(".modal.show")
+                        .forEach(modal => {
+
+                            modal.classList.remove("show");
+
+                        });
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,766 @@
+﻿@model IEnumerable<EmFren.Models.Article>
+@using System.Globalization
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artículos - EmFren</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/Shop.css")" />
+
+</head>
+
+<body>
+
+    <!-- =========================================================
+     HEADER & MAIN CONTENT
+     ========================================================= -->
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">EmFren</div>
+            <a href="/Home/HomeBuyer" class="home-link">Home</a>
+        </div>
+        <div class="header-right">
+            <div class="username">
+                <div class="user-circle">
+                    @ViewBag.Username?.ToString().Substring(0, Math.Min(1, ViewBag.Username?.ToString().Length ?? 1)).ToUpper()
+                </div>
+                <span>@ViewBag.Username</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <div class="page-title">
+            <div>
+                <h1>Artículos</h1>
+                <p>Seleccione los artículos que desea comprar.</p>
+            </div>
+            <div class="article-count">@ViewBag.TotalArticles artículos</div>
+        </div>
+
+        <div class="cart-bar">
+            <div class="cart-bar-left">
+                <span class="cart-icon">🛒</span>
+                <div>
+                    <strong>Carrito de compras</strong>
+                    <span id="cartItemCount">0 artículos</span>
+                </div>
+            </div>
+            <div class="cart-bar-right">
+                <strong id="cartTotal">$0,00</strong>
+                <button type="button" id="openCartButton" class="cart-button">Ver carrito</button>
+            </div>
+        </div>
+
+        <form method="get" action="/Shop/Articles" class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔎</span>
+                <input type="text" name="search" value="@ViewBag.Search" placeholder="Buscar por artículo, vehículo, medida, tipo o fricción..." />
+            </div>
+            <button type="submit" class="search-button">Buscar</button>
+            @if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+            {
+                <a href="/Shop/Articles" class="clear-button">Limpiar</a>
+            }
+        </form>
+
+        <!-- CART PANEL -->
+        <div id="cartPanel" class="cart-panel">
+            <div class="cart-panel-header">
+                <div>
+                    <h2>Carrito de compras</h2>
+                    <span id="cartPanelCount">0 artículos</span>
+                </div>
+                <button type="button" id="closeCartButton" class="close-cart">×</button>
+            </div>
+
+            <div id="cartItems" class="cart-items">
+                <div class="empty-cart">
+                    <div class="empty-cart-icon">🛒</div>
+                    <strong>El carrito está vacío</strong>
+                    <span>Agregue artículos para comenzar su compra.</span>
+                </div>
+            </div>
+
+            <div class="coin-payment-section">
+                <div class="coin-payment-header">
+                    <div>
+                        <h3>Moneda de pago</h3>
+                        <span>Seleccione la moneda con la que desea realizar el pago.</span>
+                    </div>
+                </div>
+
+                <div class="coin-payment-selector">
+                    <button type="button" id="coinPaymentSelectButton" class="coin-payment-select-button">
+                        <span id="selectedCoinName">Seleccionar</span>
+                    </button>
+                </div>
+
+                <div id="selectedCoinInfo" class="selected-coin-info">
+                    <span>Moneda seleccionada:</span>
+                    <strong id="selectedCoinDisplay">Ninguna</strong>
+                </div>
+
+                <div id="coinPaymentError" class="coin-payment-error">
+                    Seleccione una moneda de pago para continuar.
+                </div>
+            </div>
+
+            <div class="cart-footer">
+                <div class="cart-summary-row">
+                    <span>Subtotal</span>
+                    <strong id="cartSubtotal">$0,00</strong>
+                </div>
+                <div class="cart-summary-row discount-row">
+                    <span>Descuento</span>
+                    <strong id="cartDiscount">-$0,00</strong>
+                </div>
+                <div class="cart-summary-total">
+                    <span>Total</span>
+                    <strong id="cartPanelTotal">$0,00</strong>
+                </div>
+                <div class="cart-actions">
+                    <button type="button" id="clearCartButton" class="clear-cart-button">Vaciar carrito</button>
+                    <button type="button" id="checkoutButton" class="checkout-button">Continuar compra</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ARTICLES TABLE -->
+        <div class="table-container">
+            <table class="articles-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Artículo</th>
+                        <th>Vehículo</th>
+                        <th>Medida</th>
+                        <th>Tipo</th>
+                        <th>Fricción</th>
+                        <th>Precio</th>
+                        <th>Descuento</th>
+                        <th>Precio final</th>
+                        <th>Stock</th>
+                        <th>Cantidad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var article in Model)
+                    {
+                        decimal price = article.Price ?? 0m;
+                        decimal discount = article.Discount ?? 0m;
+                        if (discount < 0) { discount = 0; }
+                        if (discount > 100) { discount = 100; }
+                        decimal finalPrice = price - (price * discount / 100m);
+                        decimal savings = price - finalPrice;
+
+                        <tr class="article-row"
+                            data-id="@article.Id"
+                            data-article-id="@article.ArticleId"
+                            data-vehicle="@(article.Vehicle?.Brand ?? "")"
+                            data-measure="@(article.Measure ?? "")"
+                            data-type="@(article.Type ?? "")"
+                            data-friction="@(article.Friction ?? "")"
+                            data-price="@price.ToString(CultureInfo.InvariantCulture)"
+                            data-discount="@discount.ToString(CultureInfo.InvariantCulture)"
+                            data-final-price="@finalPrice.ToString(CultureInfo.InvariantCulture)"
+                            data-stock="@(article.Stock == true ? "true" : "false")">
+
+                            <td><span class="id-badge">@article.Id</span></td>
+                            <td><strong class="article-code">@(article.ArticleId ?? "-")</strong></td>
+                            <td>
+                                @if (article.Vehicle != null)
+                                {
+                                    <span class="vehicle-name">@article.Vehicle.Brand</span>
+                                }
+                                else
+                                {
+                                    <span class="empty-value">-</span>
+                                }
+                            </td>
+                            <td><span class="table-value">@(article.Measure ?? "-")</span></td>
+                            <td><span class="table-value">@(article.Type ?? "-")</span></td>
+                            <td><span class="table-value">@(article.Friction ?? "-")</span></td>
+                            <td>
+                                @if (discount > 0)
+                                {
+                                    <span class="old-price">@price.ToString("C2", CultureInfo.GetCultureInfo("es-AR"))</span>
+                                }
+                                else
+                                {
+                                    <span class="price">@price.ToString("C2", CultureInfo.GetCultureInfo("es-AR"))</span>
+                                }
+                            </td>
+                            <td>
+                                @if (discount > 0)
+                                {
+                                    <span class="discount-badge">-@discount.ToString("0.##")%</span>
+                                }
+                                else
+                                {
+                                    <span class="no-discount">—</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="final-price">@finalPrice.ToString("C2", CultureInfo.GetCultureInfo("es-AR"))</div>
+                                @if (discount > 0)
+                                {
+                                    <small class="saving">Ahorra @savings.ToString("C2", CultureInfo.GetCultureInfo("es-AR"))</small>
+                                }
+                            </td>
+                            <td>
+                                @if (article.Stock == true)
+                                {
+                                    <span class="stock available">Disponible</span>
+                                }
+                                else
+                                {
+                                    <span class="stock unavailable">Sin stock</span>
+                                }
+                            </td>
+                            <td>
+                                @if (article.Stock == true)
+                                {
+                                    <div class="quantity-control">
+                                        <button type="button" class="quantity-minus">−</button>
+                                        <input type="number" class="quantity-input" value="1" min="1" max="99" />
+                                        <button type="button" class="quantity-plus">+</button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="disabled-text">—</span>
+                                }
+                            </td>
+                            <td>
+                                @if (article.Stock == true)
+                                {
+                                    <button type="button" class="add-button">+ Agregar</button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="add-button disabled" disabled>Sin stock</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        @if (ViewBag.TotalPages > 0)
+        {
+            int currentPage = ViewBag.CurrentPage ?? 1;
+            int totalPages = ViewBag.TotalPages ?? 1;
+            string searchParam = !string.IsNullOrWhiteSpace(ViewBag.Search) ? $"&search={Uri.EscapeDataString(ViewBag.Search)}" : "";
+
+            int startPage = Math.Max(1, currentPage - 2);
+            int endPage = Math.Min(totalPages, currentPage + 2);
+
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Página <strong>@currentPage</strong> de <strong>@totalPages</strong>
+                </div>
+
+                <div class="pagination">
+                    <!-- PREVIOUS -->
+                    @if (currentPage > 1)
+                    {
+                        <a class="page-button" href="?page=@(currentPage - 1)@searchParam">‹</a>
+                    }
+                    else
+                    {
+                        <span class="page-button disabled">‹</span>
+                    }
+
+                    <!-- FIRST PAGE -->
+                    @if (startPage > 1)
+                    {
+                        <a class="page-number" href="?page=1@searchParam">1</a>
+
+                        @if (startPage > 2)
+                        {
+                            <span class="dots">...</span>
+                        }
+                    }
+
+                    <!-- PAGE NUMBERS -->
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <span class="page-number active">@i</span>
+                        }
+                        else
+                        {
+                            <a class="page-number" href="?page=@i@searchParam">@i</a>
+                        }
+                    }
+
+                    <!-- LAST PAGE -->
+                    @if (endPage < totalPages)
+                    {
+                        @if (endPage < totalPages - 1)
+                        {
+                            <span class="dots">...</span>
+                        }
+
+                        <a class="page-number" href="?page=@totalPages@searchParam">@totalPages</a>
+                    }
+
+                    <!-- NEXT -->
+                    @if (currentPage < totalPages)
+                    {
+                        <a class="page-button" href="?page=@(currentPage + 1)@searchParam">›</a>
+                    }
+                    else
+                    {
+                        <span class="page-button disabled">›</span>
+                    }
+                </div>
+            </div>
+        }
+    </main>
+
+    <!-- =========================================================
+     COIN PAYMENT MODAL
+     ========================================================= -->
+
+    <div id="coinPaymentModal" class="coin-payment-modal">
+        <div class="coin-payment-modal-content">
+            <div class="coin-payment-modal-header">
+                <div class="coin-payment-modal-title">
+                    <h2>Seleccionar moneda</h2>
+                    <span>Busque y seleccione la moneda que desea utilizar.</span>
+                </div>
+                <button type="button" id="closeCoinPaymentModal" class="coin-payment-modal-close" aria-label="Cerrar">×</button>
+            </div>
+
+            <div class="coin-payment-modal-search">
+                <span class="coin-payment-search-icon">🔎</span>
+                <input type="text" id="coinPaymentSearch" class="coin-payment-search-input" placeholder="Buscar por ID o nombre de moneda..." autocomplete="off" />
+            </div>
+
+            <div class="coin-table-wrapper">
+                <table class="coin-payment-table" id="coinPaymentTableElement">
+                    <thead>
+                        <tr>
+                            <th width="20%">ID</th>
+                            <th width="60%">Moneda</th>
+                            <th width="20%" style="text-align: right;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coinPaymentList">
+                        @if (ViewBag.CoinPayments != null && ViewBag.CoinPayments.Count > 0)
+                        {
+                            foreach (var coin in ViewBag.CoinPayments)
+                            {
+                                <tr class="coin-payment-item" data-coin-id="@coin.Id" data-coin-name="@coin.CoinName">
+                                    <td>
+                                        <span class="coin-id-badge">#@coin.Id</span>
+                                    </td>
+                                    <td>
+                                        <strong class="coin-payment-item-name">@coin.CoinName</strong>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <button type="button"
+                                                class="coin-payment-select-row-button"
+                                                data-coin-id="@coin.Id"
+                                                data-coin-name="@coin.CoinName">
+                                            Seleccionar
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+                @if (ViewBag.CoinPayments == null || ViewBag.CoinPayments.Count == 0)
+                {
+                    <div class="coin-payment-no-results">
+                        No hay monedas de pago disponibles.
+                    </div>
+                }
+
+                <div id="coinPaymentNoSearchResults" class="coin-payment-no-results" style="display:none;">
+                    No se encontraron monedas.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+     JAVASCRIPT & ANTI-FORGERY TOKEN
+     ========================================================= -->
+    @Html.AntiForgeryToken()
+
+    <script>
+            const CART_KEY = "emfrenCart";
+            const COIN_PAYMENT_KEY = "emfrenCoinPaymentId";
+
+            let cart = [];
+            let selectedCoinPaymentId = null;
+
+            function loadCart() {
+                try {
+                    const saved = sessionStorage.getItem(CART_KEY);
+                    if (saved) {
+                        cart = JSON.parse(saved);
+                        if (!Array.isArray(cart)) cart = [];
+                    }
+                } catch (error) { cart = []; }
+            }
+
+            function saveCart() {
+                sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
+            }
+
+            function money(value) {
+                return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value);
+            }
+
+            function escapeHtml(value) {
+                if (value === null || value === undefined) return "";
+                return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
+
+            function addToCart(row) {
+                if (!row) return;
+
+                const id = parseInt(row.dataset.id);
+                const articleId = row.dataset.articleId || "";
+                const vehicle = row.dataset.vehicle || "";
+                const measure = row.dataset.measure || "";
+                const price = parseFloat(row.dataset.price) || 0;
+                const discount = parseFloat(row.dataset.discount) || 0;
+                const finalPrice = parseFloat(row.dataset.finalPrice) || 0;
+                const quantityInput = row.querySelector(".quantity-input");
+                let quantity = parseInt(quantityInput?.value) || 1;
+                quantity = Math.max(1, Math.min(99, quantity));
+
+                const existing = cart.find(item => item.id === id);
+
+                if (existing) {
+                    existing.quantity += quantity;
+                    if (existing.quantity > 99) existing.quantity = 99;
+                } else {
+                    cart.push({ id, articleId, vehicle, measure, price, discount, finalPrice, quantity });
+                }
+
+                saveCart();
+                updateCart();
+                showCart();
+            }
+
+            function removeFromCart(id) {
+                cart = cart.filter(item => item.id !== id);
+                saveCart();
+                updateCart();
+            }
+
+            function changeCartQuantity(id, change) {
+                const item = cart.find(item => item.id === id);
+                if (!item) return;
+
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(id);
+                    return;
+                }
+                if (item.quantity > 99) item.quantity = 99;
+
+                saveCart();
+                updateCart();
+            }
+
+            function updateCart() {
+                const cartItems = document.getElementById("cartItems");
+                let totalQuantity = 0, subtotal = 0, discountTotal = 0, total = 0;
+
+                cart.forEach(item => {
+                    totalQuantity += item.quantity;
+                    subtotal += item.price * item.quantity;
+                    discountTotal += (item.price - item.finalPrice) * item.quantity;
+                    total += item.finalPrice * item.quantity;
+                });
+
+                const countText = totalQuantity + (totalQuantity === 1 ? " artículo" : " artículos");
+                document.getElementById("cartItemCount").textContent = countText;
+                document.getElementById("cartPanelCount").textContent = countText;
+                document.getElementById("cartTotal").textContent = money(total);
+                document.getElementById("cartSubtotal").textContent = money(subtotal);
+                document.getElementById("cartDiscount").textContent = "-" + money(discountTotal);
+                document.getElementById("cartPanelTotal").textContent = money(total);
+
+                if (cart.length === 0) {
+                    cartItems.innerHTML = `
+                        <div class="empty-cart">
+                            <div class="empty-cart-icon">🛒</div>
+                            <strong>El carrito está vacío</strong>
+                            <span>Agregue artículos para comenzar su compra.</span>
+                        </div>`;
+                    return;
+                }
+
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <strong>${escapeHtml(item.articleId || "-")}</strong>
+                            <span>Vehículo: ${escapeHtml(item.vehicle || "-")}</span>
+                            <span>Medida: ${escapeHtml(item.measure || "-")}</span>
+                            <span>Precio: ${money(item.finalPrice)}</span>
+                        </div>
+                        <div class="cart-item-right">
+                            <div class="cart-quantity">
+                                <button type="button" onclick="changeCartQuantity(${item.id}, -1)">−</button>
+                                <span>${item.quantity}</span>
+                                <button type="button" onclick="changeCartQuantity(${item.id}, 1)">+</button>
+                            </div>
+                            <strong class="cart-item-total">${money(item.finalPrice * item.quantity)}</strong>
+                            <button type="button" class="remove-item" onclick="removeFromCart(${item.id})">Eliminar</button>
+                        </div>
+                    </div>
+                `).join("");
+            }
+
+            function showCart() { document.getElementById("cartPanel").classList.add("open"); }
+            function hideCart() { document.getElementById("cartPanel").classList.remove("open"); }
+
+            function openCoinPaymentModal() {
+                const modal = document.getElementById("coinPaymentModal");
+                const search = document.getElementById("coinPaymentSearch");
+                if (!modal) return;
+
+                modal.classList.add("open");
+                document.body.classList.add("coin-payment-modal-open");
+
+                if (search) {
+                    search.value = "";
+                    filterCoinPayments();
+                    setTimeout(() => search.focus(), 50);
+                }
+            }
+
+            function closeCoinPaymentModal() {
+                const modal = document.getElementById("coinPaymentModal");
+                if (!modal) return;
+                modal.classList.remove("open");
+                document.body.classList.remove("coin-payment-modal-open");
+            }
+
+            function filterCoinPayments() {
+                const searchInput = document.getElementById("coinPaymentSearch");
+                const noResults = document.getElementById("coinPaymentNoSearchResults");
+                const tableEl = document.getElementById("coinPaymentTableElement");
+
+                if (!searchInput) return;
+
+                const search = searchInput.value.trim().toLowerCase();
+                const items = document.querySelectorAll(".coin-payment-item");
+                let visibleCount = 0;
+
+                items.forEach(item => {
+                    const coinId = (item.dataset.coinId || "").toLowerCase();
+                    const coinName = (item.dataset.coinName || "").toLowerCase();
+
+                    if (coinId.includes(search) || coinName.includes(search)) {
+                        item.style.display = "";
+                        visibleCount++;
+                    } else {
+                        item.style.display = "none";
+                    }
+                });
+
+                if (noResults) {
+                    noResults.style.display = visibleCount === 0 ? "block" : "none";
+                }
+                if (tableEl) {
+                    tableEl.style.display = visibleCount === 0 ? "none" : "table";
+                }
+            }
+
+            function loadCoinPayment() {
+                const savedCoinPaymentId = sessionStorage.getItem(COIN_PAYMENT_KEY);
+                if (!savedCoinPaymentId) {
+                    selectedCoinPaymentId = null;
+                    updateSelectedCoin();
+                    return;
+                }
+                const item = document.querySelector('.coin-payment-item[data-coin-id="' + CSS.escape(savedCoinPaymentId) + '"]');
+                if (!item) {
+                    sessionStorage.removeItem(COIN_PAYMENT_KEY);
+                    selectedCoinPaymentId = null;
+                    updateSelectedCoin();
+                    return;
+                }
+                selectedCoinPaymentId = savedCoinPaymentId;
+                updateSelectedCoin();
+            }
+
+            function selectCoinPayment(coinId, coinName) {
+                if (!coinId) return;
+                selectedCoinPaymentId = coinId;
+                sessionStorage.setItem(COIN_PAYMENT_KEY, selectedCoinPaymentId);
+
+                const selectedCoinName = document.getElementById("selectedCoinName");
+                const selectedCoinDisplay = document.getElementById("selectedCoinDisplay");
+
+                if (selectedCoinName) selectedCoinName.textContent = coinName;
+                if (selectedCoinDisplay) selectedCoinDisplay.textContent = coinName;
+
+                const error = document.getElementById("coinPaymentError");
+                if (error) error.classList.remove("show");
+
+                closeCoinPaymentModal();
+            }
+
+            function updateSelectedCoin() {
+                const selectedCoinName = document.getElementById("selectedCoinName");
+                const selectedCoinDisplay = document.getElementById("selectedCoinDisplay");
+
+                if (!selectedCoinPaymentId) {
+                    if (selectedCoinName) selectedCoinName.textContent = "Seleccionar";
+                    if (selectedCoinDisplay) selectedCoinDisplay.textContent = "Ninguna";
+                    return;
+                }
+
+                const selectedItem = document.querySelector('.coin-payment-item[data-coin-id="' + CSS.escape(selectedCoinPaymentId) + '"]');
+                if (!selectedItem) {
+                    selectedCoinPaymentId = null;
+                    sessionStorage.removeItem(COIN_PAYMENT_KEY);
+                    updateSelectedCoin();
+                    return;
+                }
+
+                const coinName = selectedItem.dataset.coinName || "Ninguna";
+                if (selectedCoinName) selectedCoinName.textContent = coinName;
+                if (selectedCoinDisplay) selectedCoinDisplay.textContent = coinName;
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                loadCart();
+                updateCart();
+                loadCoinPayment();
+
+                document.getElementById("coinPaymentSelectButton")?.addEventListener("click", openCoinPaymentModal);
+                document.getElementById("closeCoinPaymentModal")?.addEventListener("click", closeCoinPaymentModal);
+                document.getElementById("coinPaymentSearch")?.addEventListener("input", filterCoinPayments);
+
+                document.querySelectorAll(".coin-payment-select-row-button").forEach(button => {
+                    button.addEventListener("click", function () {
+                        selectCoinPayment(this.dataset.coinId, this.dataset.coinName);
+                    });
+                });
+
+                const coinPaymentModal = document.getElementById("coinPaymentModal");
+                if (coinPaymentModal) {
+                    coinPaymentModal.addEventListener("click", function (event) {
+                        if (event.target === coinPaymentModal) closeCoinPaymentModal();
+                    });
+                }
+
+                document.addEventListener("keydown", function (event) {
+                    if (event.key === "Escape") {
+                        const modal = document.getElementById("coinPaymentModal");
+                        if (modal && modal.classList.contains("open")) closeCoinPaymentModal();
+                    }
+                });
+
+                document.querySelectorAll(".add-button:not(.disabled)").forEach(button => {
+                    button.addEventListener("click", function () { addToCart(this.closest(".article-row")); });
+                });
+
+                document.querySelectorAll(".quantity-minus").forEach(button => {
+                    button.addEventListener("click", function () {
+                        const input = this.parentElement.querySelector(".quantity-input");
+                        let value = parseInt(input.value) || 1;
+                        if (--value < 1) value = 1;
+                        input.value = value;
+                    });
+                });
+
+                document.querySelectorAll(".quantity-plus").forEach(button => {
+                    button.addEventListener("click", function () {
+                        const input = this.parentElement.querySelector(".quantity-input");
+                        let value = parseInt(input.value) || 1;
+                        if (++value > 99) value = 99;
+                        input.value = value;
+                    });
+                });
+
+                document.getElementById("openCartButton")?.addEventListener("click", showCart);
+                document.getElementById("closeCartButton")?.addEventListener("click", hideCart);
+
+                document.getElementById("clearCartButton")?.addEventListener("click", function () {
+                    if (cart.length === 0) return;
+                    cart = [];
+                    saveCart();
+                    updateCart();
+                });
+
+                document.getElementById("checkoutButton")?.addEventListener("click", async function () {
+                    if (cart.length === 0) {
+                        alert("El carrito está vacío.");
+                        return;
+                    }
+
+                    const coinPaymentError = document.getElementById("coinPaymentError");
+                    if (!selectedCoinPaymentId) {
+                        if (coinPaymentError) coinPaymentError.classList.add("show");
+                        alert("Por favor, seleccione una moneda de pago para continuar.");
+                        return;
+                    }
+                    if (coinPaymentError) coinPaymentError.classList.remove("show");
+
+                    const formData = new FormData();
+                    formData.append("coinPaymentId", selectedCoinPaymentId);
+
+                    cart.forEach((item, index) => {
+                        formData.append(`items[${index}].ArticleId`, item.id);
+                        formData.append(`items[${index}].Quantity`, item.quantity);
+                    });
+
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+                    try {
+                        this.disabled = true;
+                        this.textContent = "Procesando...";
+
+                        const response = await fetch('/Shop/CreateOrder', {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': token
+                            },
+                            body: formData
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            alert(result.message);
+                            cart = [];
+                            saveCart();
+                            updateCart();
+                            hideCart();
+                        } else {
+                            alert("Error: " + result.message);
+                        }
+                    } catch (error) {
+                        console.error("Error al procesar la compra:", error);
+                        alert("Ocurrió un error al procesar la compra. Intente nuevamente.");
+                    } finally {
+                        this.disabled = false;
+                        this.textContent = "Continuar compra";
+                    }
+                });
+            });
+    </script>
+</body>
+</html>

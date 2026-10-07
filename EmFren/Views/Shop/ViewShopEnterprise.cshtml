@@ -1,0 +1,1723 @@
+﻿@using System.Globalization
+@model IEnumerable<EmFren.Models.ViewShopUser>
+
+@{
+    ViewData["Title"] = "Gestión de compras";
+
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var totalRecords = ViewBag.TotalRecords ?? 0;
+    var username = ViewBag.Username ?? "U";
+
+    var searchUser = ViewBag.SearchUser ?? "";
+    var dateFrom = ViewBag.DateFrom ?? "";
+    var dateTo = ViewBag.DateTo ?? "";
+}
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Gestión de compras - EmFren
+    </title>
+
+    <link rel="stylesheet"
+          href="~/css/ViewShopEnterprise.css"
+          asp-append-version="true" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+
+<body>
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <header class="shop-header">
+
+        <div class="header-left">
+
+            <a href="/Home/HomeEnterprise"
+               class="home-link">
+
+                Home
+
+            </a>
+
+        </div>
+
+        <div class="header-center">
+
+            <h1>
+
+                Gestión de compras
+
+            </h1>
+
+        </div>
+
+        <div class="header-right">
+
+            <span class="username">
+
+                <span class="user-icon">
+
+                    ●
+
+                </span>
+
+                @username
+
+            </span>
+
+            <span class="notification-icon">
+
+                ♢
+
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="purchases-container">
+
+        <div class="page-title-section">
+
+            <div>
+
+                <h2>
+
+                    Historial de compras
+
+                </h2>
+
+                <p>
+
+                    Consulta y administra las compras realizadas por los usuarios.
+
+                </p>
+
+            </div>
+
+            <div class="total-records">
+
+                @totalRecords registro(s)
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             FILTERS
+             ===================================================== -->
+
+        <div class="filters-container">
+
+            <form method="get"
+                  action="@Url.Action("ViewShopEnterprise", "Shop")"
+                  class="filters-form">
+
+                <div class="filter-field search-field">
+
+                    <label for="searchUser">
+
+                        Usuario o ID
+
+                    </label>
+
+                    <input type="text"
+                           id="searchUser"
+                           name="searchUser"
+                           value="@searchUser"
+                           placeholder="Buscar usuario o ID..."
+                           autocomplete="off" />
+
+                </div>
+
+
+                <div class="filter-field">
+
+                    <label for="dateFrom">
+
+                        Fecha desde
+
+                    </label>
+
+                    <input type="date"
+                           id="dateFrom"
+                           name="dateFrom"
+                           value="@dateFrom" />
+
+                </div>
+
+
+                <div class="filter-field">
+
+                    <label for="dateTo">
+
+                        Fecha hasta
+
+                    </label>
+
+                    <input type="date"
+                           id="dateTo"
+                           name="dateTo"
+                           value="@dateTo" />
+
+                </div>
+
+
+                <button type="submit"
+                        class="filter-button">
+
+                    Buscar
+
+                </button>
+
+
+                <a href="@Url.Action(
+                    "ViewShopEnterprise",
+                    "Shop"
+                )"
+                   class="filter-clear">
+
+                    Limpiar
+
+                </a>
+
+            </form>
+
+        </div>
+
+
+        <!-- =====================================================
+             PURCHASE TABLE
+             ===================================================== -->
+
+        <div class="table-container">
+
+            <table class="purchases-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+
+                            ID Usuario
+
+                        </th>
+
+                        <th>
+
+                            Usuario
+
+                        </th>
+
+                        <th>
+
+                            Fecha del pedido
+
+                        </th>
+
+                        <th>
+
+                            Acción
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+
+                        var orders =
+                            Model
+                                .GroupBy(x => x.OrderId)
+                                .OrderByDescending(x =>
+                                    x.First().DateOrder)
+                                .ThenByDescending(x =>
+                                    x.Key);
+
+                        foreach (var order in orders)
+                        {
+
+                            var first =
+                                order.First();
+
+                            <tr>
+
+                                <td>
+
+                                    @first.UserId
+
+                                </td>
+
+                                <td>
+
+                                    @first.Username
+
+                                </td>
+
+                                <td>
+
+                                    @(first.DateOrder.HasValue
+                                        ? first.DateOrder.Value.ToString(
+                                            "dd/MM/yyyy",
+                                            CultureInfo.InvariantCulture)
+                                        : "-")
+
+                                </td>
+
+                                <td class="actions-cell">
+
+                                    <!-- =================================================
+                                         VER
+                                         ================================================= -->
+
+                                    <button type="button"
+                                            class="view-button"
+                                            data-order-id="@first.OrderId">
+
+                                        Ver
+
+                                    </button>
+
+
+                                    <!-- =================================================
+                                         MARCAR COMO DEUDOR
+                                         ================================================= -->
+
+                                    <form method="post"
+                                          action="@Url.Action(
+                                              "SetClientDebtor",
+                                              "Shop"
+                                          )"
+                                          class="debtor-client-form"
+                                          onsubmit="return confirmSetClientDebtor(@first.OrderId);">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="orderId"
+                                               value="@first.OrderId" />
+
+                                            <input type="hidden"
+                                            name="userId"
+                                            value="@first.UserId" />
+
+                                        <button type="submit"
+                                                class="debtor-button">
+
+                                            Marcar como deudor
+
+                                        </button>
+
+                                    </form>
+
+
+                                    <!-- =================================================
+                                         ELIMINAR
+                                         ================================================= -->
+
+                                    <form method="post"
+                                          action="@Url.Action(
+                                              "DeletePurchase",
+                                              "Shop"
+                                          )"
+                                          class="delete-purchase-form"
+                                          onsubmit="return confirmDeletePurchase(@first.OrderId);">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="orderId"
+                                               value="@first.OrderId" />
+
+                                        <button type="submit"
+                                                class="delete-button">
+
+                                            Eliminar
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    }
+                    else
+                    {
+
+                        <tr>
+
+                            <td colspan="4"
+                                class="empty-message">
+
+                                No se encontraron compras
+                                para los filtros seleccionados.
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             PAGINATION
+             ===================================================== -->
+
+        @if (totalPages > 1)
+        {
+
+            <div class="pagination">
+
+                @if (currentPage > 1)
+                {
+
+                    <a href="@Url.Action(
+                        "ViewShopEnterprise",
+                        "Shop",
+                        new
+                        {
+                            page = currentPage - 1,
+                            searchUser = searchUser,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo
+                        })"
+                       class="page-button"
+                       aria-label="Página anterior">
+
+                        ‹
+
+                    </a>
+
+                }
+
+
+                @{
+
+                    int startPage =
+                        Math.Max(
+                            1,
+                            currentPage - 2
+                        );
+
+                    int endPage =
+                        Math.Min(
+                            totalPages,
+                            currentPage + 2
+                        );
+
+                }
+
+
+                @if (startPage > 1)
+                {
+
+                    <a href="@Url.Action(
+                        "ViewShopEnterprise",
+                        "Shop",
+                        new
+                        {
+                            page = 1,
+                            searchUser = searchUser,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo
+                        })"
+                       class="page-button">
+
+                        1
+
+                    </a>
+
+
+                    @if (startPage > 2)
+                    {
+
+                        <span class="page-dots">
+
+                            ...
+
+                        </span>
+
+                    }
+
+                }
+
+
+                @for (
+                    int i = startPage;
+                    i <= endPage;
+                    i++
+                )
+                {
+
+                    if (i == currentPage)
+                    {
+
+                        <span class="page-button active">
+
+                            @i
+
+                        </span>
+
+                    }
+                    else
+                    {
+
+                        <a href="@Url.Action(
+                            "ViewShopEnterprise",
+                            "Shop",
+                            new
+                            {
+                                page = i,
+                                searchUser = searchUser,
+                                dateFrom = dateFrom,
+                                dateTo = dateTo
+                            })"
+                           class="page-button">
+
+                            @i
+
+                        </a>
+
+                    }
+
+                }
+
+
+                @if (endPage < totalPages)
+                {
+
+                    @if (endPage < totalPages - 1)
+                    {
+
+                        <span class="page-dots">
+
+                            ...
+
+                        </span>
+
+                    }
+
+                    <a href="@Url.Action(
+                        "ViewShopEnterprise",
+                        "Shop",
+                        new
+                        {
+                            page = totalPages,
+                            searchUser = searchUser,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo
+                        })"
+                       class="page-button">
+
+                        @totalPages
+
+                    </a>
+
+                }
+
+
+                @if (currentPage < totalPages)
+                {
+
+                    <a href="@Url.Action(
+                        "ViewShopEnterprise",
+                        "Shop",
+                        new
+                        {
+                            page = currentPage + 1,
+                            searchUser = searchUser,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo
+                        })"
+                       class="page-button"
+                       aria-label="Página siguiente">
+
+                        ›
+
+                    </a>
+
+                }
+
+            </div>
+
+        }
+
+
+        <!-- =====================================================
+             PURCHASE DETAILS MODAL
+             ===================================================== -->
+
+        <div id="purchaseModal"
+             class="purchase-modal">
+
+            <div id="purchaseModalOverlay"
+                 class="purchase-modal-overlay">
+            </div>
+
+
+            <div class="purchase-modal-content">
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <h2>
+
+                            Detalles de la compra
+
+                        </h2>
+
+                        <span id="modalOrderId"
+                              class="order-number">
+                        </span>
+
+                    </div>
+
+                    <button type="button"
+                            id="closePurchaseModal"
+                            class="close-modal">
+
+                        &times;
+
+                    </button>
+
+                </div>
+
+
+                <!-- =================================================
+                     ORDER INFORMATION
+                     ================================================= -->
+
+                <div class="order-information">
+
+                    <!-- ORDER ID -->
+
+                    <div class="information-card">
+
+                        <span>
+
+                            ID Pedido
+
+                        </span>
+
+                        <strong id="modalOrderIdInfo">
+                        </strong>
+
+                    </div>
+
+
+                    <!-- USER ID -->
+
+                    <div class="information-card">
+
+                        <span>
+
+                            ID Usuario
+
+                        </span>
+
+                        <strong id="modalUserId">
+                        </strong>
+
+                    </div>
+
+
+                    <!-- USERNAME -->
+
+                    <div class="information-card">
+
+                        <span>
+
+                            Usuario
+
+                        </span>
+
+                        <strong id="modalUsername">
+                        </strong>
+
+                    </div>
+
+
+                    <!-- DATE -->
+
+                    <div class="information-card">
+
+                        <span>
+
+                            Fecha del pedido
+
+                        </span>
+
+                        <strong id="modalDate">
+                        </strong>
+
+                    </div>
+
+
+                    <!-- CURRENCY -->
+
+                    <div class="information-card">
+
+                        <span>
+
+                            Moneda de pago
+
+                        </span>
+
+                        <strong id="modalCurrency">
+                        </strong>
+
+                    </div>
+
+
+                    <!-- TOTAL -->
+
+                    <div class="information-card total-card">
+
+                        <span>
+
+                            Total de compra
+
+                        </span>
+
+                        <strong id="modalTotal">
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ARTICLES
+                     ================================================= -->
+
+                <div class="articles-section">
+
+                    <div class="articles-title">
+
+                        <h3>
+
+                            Artículos de la compra
+
+                        </h3>
+
+                        <span id="modalArticleCount">
+
+                            0 artículos
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="details-table-container">
+
+                        <table class="details-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Código</th>
+
+                                    <th>Vehículo</th>
+
+                                    <th>Medida</th>
+
+                                    <th>Tipo</th>
+
+                                    <th>Fricción</th>
+
+                                    <th>Cantidad</th>
+
+                                    <th>Precio unitario</th>
+
+                                    <th>Descuento</th>
+
+                                    <th>Stock</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="articlesTableBody">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     FOOTER
+                     ================================================= -->
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            id="downloadPurchasePdf"
+                            class="pdf-button">
+
+                        Descargar PDF
+
+                    </button>
+
+                    <button type="button"
+                            id="closePurchaseModalBottom"
+                            class="close-button">
+
+                        Cerrar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             HIDDEN PURCHASE DATA
+             ===================================================== -->
+
+        <div id="purchaseData"
+             style="display: none;">
+
+            @if (Model != null)
+            {
+
+                foreach (
+                    var orderGroup
+                    in Model.GroupBy(x => x.OrderId)
+                )
+                {
+
+                    var first =
+                        orderGroup.First();
+
+
+                    var totalPurchase =
+                        first.TotalPurchase.HasValue
+                            ? first.TotalPurchase.Value.ToString(
+                                "N2",
+                                CultureInfo.InvariantCulture)
+                            : "0.00";
+
+
+                    <div class="purchase-data"
+
+                         data-order-id="@first.OrderId"
+
+                         data-user-id="@first.UserId"
+
+                         data-username="@first.Username"
+
+                         data-date="@(first.DateOrder.HasValue
+                             ? first.DateOrder.Value.ToString(
+                                 "dd/MM/yyyy",
+                                 CultureInfo.InvariantCulture)
+                             : "-")"
+
+                         data-total="@totalPurchase"
+
+                         data-currency="@first.PaymentCurrency">
+
+
+                        @foreach (var item in orderGroup)
+                        {
+
+                            var unitPrice =
+                                item.UnitPrice.HasValue
+                                    ? item.UnitPrice.Value.ToString(
+                                        "N2",
+                                        CultureInfo.InvariantCulture)
+                                    : "0.00";
+
+
+                            var discount =
+                                item.Discount.HasValue
+                                    ? item.Discount.Value.ToString(
+                                        "N2",
+                                        CultureInfo.InvariantCulture)
+                                    : "0.00";
+
+
+                            <div class="article-data"
+
+                                 data-quantity="@item.Quantity"
+
+                                 data-article-code="@item.ArticleCode"
+
+                                 data-vehicle="@item.VehicleBrand"
+
+                                 data-measure="@item.Measure"
+
+                                 data-type="@item.Type"
+
+                                 data-friction="@item.Friction"
+
+                                 data-price="@unitPrice"
+
+                                 data-discount="@discount"
+
+                                 data-stock="@(item.Stock == true
+                                     ? "Disponible"
+                                     : "Sin stock")">
+
+                            </div>
+
+                        }
+
+                    </div>
+
+                }
+
+            }
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+         ========================================================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const modal =
+                    document.getElementById(
+                        "purchaseModal"
+                    );
+
+                const overlay =
+                    document.getElementById(
+                        "purchaseModalOverlay"
+                    );
+
+                const closeButton =
+                    document.getElementById(
+                        "closePurchaseModal"
+                    );
+
+                const closeBottomButton =
+                    document.getElementById(
+                        "closePurchaseModalBottom"
+                    );
+
+                const downloadPdfButton =
+                    document.getElementById(
+                        "downloadPurchasePdf"
+                    );
+
+                const viewButtons =
+                    document.querySelectorAll(
+                        ".view-button"
+                    );
+
+                const purchaseData =
+                    document.querySelectorAll(
+                        ".purchase-data"
+                    );
+
+
+                const modalOrderId =
+                    document.getElementById(
+                        "modalOrderId"
+                    );
+
+                const modalOrderIdInfo =
+                    document.getElementById(
+                        "modalOrderIdInfo"
+                    );
+
+                const modalUserId =
+                    document.getElementById(
+                        "modalUserId"
+                    );
+
+                const modalUsername =
+                    document.getElementById(
+                        "modalUsername"
+                    );
+
+                const modalDate =
+                    document.getElementById(
+                        "modalDate"
+                    );
+
+                const modalCurrency =
+                    document.getElementById(
+                        "modalCurrency"
+                    );
+
+                const modalTotal =
+                    document.getElementById(
+                        "modalTotal"
+                    );
+
+                const modalArticleCount =
+                    document.getElementById(
+                        "modalArticleCount"
+                    );
+
+                const articlesTableBody =
+                    document.getElementById(
+                        "articlesTableBody"
+                    );
+
+
+                const dateFromInput =
+                    document.getElementById(
+                        "dateFrom"
+                    );
+
+                const dateToInput =
+                    document.getElementById(
+                        "dateTo"
+                    );
+
+
+                let currentPurchase =
+                    null;
+
+
+                // =================================================
+                // DATE VALIDATION
+                // =================================================
+
+                if (
+                    dateFromInput &&
+                    dateToInput
+                ) {
+
+                    dateFromInput.addEventListener(
+                        "change",
+                        function () {
+
+                            if (
+                                dateToInput.value &&
+                                this.value &&
+                                this.value >
+                                dateToInput.value
+                            ) {
+
+                                dateToInput.value =
+                                    this.value;
+
+                            }
+
+                        }
+                    );
+
+
+                    dateToInput.addEventListener(
+                        "change",
+                        function () {
+
+                            if (
+                                dateFromInput.value &&
+                                this.value &&
+                                this.value <
+                                dateFromInput.value
+                            ) {
+
+                                dateFromInput.value =
+                                    this.value;
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                // =================================================
+                // OPEN MODAL
+                // =================================================
+
+                function openPurchaseModal(
+                    orderId
+                ) {
+
+                    let selectedPurchase =
+                        null;
+
+
+                    purchaseData.forEach(
+                        function (purchase) {
+
+                            if (
+                                purchase.dataset.orderId ===
+                                String(orderId)
+                            ) {
+
+                                selectedPurchase =
+                                    purchase;
+
+                            }
+
+                        }
+                    );
+
+
+                    if (!selectedPurchase) {
+
+                        return;
+
+                    }
+
+
+                    currentPurchase =
+                        selectedPurchase;
+
+
+                    // =================================================
+                    // ORDER ID
+                    // =================================================
+
+                    const selectedOrderId =
+                        selectedPurchase.dataset.orderId ||
+                        "-";
+
+
+                    modalOrderId.textContent =
+                        "Pedido #" +
+                        selectedOrderId;
+
+
+                    modalOrderIdInfo.textContent =
+                        selectedOrderId;
+
+
+                    // =================================================
+                    // USER INFORMATION
+                    // =================================================
+
+                    modalUserId.textContent =
+                        selectedPurchase.dataset.userId ||
+                        "-";
+
+
+                    modalUsername.textContent =
+                        selectedPurchase.dataset.username ||
+                        "-";
+
+
+                    modalDate.textContent =
+                        selectedPurchase.dataset.date ||
+                        "-";
+
+
+                    modalCurrency.textContent =
+                        selectedPurchase.dataset.currency ||
+                        "-";
+
+
+                    modalTotal.textContent =
+                        selectedPurchase.dataset.total ||
+                        "0.00";
+
+
+                    // =================================================
+                    // ARTICLES
+                    // =================================================
+
+                    articlesTableBody.innerHTML =
+                        "";
+
+
+                    const articles =
+                        selectedPurchase.querySelectorAll(
+                            ".article-data"
+                        );
+
+
+                    modalArticleCount.textContent =
+                        articles.length +
+                        (
+                            articles.length === 1
+                                ? " artículo"
+                                : " artículos"
+                        );
+
+
+                    articles.forEach(
+                        function (article) {
+
+                            const row =
+                                document.createElement(
+                                    "tr"
+                                );
+
+
+                            const values =
+                            [
+
+                                article.dataset.articleCode ||
+                                "-",
+
+                                article.dataset.vehicle ||
+                                "-",
+
+                                article.dataset.measure ||
+                                "-",
+
+                                article.dataset.type ||
+                                "-",
+
+                                article.dataset.friction ||
+                                "-",
+
+                                article.dataset.quantity ||
+                                "0",
+
+                                article.dataset.price ||
+                                "0.00",
+
+                                (
+                                    article.dataset.discount ||
+                                    "0.00"
+                                ) + "%",
+
+                                article.dataset.stock ||
+                                "-"
+
+                            ];
+
+
+                            values.forEach(
+                                function (value) {
+
+                                    const cell =
+                                        document.createElement(
+                                            "td"
+                                        );
+
+                                    cell.textContent =
+                                        value;
+
+                                    row.appendChild(
+                                        cell
+                                    );
+
+                                }
+                            );
+
+
+                            articlesTableBody.appendChild(
+                                row
+                            );
+
+                        }
+                    );
+
+
+                    modal.classList.add(
+                        "active"
+                    );
+
+                    document.body.style.overflow =
+                        "hidden";
+
+                }
+
+
+                // =================================================
+                // PDF
+                // =================================================
+
+                function downloadPurchasePdf() {
+
+                    if (!currentPurchase) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        typeof window.jspdf ===
+                        "undefined"
+                    ) {
+
+                        alert(
+                            "No se pudo cargar el generador de PDF."
+                        );
+
+                        return;
+
+                    }
+
+
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+
+
+                    const doc =
+                        new jsPDF(
+                            {
+                                orientation: "landscape",
+                                unit: "mm",
+                                format: "a4"
+                            }
+                        );
+
+
+                    const orderId =
+                        currentPurchase.dataset.orderId ||
+                        "-";
+
+                    const userId =
+                        currentPurchase.dataset.userId ||
+                        "-";
+
+                    const username =
+                        currentPurchase.dataset.username ||
+                        "-";
+
+                    const date =
+                        currentPurchase.dataset.date ||
+                        "-";
+
+                    const currency =
+                        currentPurchase.dataset.currency ||
+                        "-";
+
+                    const total =
+                        currentPurchase.dataset.total ||
+                        "0.00";
+
+
+                    doc.setFontSize(20);
+
+                    doc.setFont(
+                        "helvetica",
+                        "bold"
+                    );
+
+                    doc.text(
+                        "EmFren",
+                        14,
+                        18
+                    );
+
+
+                    doc.setFontSize(15);
+
+                    doc.text(
+                        "Detalle de compra",
+                        14,
+                        28
+                    );
+
+
+                    doc.setFontSize(10);
+
+                    doc.setFont(
+                        "helvetica",
+                        "normal"
+                    );
+
+
+                    doc.text(
+                        "Pedido: #" + orderId,
+                        14,
+                        39
+                    );
+
+                    doc.text(
+                        "ID Usuario: " + userId,
+                        14,
+                        46
+                    );
+
+                    doc.text(
+                        "Usuario: " + username,
+                        14,
+                        53
+                    );
+
+                    doc.text(
+                        "Fecha del pedido: " + date,
+                        14,
+                        60
+                    );
+
+                    doc.text(
+                        "Moneda de pago: " + currency,
+                        120,
+                        39
+                    );
+
+                    doc.text(
+                        "Total de compra: " + total,
+                        120,
+                        46
+                    );
+
+
+                    const articles =
+                        currentPurchase.querySelectorAll(
+                            ".article-data"
+                        );
+
+
+                    const tableRows = [];
+
+
+                    articles.forEach(
+                        function (article) {
+
+                            tableRows.push(
+                                [
+
+                                    article.dataset.articleCode ||
+                                    "-",
+
+                                    article.dataset.vehicle ||
+                                    "-",
+
+                                    article.dataset.measure ||
+                                    "-",
+
+                                    article.dataset.type ||
+                                    "-",
+
+                                    article.dataset.friction ||
+                                    "-",
+
+                                    article.dataset.quantity ||
+                                    "0",
+
+                                    article.dataset.price ||
+                                    "0.00",
+
+                                    (
+                                        article.dataset.discount ||
+                                        "0.00"
+                                    ) + "%",
+
+                                    article.dataset.stock ||
+                                    "-"
+
+                                ]
+                            );
+
+                        }
+                    );
+
+
+                    doc.autoTable(
+                        {
+
+                            startY: 70,
+
+                            head:
+                            [
+                                [
+
+                                    "Código",
+                                    "Vehículo",
+                                    "Medida",
+                                    "Tipo",
+                                    "Fricción",
+                                    "Cantidad",
+                                    "Precio unitario",
+                                    "Descuento",
+                                    "Stock"
+
+                                ]
+                            ],
+
+                            body:
+                                tableRows,
+
+                            theme:
+                                "grid",
+
+                            styles:
+                            {
+
+                                fontSize: 8,
+
+                                cellPadding: 2,
+
+                                overflow:
+                                    "linebreak",
+
+                                valign:
+                                    "middle"
+
+                            },
+
+                            headStyles:
+                            {
+
+                                fontStyle:
+                                    "bold"
+
+                            },
+
+                            margin:
+                            {
+
+                                left: 10,
+
+                                right: 10
+
+                            }
+
+                        }
+                    );
+
+
+                    const pageCount =
+                        doc.internal.getNumberOfPages();
+
+
+                    for (
+                        let i = 1;
+                        i <= pageCount;
+                        i++
+                    ) {
+
+                        doc.setPage(i);
+
+                        doc.setFontSize(8);
+
+                        doc.setFont(
+                            "helvetica",
+                            "normal"
+                        );
+
+                        doc.text(
+                            "EmFren - Gestión de compras",
+                            14,
+                            202
+                        );
+
+                        doc.text(
+                            "Página " +
+                            i +
+                            " de " +
+                            pageCount,
+                            250,
+                            202
+                        );
+
+                    }
+
+
+                    doc.save(
+                        "EmFren_Pedido_" +
+                        orderId +
+                        ".pdf"
+                    );
+
+                }
+
+
+                // =================================================
+                // CLOSE MODAL
+                // =================================================
+
+                function closePurchaseModal() {
+
+                    modal.classList.remove(
+                        "active"
+                    );
+
+                    document.body.style.overflow =
+                        "";
+
+                    currentPurchase =
+                        null;
+
+                }
+
+
+                // =================================================
+                // VIEW BUTTONS
+                // =================================================
+
+                viewButtons.forEach(
+                    function (button) {
+
+                        button.addEventListener(
+                            "click",
+                            function () {
+
+                                openPurchaseModal(
+                                    this.dataset.orderId
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                // =================================================
+                // PDF BUTTON
+                // =================================================
+
+                if (downloadPdfButton) {
+
+                    downloadPdfButton.addEventListener(
+                        "click",
+                        downloadPurchasePdf
+                    );
+
+                }
+
+
+                // =================================================
+                // CLOSE BUTTONS
+                // =================================================
+
+                if (closeButton) {
+
+                    closeButton.addEventListener(
+                        "click",
+                        closePurchaseModal
+                    );
+
+                }
+
+
+                if (closeBottomButton) {
+
+                    closeBottomButton.addEventListener(
+                        "click",
+                        closePurchaseModal
+                    );
+
+                }
+
+
+                if (overlay) {
+
+                    overlay.addEventListener(
+                        "click",
+                        closePurchaseModal
+                    );
+
+                }
+
+
+                // =================================================
+                // ESC
+                // =================================================
+
+                document.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            event.key === "Escape" &&
+                            modal.classList.contains(
+                                "active"
+                            )
+                        ) {
+
+                            closePurchaseModal();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        // =========================================================
+        // SET CLIENT DEBTOR CONFIRMATION
+        // =========================================================
+
+        function confirmSetClientDebtor(
+            orderId
+        ) {
+
+            return confirm(
+                "¿Está seguro de que desea marcar el pedido #" +
+                orderId +
+                " como deudor?\n\n" +
+                "Esta acción registrará este pedido como perteneciente a un cliente deudor."
+            );
+
+        }
+
+
+        // =========================================================
+        // DELETE PURCHASE CONFIRMATION
+        // =========================================================
+
+        function confirmDeletePurchase(
+            orderId
+        ) {
+
+            return confirm(
+                "¿Está seguro de que desea eliminar el pedido #" +
+                orderId +
+                "?\n\n" +
+                "Se eliminarán todos los artículos asociados a esta compra."
+            );
+
+        }
+
+    </script>
+
+</body>
+
+</html>

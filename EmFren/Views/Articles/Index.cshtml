@@ -1,0 +1,2198 @@
+﻿@model IEnumerable<EmFren.Models.Article>
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Artículos - EmFren</title>
+
+    <link rel="stylesheet"
+          href="~/css/Article.css" />
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <div class="logo">
+                EmFren
+            </div>
+
+        </div>
+
+
+        <div class="header-center">
+
+            <a href="@Url.Action("HomeEnterprise", "Home")"
+               class="home-link">
+
+                Home
+
+            </a>
+
+        </div>
+
+
+        <div class="header-right">
+
+            <div class="user-circle">
+
+                @(string.IsNullOrEmpty(ViewBag.Username)
+                    ? "U"
+                    : ViewBag.Username.Substring(0, 1).ToUpper())
+
+            </div>
+
+            <span class="username">
+                @ViewBag.Username
+            </span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main class="main-container">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Artículos
+                </h1>
+
+                <p>
+                    Administración de artículos
+                </p>
+
+            </div>
+
+
+            <button type="button"
+                    class="btn-primary"
+                    id="btnCreateArticle">
+
+                + Nuevo artículo
+
+            </button>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SEARCH
+             ================================================= -->
+
+        <div class="search-container">
+
+            <form method="get"
+                  action="@Url.Action("Index", "Articles")"
+                  class="search-form">
+
+                <input type="text"
+                       name="search"
+                       value="@ViewBag.Search"
+                       placeholder="Buscar artículo, vehículo, medida, tipo o fricción..."
+                       class="search-input" />
+
+                <input type="hidden"
+                       name="sort"
+                       value="@ViewBag.Sort" />
+
+
+                <button type="submit"
+                        class="btn-search">
+
+                    Buscar
+
+                </button>
+
+
+                @if (!string.IsNullOrEmpty(ViewBag.Search))
+                {
+                    <a href="@Url.Action("Index", "Articles")"
+                       class="btn-clear">
+
+                        Limpiar
+
+                    </a>
+                }
+
+            </form>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ARTICLES TABLE
+             ================================================= -->
+
+        <div class="table-container">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <!-- ID -->
+
+                        <th>
+
+                            <a href="@Url.Action(
+                                "Index",
+                                "Articles",
+                                new
+                                {
+                                    search = ViewBag.Search,
+                                    sort = ViewBag.Sort == "id_asc"
+                                        ? "id_desc"
+                                        : "id_asc",
+                                    page = 1
+                                })">
+
+                                ID
+
+                                @if (ViewBag.Sort == "id_asc")
+                                {
+                                    <span>▲</span>
+                                }
+                                else if (ViewBag.Sort == "id_desc")
+                                {
+                                    <span>▼</span>
+                                }
+
+                            </a>
+
+                        </th>
+
+
+                        <!-- ARTICLE -->
+
+                        <th>
+
+                            <a href="@Url.Action(
+                                "Index",
+                                "Articles",
+                                new
+                                {
+                                    search = ViewBag.Search,
+                                    sort = ViewBag.Sort == "article_id_asc"
+                                        ? "article_id_desc"
+                                        : "article_id_asc",
+                                    page = 1
+                                })">
+
+                                Artículo
+
+                            </a>
+
+                        </th>
+
+
+                        <!-- VEHICLE -->
+
+                        <th>
+
+                            <a href="@Url.Action(
+                                "Index",
+                                "Articles",
+                                new
+                                {
+                                    search = ViewBag.Search,
+                                    sort = ViewBag.Sort == "vehicle_asc"
+                                        ? "vehicle_desc"
+                                        : "vehicle_asc",
+                                    page = 1
+                                })">
+
+                                Vehículo
+
+                            </a>
+
+                        </th>
+
+
+                        <th>
+                            Medida
+                        </th>
+
+
+                        <th>
+                            Tipo
+                        </th>
+
+
+                        <th>
+                            Fricción
+                        </th>
+
+
+                        <!-- PRICE -->
+
+                        <th>
+
+                            <a href="@Url.Action(
+                                "Index",
+                                "Articles",
+                                new
+                                {
+                                    search = ViewBag.Search,
+                                    sort = ViewBag.Sort == "price_asc"
+                                        ? "price_desc"
+                                        : "price_asc",
+                                    page = 1
+                                })">
+
+                                Precio
+
+                            </a>
+
+                        </th>
+
+
+                        <th>
+                            Stock
+                        </th>
+
+
+                        <th>
+                            Descuento
+                        </th>
+
+
+                        <th>
+                            Acciones
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+
+                        foreach (var article in Model)
+                        {
+
+                            <tr>
+
+                                <!-- ID -->
+
+                                <td>
+                                    @article.Id
+                                </td>
+
+
+                                <!-- ARTICLE ID -->
+
+                                <td>
+                                    @(article.ArticleId ?? "—")
+                                </td>
+
+
+                                <!-- VEHICLE -->
+
+                                <td>
+                                    @(article.Vehicle?.Brand ?? "—")
+                                </td>
+
+
+                                <!-- MEASURE -->
+
+                                <td>
+                                    @(article.Measure ?? "—")
+                                </td>
+
+
+                                <!-- TYPE -->
+
+                                <td>
+                                    @(article.Type ?? "—")
+                                </td>
+
+
+                                <!-- FRICTION -->
+
+                                <td>
+                                    @(article.Friction ?? "—")
+                                </td>
+
+
+                                <!-- PRICE -->
+
+                                <td>
+
+                                    @if (article.Price.HasValue)
+                                    {
+                                        @article.Price.Value.ToString("0.00")
+                                    }
+                                    else
+                                    {
+                                        <text>—</text>
+                                    }
+
+                                </td>
+
+
+                                <!-- STOCK -->
+
+                                <td>
+
+                                    @if (article.Stock == true)
+                                    {
+                                        <span class="status-active">
+                                            En stock
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-inactive">
+                                            Sin stock
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- DISCOUNT -->
+
+                                <td>
+
+                                    @(article.Discount?.ToString("0.00") ?? "0.00")%
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="actions">
+
+
+                                        <!-- =========================
+                                             VIEW
+                                             ========================= -->
+
+                                        <button type="button"
+                                                class="btn-action btn-view btn-view-article"
+                                                data-id="@article.Id"
+                                                data-article-id="@article.ArticleId"
+                                                data-vehicle="@article.Vehicle?.Brand"
+                                                data-measure="@article.Measure"
+                                                data-type="@article.Type"
+                                                data-friction="@article.Friction"
+                                                data-price="@(article.Price?.ToString("0.00") ?? "")"
+                                                data-stock="@(article.Stock == true ? "En stock" : "Sin stock")"
+                                                data-discount="@(article.Discount?.ToString("0.00") ?? "0.00")">
+
+                                            Ver
+
+                                        </button>
+
+
+
+                                        <!-- =========================
+                                             EDIT
+                                             ========================= -->
+
+                                        <button type="button"
+                                                class="btn-action btn-edit btn-edit-article"
+                                                data-id="@article.Id"
+                                                data-article-id="@article.ArticleId"
+                                                data-vehicle-id="@article.VehicleId"
+                                                data-vehicle="@article.Vehicle?.Brand"
+                                                data-measure="@article.Measure"
+                                                data-type="@article.Type"
+                                                data-friction="@article.Friction"
+                                                data-price="@(article.Price?.ToString(
+                                                    System.Globalization.CultureInfo.InvariantCulture) ?? "")"
+                                                data-stock="@(article.Stock == true ? "true" : "false")"
+                                                data-discount="@(article.Discount?.ToString(
+                                                    System.Globalization.CultureInfo.InvariantCulture) ?? "0")">
+
+                                            Editar
+
+                                        </button>
+
+
+
+                                        <!-- =========================
+                                             STOCK
+                                             ========================= -->
+
+                                        <form method="post"
+                                              action="@Url.Action("ToggleStock", "Articles")"
+                                              style="display:inline;">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@article.Id" />
+
+                                            <button type="submit"
+                                                    class="btn-action btn-stock">
+
+                                                @(article.Stock == true
+                                                    ? "Sin stock"
+                                                    : "Stock")
+
+                                            </button>
+
+                                        </form>
+
+
+
+                                        <!-- =========================
+                                             DELETE
+                                             ========================= -->
+
+                                        <button type="button"
+                                                class="btn-action btn-delete btn-delete-article"
+                                                data-id="@article.Id">
+
+                                            Eliminar
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    }
+                    else
+                    {
+
+                        <tr>
+
+                            <td colspan="10"
+                                class="empty-message">
+
+                                No se encontraron artículos.
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+
+        <!-- =================================================
+             FOOTER / PAGINATION
+             ================================================= -->
+
+        <div class="table-footer">
+
+            <div class="users-count">
+
+                @ViewBag.TotalArticles
+
+                <text>
+                    artículos encontrados
+                </text>
+
+            </div>
+
+
+            @if (ViewBag.TotalPages > 0)
+            {
+
+                <div class="pagination-container">
+
+
+                    <!-- =================================================
+                         PAGINATION INFO
+                         ================================================= -->
+
+                    <div class="pagination-info">
+
+                        Página
+
+                        <strong>
+                            @ViewBag.CurrentPage
+                        </strong>
+
+                        de
+
+                        <strong>
+                            @ViewBag.TotalPages
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="pagination">
+
+
+                        <!-- =================================================
+                             PREVIOUS
+                             ================================================= -->
+
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+
+                            <a class="page-button"
+                               href="@Url.Action(
+                                   "Index",
+                                   "Articles",
+                                   new
+                                   {
+                                       search = ViewBag.Search,
+                                       sort = ViewBag.Sort,
+                                       page = ViewBag.CurrentPage - 1
+                                   })">
+
+                                ‹
+
+                            </a>
+
+                        }
+                        else
+                        {
+
+                            <span class="page-button disabled">
+
+                                ‹
+
+                            </span>
+
+                        }
+
+
+
+                        <!-- =================================================
+                             CALCULATE PAGE RANGE
+                             ================================================= -->
+
+                        @{
+                            int currentPage = ViewBag.CurrentPage;
+                            int totalPages = ViewBag.TotalPages;
+
+                            int startPage =
+                                Math.Max(1, currentPage - 2);
+
+                            int endPage =
+                                Math.Min(totalPages, currentPage + 2);
+                        }
+
+
+
+                        <!-- =================================================
+                             FIRST PAGE
+                             ================================================= -->
+
+                        @if (startPage > 1)
+                        {
+
+                            <a class="page-number"
+                               href="@Url.Action(
+                                   "Index",
+                                   "Articles",
+                                   new
+                                   {
+                                       search = ViewBag.Search,
+                                       sort = ViewBag.Sort,
+                                       page = 1
+                                   })">
+
+                                1
+
+                            </a>
+
+
+                            @if (startPage > 2)
+                            {
+
+                                <span class="dots">
+
+                                    ...
+
+                                </span>
+
+                            }
+
+                        }
+
+
+
+                        <!-- =================================================
+                             PAGE NUMBERS
+                             ================================================= -->
+
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+
+                            if (i == currentPage)
+                            {
+
+                                <span class="page-number active">
+
+                                    @i
+
+                                </span>
+
+                            }
+                            else
+                            {
+
+                                <a class="page-number"
+                                   href="@Url.Action(
+                                       "Index",
+                                       "Articles",
+                                       new
+                                       {
+                                           search = ViewBag.Search,
+                                           sort = ViewBag.Sort,
+                                           page = i
+                                       })">
+
+                                    @i
+
+                                </a>
+
+                            }
+
+                        }
+
+
+
+                        <!-- =================================================
+                             LAST PAGE
+                             ================================================= -->
+
+                        @if (endPage < totalPages)
+                        {
+
+                            @if (endPage < totalPages - 1)
+                            {
+
+                                <span class="dots">
+
+                                    ...
+
+                                </span>
+
+                            }
+
+
+                            <a class="page-number"
+                               href="@Url.Action(
+                                   "Index",
+                                   "Articles",
+                                   new
+                                   {
+                                       search = ViewBag.Search,
+                                       sort = ViewBag.Sort,
+                                       page = totalPages
+                                   })">
+
+                                @totalPages
+
+                            </a>
+
+                        }
+
+
+
+                        <!-- =================================================
+                             NEXT
+                             ================================================= -->
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+
+                            <a class="page-button"
+                               href="@Url.Action(
+                                   "Index",
+                                   "Articles",
+                                   new
+                                   {
+                                       search = ViewBag.Search,
+                                       sort = ViewBag.Sort,
+                                       page = ViewBag.CurrentPage + 1
+                                   })">
+
+                                ›
+
+                            </a>
+
+                        }
+                        else
+                        {
+
+                            <span class="page-button disabled">
+
+                                ›
+
+                            </span>
+
+                        }
+
+                    </div>
+
+                </div>
+
+            }
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         CREATE MODAL
+         ===================================================== -->
+
+    <div id="createModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Nuevo artículo
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        data-close-modal="createModal">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+
+            <form method="post"
+                  action="@Url.Action("Create", "Articles")">
+
+                @Html.AntiForgeryToken()
+
+
+                <div class="modal-body">
+
+
+                    <div class="form-group">
+
+                        <label>
+                            ID del artículo
+                        </label>
+
+                        <input type="text"
+                               name="ArticleId"
+                               maxlength="50" />
+
+                    </div>
+
+
+
+                    <!-- VEHICLE -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Vehículo
+                        </label>
+
+
+                        <input type="hidden"
+                               id="createVehicleId"
+                               name="VehicleId" />
+
+
+                        <div class="vehicle-selected">
+
+                            <span id="createVehicleSelected">
+                                Ningún vehículo seleccionado
+                            </span>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="btn-secondary"
+                                id="btnCreateVehicle">
+
+                            Buscar vehículo
+
+                        </button>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Medida
+                        </label>
+
+                        <input type="text"
+                               name="Measure"
+                               maxlength="50" />
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Tipo
+                        </label>
+
+                        <input type="text"
+                               name="Type"
+                               maxlength="100" />
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Fricción
+                        </label>
+
+                        <input type="text"
+                               name="Friction"
+                               maxlength="100" />
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Precio
+                        </label>
+
+                        <input type="number"
+                               name="Price"
+                               step="0.01"
+                               min="0" />
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Stock
+                        </label>
+
+                        <select name="Stock">
+
+                            <option value="true">
+                                En stock
+                            </option>
+
+                            <option value="false">
+                                Sin stock
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Descuento (%)
+                        </label>
+
+                        <input type="number"
+                               name="Discount"
+                               step="0.01"
+                               min="0"
+                               max="100"
+                               value="0" />
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-secondary"
+                            data-close-modal="createModal">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-primary">
+
+                        Crear
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         EDIT MODAL
+         ===================================================== -->
+
+    <div id="editModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Editar artículo
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        data-close-modal="editModal">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+
+            <form method="post"
+                  action="@Url.Action("Edit", "Articles")">
+
+                @Html.AntiForgeryToken()
+
+
+                <div class="modal-body">
+
+
+                    <input type="hidden"
+                           id="editId"
+                           name="Id" />
+
+
+                    <div class="form-group">
+
+                        <label>
+                            ID del artículo
+                        </label>
+
+                        <input type="text"
+                               id="editArticleId"
+                               name="ArticleId"
+                               maxlength="50" />
+
+                    </div>
+
+
+
+                    <!-- VEHICLE -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Vehículo
+                        </label>
+
+
+                        <input type="hidden"
+                               id="editVehicleId"
+                               name="VehicleId" />
+
+
+                        <div class="vehicle-selected">
+
+                            <span id="editVehicleSelected">
+                                Ningún vehículo seleccionado
+                            </span>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="btn-secondary"
+                                id="btnEditVehicle">
+
+                            Buscar vehículo
+
+                        </button>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Medida
+                        </label>
+
+                        <input type="text"
+                               id="editMeasure"
+                               name="Measure"
+                               maxlength="50" />
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Tipo
+                        </label>
+
+                        <input type="text"
+                               id="editType"
+                               name="Type"
+                               maxlength="100" />
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Fricción
+                        </label>
+
+                        <input type="text"
+                               id="editFriction"
+                               name="Friction"
+                               maxlength="100" />
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Precio
+                        </label>
+
+                        <input type="number"
+                               id="editPrice"
+                               name="Price"
+                               step="0.01"
+                               min="0" />
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Stock
+                        </label>
+
+                        <select id="editStock"
+                                name="Stock">
+
+                            <option value="true">
+                                En stock
+                            </option>
+
+                            <option value="false">
+                                Sin stock
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Descuento (%)
+                        </label>
+
+                        <input type="number"
+                               id="editDiscount"
+                               name="Discount"
+                               step="0.01"
+                               min="0"
+                               max="100" />
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-secondary"
+                            data-close-modal="editModal">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-primary">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         VEHICLE MODAL
+         ===================================================== -->
+
+    <div id="vehicleModal"
+         class="modal">
+
+        <div class="modal-content vehicle-modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Seleccionar vehículo
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        data-close-modal="vehicleModal">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+
+            <div class="modal-body">
+
+
+                <div class="vehicle-search">
+
+                    <input type="text"
+                           id="vehicleSearch"
+                           placeholder="Buscar por ID o vehículo..." />
+
+                </div>
+
+
+
+                <div class="vehicle-table-container">
+
+                    <table class="vehicle-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    ID
+                                </th>
+
+                                <th>
+                                    Vehículo
+                                </th>
+
+                                <th>
+                                    Acción
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @if (ViewBag.Vehicles != null)
+                            {
+
+                                foreach (var vehicle in ViewBag.Vehicles)
+                                {
+
+                                    <tr class="vehicle-row"
+                                        data-id="@vehicle.Id"
+                                        data-brand="@vehicle.Brand">
+
+                                        <td>
+                                            @vehicle.Id
+                                        </td>
+
+                                        <td>
+                                            @vehicle.Brand
+                                        </td>
+
+                                        <td>
+
+                                            <button type="button"
+                                                    class="btn-select-vehicle"
+                                                    data-vehicle-id="@vehicle.Id"
+                                                    data-vehicle-brand="@vehicle.Brand">
+
+                                                Seleccionar
+
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                }
+
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn-secondary"
+                        data-close-modal="vehicleModal">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         VIEW MODAL
+         ===================================================== -->
+
+    <div id="viewModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Información del artículo
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        data-close-modal="viewModal">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+
+            <div class="modal-body">
+
+
+                <div class="detail-row">
+
+                    <strong>ID:</strong>
+
+                    <span id="viewId">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <strong>Artículo:</strong>
+
+                    <span id="viewArticleId">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <strong>Vehículo:</strong>
+
+                    <span id="viewVehicle">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <strong>Medida:</strong>
+
+                    <span id="viewMeasure">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <strong>Tipo:</strong>
+
+                    <span id="viewType">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <strong>Fricción:</strong>
+
+                    <span id="viewFriction">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <strong>Precio:</strong>
+
+                    <span id="viewPrice">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <strong>Stock:</strong>
+
+                    <span id="viewStock">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <strong>Descuento:</strong>
+
+                    <span id="viewDiscount">
+                        —
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn-secondary"
+                        data-close-modal="viewModal">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         DELETE MODAL
+         ===================================================== -->
+
+    <div id="deleteModal"
+         class="modal">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Eliminar artículo
+                </h2>
+
+                <button type="button"
+                        class="modal-close"
+                        data-close-modal="deleteModal">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+
+            <div class="modal-body">
+
+                <p>
+                    ¿Está seguro de que desea eliminar este artículo?
+                </p>
+
+            </div>
+
+
+
+            <form method="post"
+                  action="@Url.Action("Delete", "Articles")">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       id="deleteId"
+                       name="id" />
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn-secondary"
+                            data-close-modal="deleteModal">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn-delete-confirm">
+
+                        Eliminar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+
+            /* =================================================
+               VARIABLES
+               ================================================= */
+
+            let vehicleTarget = null;
+
+
+
+            /* =================================================
+               MODAL FUNCTIONS
+               ================================================= */
+
+            function openModal(id) {
+
+                const modal =
+                    document.getElementById(id);
+
+                if (!modal) {
+                    return;
+                }
+
+                modal.classList.add("show");
+
+            }
+
+
+            function closeModal(id) {
+
+                const modal =
+                    document.getElementById(id);
+
+                if (!modal) {
+                    return;
+                }
+
+                modal.classList.remove("show");
+
+            }
+
+
+
+            /* =================================================
+               CLOSE BUTTONS
+               ================================================= */
+
+            document
+                .querySelectorAll("[data-close-modal]")
+                .forEach(function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const modalId =
+                                button.dataset.closeModal;
+
+                            closeModal(modalId);
+
+                        }
+                    );
+
+                });
+
+
+
+            /* =================================================
+               CREATE ARTICLE
+               ================================================= */
+
+            const createButton =
+                document.getElementById(
+                    "btnCreateArticle"
+                );
+
+
+            if (createButton) {
+
+                createButton.addEventListener(
+                    "click",
+                    function () {
+
+                        const form =
+                            document.querySelector(
+                                "#createModal form"
+                            );
+
+
+                        if (form) {
+                            form.reset();
+                        }
+
+
+                        document.getElementById(
+                            "createVehicleId"
+                        ).value = "";
+
+
+                        document.getElementById(
+                            "createVehicleSelected"
+                        ).textContent =
+                            "Ningún vehículo seleccionado";
+
+
+                        openModal("createModal");
+
+                    }
+                );
+
+            }
+
+
+
+            /* =================================================
+               VIEW ARTICLE
+               ================================================= */
+
+            document
+                .querySelectorAll(".btn-view-article")
+                .forEach(function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const data =
+                                button.dataset;
+
+
+                            document.getElementById(
+                                "viewId"
+                            ).textContent =
+                                data.id || "—";
+
+
+                            document.getElementById(
+                                "viewArticleId"
+                            ).textContent =
+                                data.articleId || "—";
+
+
+                            document.getElementById(
+                                "viewVehicle"
+                            ).textContent =
+                                data.vehicle || "—";
+
+
+                            document.getElementById(
+                                "viewMeasure"
+                            ).textContent =
+                                data.measure || "—";
+
+
+                            document.getElementById(
+                                "viewType"
+                            ).textContent =
+                                data.type || "—";
+
+
+                            document.getElementById(
+                                "viewFriction"
+                            ).textContent =
+                                data.friction || "—";
+
+
+                            document.getElementById(
+                                "viewPrice"
+                            ).textContent =
+                                data.price || "—";
+
+
+                            document.getElementById(
+                                "viewStock"
+                            ).textContent =
+                                data.stock || "—";
+
+
+                            document.getElementById(
+                                "viewDiscount"
+                            ).textContent =
+                                (data.discount || "0.00")
+                                + "%";
+
+
+                            openModal("viewModal");
+
+                        }
+                    );
+
+                });
+
+
+
+            /* =================================================
+               EDIT ARTICLE
+               ================================================= */
+
+            document
+                .querySelectorAll(".btn-edit-article")
+                .forEach(function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const data =
+                                button.dataset;
+
+
+                            document.getElementById(
+                                "editId"
+                            ).value =
+                                data.id || "";
+
+
+                            document.getElementById(
+                                "editArticleId"
+                            ).value =
+                                data.articleId || "";
+
+
+                            document.getElementById(
+                                "editVehicleId"
+                            ).value =
+                                data.vehicleId || "";
+
+
+                            document.getElementById(
+                                "editMeasure"
+                            ).value =
+                                data.measure || "";
+
+
+                            document.getElementById(
+                                "editType"
+                            ).value =
+                                data.type || "";
+
+
+                            document.getElementById(
+                                "editFriction"
+                            ).value =
+                                data.friction || "";
+
+
+                            document.getElementById(
+                                "editPrice"
+                            ).value =
+                                data.price || "";
+
+
+                            document.getElementById(
+                                "editStock"
+                            ).value =
+                                data.stock || "true";
+
+
+                            document.getElementById(
+                                "editDiscount"
+                            ).value =
+                                data.discount || "0";
+
+
+                            document.getElementById(
+                                "editVehicleSelected"
+                            ).textContent =
+                                data.vehicle
+                                    ? data.vehicle
+                                    : "Ningún vehículo seleccionado";
+
+
+                            openModal("editModal");
+
+                        }
+                    );
+
+                });
+
+
+
+            /* =================================================
+               DELETE ARTICLE
+               ================================================= */
+
+            document
+                .querySelectorAll(".btn-delete-article")
+                .forEach(function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            document.getElementById(
+                                "deleteId"
+                            ).value =
+                                button.dataset.id;
+
+
+                            openModal("deleteModal");
+
+                        }
+                    );
+
+                });
+
+
+
+            /* =================================================
+               OPEN VEHICLE SELECTOR - CREATE
+               ================================================= */
+
+            const createVehicleButton =
+                document.getElementById(
+                    "btnCreateVehicle"
+                );
+
+
+            if (createVehicleButton) {
+
+                createVehicleButton.addEventListener(
+                    "click",
+                    function () {
+
+                        vehicleTarget = "create";
+
+
+                        const search =
+                            document.getElementById(
+                                "vehicleSearch"
+                            );
+
+
+                        search.value = "";
+
+
+                        filterVehicles();
+
+
+                        openModal("vehicleModal");
+
+                    }
+                );
+
+            }
+
+
+
+            /* =================================================
+               OPEN VEHICLE SELECTOR - EDIT
+               ================================================= */
+
+            const editVehicleButton =
+                document.getElementById(
+                    "btnEditVehicle"
+                );
+
+
+            if (editVehicleButton) {
+
+                editVehicleButton.addEventListener(
+                    "click",
+                    function () {
+
+                        vehicleTarget = "edit";
+
+
+                        const search =
+                            document.getElementById(
+                                "vehicleSearch"
+                            );
+
+
+                        search.value = "";
+
+
+                        filterVehicles();
+
+
+                        openModal("vehicleModal");
+
+                    }
+                );
+
+            }
+
+
+
+            /* =================================================
+               VEHICLE SEARCH
+               ================================================= */
+
+            const vehicleSearch =
+                document.getElementById(
+                    "vehicleSearch"
+                );
+
+
+            if (vehicleSearch) {
+
+                vehicleSearch.addEventListener(
+                    "input",
+                    function () {
+
+                        filterVehicles();
+
+                    }
+                );
+
+            }
+
+
+
+            function filterVehicles() {
+
+                const search =
+                    document.getElementById(
+                        "vehicleSearch"
+                    )
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+
+                document
+                    .querySelectorAll(".vehicle-row")
+                    .forEach(function (row) {
+
+                        const id =
+                            (
+                                row.dataset.id || ""
+                            )
+                            .toLowerCase();
+
+
+                        const brand =
+                            (
+                                row.dataset.brand || ""
+                            )
+                            .toLowerCase();
+
+
+                        const visible =
+                            id.includes(search) ||
+                            brand.includes(search);
+
+
+                        row.style.display =
+                            visible
+                                ? ""
+                                : "none";
+
+                    });
+
+            }
+
+
+
+            /* =================================================
+               SELECT VEHICLE
+               ================================================= */
+
+            document
+                .querySelectorAll(".btn-select-vehicle")
+                .forEach(function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const id =
+                                button.dataset.vehicleId;
+
+
+                            const brand =
+                                button.dataset.vehicleBrand;
+
+
+                            if (!id) {
+                                return;
+                            }
+
+
+                            /* ==============================
+                               CREATE
+                               ============================== */
+
+                            if (
+                                vehicleTarget ===
+                                "create"
+                            ) {
+
+                                document.getElementById(
+                                    "createVehicleId"
+                                ).value =
+                                    id;
+
+
+                                document.getElementById(
+                                    "createVehicleSelected"
+                                ).textContent =
+                                    id +
+                                    " - " +
+                                    brand;
+
+                            }
+
+
+                            /* ==============================
+                               EDIT
+                               ============================== */
+
+                            if (
+                                vehicleTarget ===
+                                "edit"
+                            ) {
+
+                                document.getElementById(
+                                    "editVehicleId"
+                                ).value =
+                                    id;
+
+
+                                document.getElementById(
+                                    "editVehicleSelected"
+                                ).textContent =
+                                    id +
+                                    " - " +
+                                    brand;
+
+                            }
+
+
+                            closeModal(
+                                "vehicleModal"
+                            );
+
+                        }
+                    );
+
+                });
+
+
+
+            /* =================================================
+               CLICK OUTSIDE MODAL
+               ================================================= */
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.target.classList.contains(
+                            "modal"
+                        )
+                    ) {
+
+                        event.target.classList.remove(
+                            "show"
+                        );
+
+                    }
+
+                }
+            );
+
+
+
+            /* =================================================
+               ESCAPE
+               ================================================= */
+
+            document.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Escape"
+                    ) {
+
+                        document
+                            .querySelectorAll(
+                                ".modal.show"
+                            )
+                            .forEach(
+                                function (modal) {
+
+                                    modal.classList.remove(
+                                        "show"
+                                    );
+
+                                }
+                            );
+
+                    }
+
+                }
+            );
+
+
+        });
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,800 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f9;
+    color: #1f2937;
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.header {
+    position: relative;
+    background: #111827;
+    color: white;
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+
+/* HOME */
+
+.home-link {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+    .home-link:hover {
+        background: #1f2937;
+    }
+
+.header-info {
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
+.container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.page-title {
+    margin-bottom: 25px;
+}
+
+    .page-title h2 {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .page-title p {
+        color: #6b7280;
+        font-size: 15px;
+    }
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.search-container {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    max-width: 700px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 13px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+    .search-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+.search-button {
+    padding: 13px 22px;
+    border: none;
+    border-radius: 9px;
+    background: #2563eb;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .search-button:hover {
+        background: #1d4ed8;
+    }
+
+.clear-button {
+    padding: 13px 18px;
+    border-radius: 9px;
+    background: #f1f5f9;
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: 0.2s;
+}
+
+    .clear-button:hover {
+        background: #e2e8f0;
+    }
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f8fafc;
+}
+
+th {
+    text-align: left;
+    padding: 17px 20px;
+    font-size: 13px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+td {
+    padding: 18px 20px;
+    border-bottom: 1px solid #edf0f3;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   USER
+   ========================================================= */
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #374151;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #111827;
+}
+
+.user-id {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+    display: inline-block;
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-user {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.status-enterprise {
+    background: #dcfce7;
+    color: #166534;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    border: none;
+    border-radius: 7px;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+
+/* EDIT */
+
+.btn-edit {
+    background: #2563eb;
+    color: white;
+}
+
+    .btn-edit:hover {
+        background: #1d4ed8;
+    }
+
+
+/* ENTERPRISE */
+
+.btn-enterprise {
+    background: #2563eb;
+    color: white;
+}
+
+    .btn-enterprise:hover {
+        background: #1d4ed8;
+    }
+
+
+/* DELETE */
+
+.btn-delete {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+    .btn-delete:hover {
+        background: #fecaca;
+    }
+
+
+/* =========================================================
+   NO USERS
+   ========================================================= */
+
+.no-users {
+    text-align: center;
+    padding: 30px;
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   TABLE FOOTER
+   ========================================================= */
+
+.table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 18px 24px;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    gap: 20px;
+}
+
+.users-count {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.pagination-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+a.pagination-button:hover {
+    background: #f8fafc;
+    color: #111827;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.pagination-button.active {
+    background: #111827;
+    color: white;
+    border-color: #111827;
+    cursor: default;
+}
+
+.pagination-button.disabled {
+    background: #f8fafc;
+    color: #b8bec8;
+    border-color: #edf0f3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   EDIT USER MODAL
+   ========================================================= */
+
+.user-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
+    background: rgba(0, 0, 0, 0.60);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+    .user-modal.show {
+        display: flex;
+    }
+
+
+/* =========================================================
+   MODAL BOX
+   ========================================================= */
+
+.user-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+    animation: modalOpen 0.20s ease-out;
+}
+
+
+/* =========================================================
+   MODAL ANIMATION
+   ========================================================= */
+
+@keyframes modalOpen {
+
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.user-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.modal-title-container p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.user-modal-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 28px;
+    line-height: 1;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .user-modal-close:hover {
+        background: #f3f4f6;
+        color: #111827;
+    }
+
+
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
+
+.user-modal-body {
+    padding: 24px;
+}
+
+
+/* =========================================================
+   FORM GROUP
+   ========================================================= */
+
+.modal-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 18px;
+}
+
+    .modal-form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .modal-form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+
+    /* =========================================================
+   MODAL INPUT
+   ========================================================= */
+
+    .modal-form-group input[type="text"],
+    .modal-form-group input[type="email"] {
+        display: block;
+        width: 100%;
+        height: 44px;
+        padding: 0 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #111827;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+        .modal-form-group input[type="text"]:focus,
+        .modal-form-group input[type="email"]:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+
+    /* =========================================================
+   READONLY ID
+   ========================================================= */
+
+    .modal-form-group input[readonly] {
+        background: #f3f4f6;
+        color: #6b7280;
+        border-color: #e5e7eb;
+        cursor: not-allowed;
+    }
+
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.user-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 24px;
+    background: #fafafa;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+/* =========================================================
+   CANCEL
+   ========================================================= */
+
+.btn-cancel {
+    background: #e5e7eb;
+    color: #374151;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 17px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .btn-cancel:hover {
+        background: #d1d5db;
+    }
+
+
+/* =========================================================
+   SAVE
+   ========================================================= */
+
+.btn-save {
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 17px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .btn-save:hover {
+        background: #15803d;
+    }
+
+
+/* =========================================================
+   DISABLE PAGE SCROLL
+   ========================================================= */
+
+body.modal-open {
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .header {
+        padding: 18px 20px;
+    }
+
+    .header-info {
+        display: none;
+    }
+
+    .home-link {
+        position: static;
+        transform: none;
+        margin: auto;
+    }
+
+    .container {
+        width: 94%;
+        margin: 25px auto;
+    }
+
+    .page-title h2 {
+        font-size: 23px;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .search-button,
+    .clear-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   MOBILE MODAL
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    /* =====================================================
+       MOBILE MODAL
+       ===================================================== */
+
+    .user-modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        padding: 12px !important;
+        display: none;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow-y: auto;
+    }
+
+        .user-modal.show {
+            display: flex !important;
+        }
+
+
+    /* MODAL CONTENT */
+
+    .user-modal-content {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: auto !important;
+        border-radius: 12px;
+        transform: translateY(0) !important;
+    }
+
+
+    /* HEADER */
+
+    .user-modal-header {
+        padding: 18px;
+    }
+
+
+    /* BODY */
+
+    .user-modal-body {
+        padding: 18px;
+    }
+
+
+    /* FOOTER */
+
+    .user-modal-footer {
+        padding: 16px 18px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+
+    /* BUTTONS */
+
+    .btn-cancel,
+    .btn-save {
+        width: 100%;
+    }
+
+
+    /* INPUTS */
+
+    .modal-form-group input[type="text"],
+    .modal-form-group input[type="email"] {
+        width: 100%;
+        height: 44px;
+    }
+
+
+    /* CLOSE BUTTON */
+
+    .user-modal-close {
+        width: 34px;
+        height: 34px;
+        font-size: 26px;
+    }
+}

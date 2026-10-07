@@ -1,0 +1,735 @@
+﻿@model IEnumerable<EmFren.Models.User>
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Usuarios - EmFren</title>
+
+    <link rel="stylesheet"
+          href="~/css/User.css?v=2" />
+
+</head>
+
+<body>
+
+    <!-- =========================================================
+         NAVBAR
+    ========================================================== -->
+
+    <header class="header">
+
+        <a href="/Home/HomeEnterprise"
+           class="logo">
+            EmFren
+        </a>
+
+        <a href="/Home/HomeEnterprise"
+           class="home-link">
+            Home
+        </a>
+
+        <span class="header-info">
+            Administración de usuarios
+        </span>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+
+    <main class="container">
+
+        <div class="page-title">
+
+            <h2>
+                Usuarios
+            </h2>
+
+            <p>
+                Gestiona los usuarios registrados en el sistema.
+            </p>
+
+        </div>
+
+
+        <!-- =====================================================
+             BUSCADOR
+        ====================================================== -->
+
+        <div class="search-container">
+
+            <form class="search-form"
+                  method="get"
+                  action="/Users/Users">
+
+                <input type="text"
+                       name="search"
+                       class="search-input"
+                       placeholder="Buscar por nombre, email o ID..."
+                       value="@Context.Request.Query["search"]" />
+
+                <button type="submit"
+                        class="search-button">
+
+                    Buscar
+
+                </button>
+
+                <a href="/Users/Users"
+                   class="clear-button">
+
+                    Limpiar
+
+                </a>
+
+            </form>
+
+        </div>
+
+
+        <!-- =====================================================
+             TABLE
+        ====================================================== -->
+
+        <div class="card">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Usuario
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Tipo de usuario
+                            </th>
+
+                            <th>
+                                Acciones
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+
+                            foreach (var user in Model)
+                            {
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="user-info">
+
+                                            <div class="avatar">
+
+                                                @if (!string.IsNullOrEmpty(user.Username))
+                                                {
+                                                    @(user.Username.Substring(0, 1).ToUpper())
+                                                }
+                                                else
+                                                {
+                                                    @:?
+                                                }
+
+                                            </div>
+
+                                            <div>
+
+                                                <div class="user-name">
+                                                    @user.Username
+                                                </div>
+
+                                                <div class="user-id">
+                                                    ID: @user.Id
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        @user.Email
+                                    </td>
+
+
+                                    <td>
+
+                                        @if (user.FromEnterprise)
+                                        {
+
+                                            <span class="status status-enterprise">
+                                                Empresa
+                                            </span>
+
+                                        }
+                                        else
+                                        {
+
+                                            <span class="status status-user">
+                                                Usuario
+                                            </span>
+
+                                        }
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            <!-- EDIT USER -->
+
+                                            <button type="button"
+                                                    class="btn btn-edit"
+                                                    data-id="@user.Id"
+                                                    data-username="@user.Username"
+                                                    data-email="@user.Email"
+                                                    onclick="openEditUserModal(this)">
+
+                                                Editar usuario
+
+                                            </button>
+
+
+                                            <!-- ENTERPRISE -->
+
+                                            <form method="post"
+                                                  action="/Users/SetFromEnterprise">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@user.Id" />
+
+                                                @if (user.FromEnterprise)
+                                                {
+
+                                                    <button type="submit"
+                                                            class="btn btn-enterprise">
+
+                                                        No hacer usuario de empresa
+
+                                                    </button>
+
+                                                }
+                                                else
+                                                {
+
+                                                    <button type="submit"
+                                                            class="btn btn-enterprise">
+
+                                                        Hacer usuario de empresa
+
+                                                    </button>
+
+                                                }
+
+                                            </form>
+
+
+                                            <!-- DELETE -->
+
+                                            <form method="post"
+                                                  action="/Users/DeleteUser"
+                                                  onsubmit="return confirm('¿Está seguro de que desea eliminar este usuario?');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@user.Id" />
+
+                                                <button type="submit"
+                                                        class="btn btn-delete">
+
+                                                    Eliminar usuario
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+                        }
+                        else
+                        {
+
+                            <tr>
+
+                                <td colspan="4"
+                                    class="no-users">
+
+                                    No se encontraron usuarios.
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- =================================================
+                 TABLE FOOTER
+            ================================================== -->
+
+            <div class="table-footer">
+
+                <div class="users-count">
+
+                    @if (Model != null)
+                    {
+                        @Model.Count()
+
+                        <text>
+                            usuarios encontrados
+                        </text>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PAGINATION
+        ====================================================== -->
+
+        <br />
+        <br />
+
+        @if (ViewBag.TotalPages > 1)
+        {
+
+            <div class="pagination">
+
+                @if (ViewBag.CurrentPage > 1)
+                {
+
+                    <a href="@Url.Action(
+                        "Users",
+                        "Users",
+                        new
+                        {
+                            search = ViewBag.Search,
+                            page = ViewBag.CurrentPage - 1
+                        })"
+                       class="pagination-button">
+
+                        ← Anterior
+
+                    </a>
+
+                }
+                else
+                {
+
+                    <span class="pagination-button disabled">
+                        ← Anterior
+                    </span>
+
+                }
+
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+
+                    if (i == ViewBag.CurrentPage)
+                    {
+
+                        <span class="pagination-button active">
+                            @i
+                        </span>
+
+                    }
+                    else
+                    {
+
+                        <a href="@Url.Action(
+                            "Users",
+                            "Users",
+                            new
+                            {
+                                search = ViewBag.Search,
+                                page = i
+                            })"
+                           class="pagination-button">
+
+                            @i
+
+                        </a>
+
+                    }
+
+                }
+
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+
+                    <a href="@Url.Action(
+                        "Users",
+                        "Users",
+                        new
+                        {
+                            search = ViewBag.Search,
+                            page = ViewBag.CurrentPage + 1
+                        })"
+                       class="pagination-button">
+
+                        Siguiente →
+
+                    </a>
+
+                }
+                else
+                {
+
+                    <span class="pagination-button disabled">
+                        Siguiente →
+                    </span>
+
+                }
+
+            </div>
+
+        }
+
+    </main>
+
+
+    <!-- =========================================================
+         EDIT USER MODAL
+         
+         IMPORTANT:
+         This modal is directly inside BODY.
+         It is NOT inside MAIN or CONTAINER.
+    ========================================================== -->
+
+    <div id="editUserModal"
+         class="user-modal"
+         aria-hidden="true">
+
+        <div class="user-modal-content">
+
+
+            <!-- MODAL HEADER -->
+
+            <div class="user-modal-header">
+
+                <div class="modal-title-container">
+
+                    <h2>
+                        Editar usuario
+                    </h2>
+
+                    <p>
+                        Modifica la información del usuario.
+                    </p>
+
+                </div>
+
+
+                <button type="button"
+                        class="user-modal-close"
+                        onclick="closeEditUserModal()"
+                        aria-label="Cerrar">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <!-- MODAL FORM -->
+
+            <form method="post"
+                  action="/Users/EditUser"
+                  class="edit-user-form">
+
+                @Html.AntiForgeryToken()
+
+
+                <div class="user-modal-body">
+
+
+                    <!-- ID -->
+
+                    <div class="modal-form-group">
+
+                        <label for="editUserIdDisplay">
+                            ID
+                        </label>
+
+                        <input type="text"
+                               id="editUserIdDisplay"
+                               readonly />
+
+                        <input type="hidden"
+                               id="editUserId"
+                               name="Id" />
+
+                    </div>
+
+
+                    <!-- USERNAME -->
+
+                    <div class="modal-form-group">
+
+                        <label for="editUsername">
+                            Usuario
+                        </label>
+
+                        <input type="text"
+                               id="editUsername"
+                               name="Username"
+                               maxlength="50"
+                               autocomplete="off"
+                               required />
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="modal-form-group">
+
+                        <label for="editEmail">
+                            Email
+                        </label>
+
+                        <input type="email"
+                               id="editEmail"
+                               name="Email"
+                               maxlength="100"
+                               autocomplete="off"
+                               required />
+
+                    </div>
+
+                </div>
+
+
+                <!-- MODAL FOOTER -->
+
+                <div class="user-modal-footer">
+
+                    <button type="button"
+                            class="btn btn-cancel"
+                            onclick="closeEditUserModal()">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-save">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================== -->
+
+    <script>
+
+        function openEditUserModal(button)
+        {
+            const modal =
+                document.getElementById("editUserModal");
+
+
+            const id =
+                button.dataset.id;
+
+            const username =
+                button.dataset.username;
+
+            const email =
+                button.dataset.email;
+
+
+            /*
+             * Fill modal
+             */
+
+            document.getElementById(
+                "editUserIdDisplay"
+            ).value = id;
+
+
+            document.getElementById(
+                "editUserId"
+            ).value = id;
+
+
+            document.getElementById(
+                "editUsername"
+            ).value = username;
+
+
+            document.getElementById(
+                "editEmail"
+            ).value = email;
+
+
+            /*
+             * Show modal
+             */
+
+            modal.style.display = "flex";
+
+            modal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+
+            document.body.classList.add(
+                "modal-open"
+            );
+
+
+            /*
+             * Focus username
+             */
+
+            setTimeout(function()
+            {
+
+                document.getElementById(
+                    "editUsername"
+                ).focus();
+
+            }, 100);
+
+        }
+
+
+        function closeEditUserModal()
+        {
+            const modal =
+                document.getElementById(
+                    "editUserModal"
+                );
+
+
+            modal.style.display = "none";
+
+
+            modal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+
+            document.body.classList.remove(
+                "modal-open"
+            );
+
+        }
+
+
+        /*
+         * Close when clicking outside
+         */
+
+        document.addEventListener(
+            "click",
+            function(event)
+            {
+
+                const modal =
+                    document.getElementById(
+                        "editUserModal"
+                    );
+
+
+                if (event.target === modal)
+                {
+                    closeEditUserModal();
+                }
+
+            }
+        );
+
+
+        /*
+         * Close with ESC
+         */
+
+        document.addEventListener(
+            "keydown",
+            function(event)
+            {
+
+                if (event.key === "Escape")
+                {
+                    closeEditUserModal();
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
