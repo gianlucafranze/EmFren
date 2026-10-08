@@ -1,153 +1,108 @@
-﻿/* =========================================================
-   GLOBAL
-   ========================================================= */
-
-* {
-    box-sizing: border-box;
-}
-
-html {
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: #ffffff;
-    color: #111827;
-    overflow-x: hidden;
-}
-
-
-/* =========================================================
+﻿/* =========================
    HEADER
-   ========================================================= */
+   ========================= */
 
 .header {
-    width: 100%;
     height: 70px;
     background: #ffffff;
     border-bottom: 1px solid #e5e7eb;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+
     padding: 0 32px;
     gap: 20px;
-    position: relative;
-    z-index: 1000;
 }
 
-
-/* =========================================================
-   HEADER LEFT
-   ========================================================= */
-
 .header-left {
-    min-width: 0;
     display: flex;
     align-items: center;
     flex-shrink: 0;
 }
 
 .logo {
-    margin: 0;
     font-size: 25px;
-    line-height: 1;
     font-weight: 700;
     color: #111827;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-
-/* =========================================================
-   HEADER CENTER
-   ========================================================= */
-
 .header-center {
-    min-width: 0;
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1;
+    min-width: 0;
 }
 
 .home-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: auto;
-    max-width: 100%;
-    padding: 10px 18px;
-    border-radius: 8px;
+
     text-decoration: none;
     color: #374151;
+
     font-size: 15px;
     font-weight: 600;
-    line-height: 1.2;
+
+    padding: 10px 18px;
+    border-radius: 8px;
+
     white-space: nowrap;
     flex-shrink: 0;
-    transition: background-color 0.2s ease, color 0.2s ease;
+
+    transition: 0.2s ease;
 }
 
-    .home-link:hover {
-        background: #f3f4f6;
-        color: #111827;
-    }
-
-
-/* =========================================================
-   HEADER RIGHT
-   ========================================================= */
+.home-link:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
 
 .header-right {
-    min-width: 0;
     display: flex;
     align-items: center;
     justify-content: flex-end;
+
     gap: 9px;
+
     flex-shrink: 0;
 }
 
 .user-circle {
     width: 34px;
     height: 34px;
+
     min-width: 34px;
     min-height: 34px;
+
     border-radius: 50%;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: #111827;
     color: #ffffff;
+
     font-size: 14px;
     font-weight: 600;
-    line-height: 1;
-    flex-shrink: 0;
 }
 
 .username {
-    max-width: 180px;
     font-size: 14px;
     font-weight: 600;
     color: #374151;
+
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 
-/* =========================================================
+/* =========================
    TABLET
-   901px → 1200px
-   ========================================================= */
+   ========================= */
 
 @media (max-width: 900px) {
 
@@ -159,6 +114,11 @@ body {
 
     .logo {
         font-size: 22px;
+    }
+
+    .header-center {
+        display: flex;
+        flex: 1;
     }
 
     .home-link {
@@ -176,53 +136,67 @@ body {
 }
 
 
-/* =========================================================
-   MOBILE
-   701px → 900px
-   ========================================================= */
+/* =========================
+   CELL PHONE
+   ========================= */
 
 @media (max-width: 700px) {
 
     .header {
-        width: 100%;
         height: 64px;
-        grid-template-columns: auto minmax(0, 1fr) auto;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
         padding: 0 12px;
         gap: 8px;
     }
 
     .header-left {
-        min-width: 0;
+        flex: 0 0 auto;
     }
 
     .logo {
         font-size: 20px;
-        max-width: 120px;
     }
 
+    /* HOME MUST STAY VISIBLE */
     .header-center {
-        width: 100%;
-        min-width: 0;
         display: flex !important;
+
+        flex: 1 1 auto;
+
         align-items: center;
         justify-content: center;
+
+        min-width: 0;
     }
 
     .home-link {
         display: inline-flex !important;
-        max-width: 100%;
-        padding: 8px 12px;
+
+        align-items: center;
+        justify-content: center;
+
         font-size: 14px;
+
+        padding: 8px 12px;
+
         white-space: nowrap;
-        visibility: visible;
-        opacity: 1;
+        flex-shrink: 0;
+
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     .header-right {
-        min-width: 0;
+        flex: 0 0 auto;
+
         display: flex;
         align-items: center;
         justify-content: flex-end;
+
         gap: 6px;
     }
 
@@ -233,17 +207,18 @@ body {
     .user-circle {
         width: 32px;
         height: 32px;
+
         min-width: 32px;
         min-height: 32px;
+
         font-size: 12px;
     }
 }
 
 
-/* =========================================================
-   SMALL MOBILE
-   501px → 700px
-   ========================================================= */
+/* =========================
+   SMALL CELL PHONE
+   ========================= */
 
 @media (max-width: 500px) {
 
@@ -255,18 +230,21 @@ body {
 
     .logo {
         font-size: 18px;
-        max-width: 100px;
     }
 
     .header-center {
+        display: flex !important;
+        flex: 1 1 auto;
+        justify-content: center;
         min-width: 0;
-        width: 100%;
     }
 
     .home-link {
         font-size: 13px;
         padding: 7px 10px;
+
         white-space: nowrap;
+        display: inline-flex !important;
     }
 
     .header-right {
@@ -276,28 +254,26 @@ body {
     .user-circle {
         width: 30px;
         height: 30px;
+
         min-width: 30px;
         min-height: 30px;
     }
 }
 
 
-/* =========================================================
-   VERY SMALL PHONES
-   361px → 500px
-   ========================================================= */
+/* =========================
+   VERY SMALL PHONE
+   ========================= */
 
 @media (max-width: 360px) {
 
     .header {
-        height: 58px;
         padding: 0 5px;
         gap: 3px;
     }
 
     .logo {
         font-size: 17px;
-        max-width: 90px;
     }
 
     .home-link {
@@ -308,38 +284,10 @@ body {
     .user-circle {
         width: 29px;
         height: 29px;
+
         min-width: 29px;
         min-height: 29px;
+
         font-size: 11px;
-    }
-}
-
-
-/* =========================================================
-   EXTRA SMALL DEVICES
-   ========================================================= */
-
-@media (max-width: 320px) {
-
-    .header {
-        padding: 0 4px;
-        gap: 2px;
-    }
-
-    .logo {
-        font-size: 16px;
-        max-width: 82px;
-    }
-
-    .home-link {
-        font-size: 11px;
-        padding: 6px 7px;
-    }
-
-    .user-circle {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
-        min-height: 28px;
     }
 }
