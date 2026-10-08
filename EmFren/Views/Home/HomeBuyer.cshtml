@@ -5,117 +5,180 @@
 
     int unreadNotificationCount = ViewBag.UnreadNotificationCount ?? 0;
 }
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>EmFren - Inicio</title>
+
     <link rel="stylesheet"
-          href="~/css/HomeBuyer.css" />
+          href="~/css/HomeBuyer.css"
+          asp-append-version="true" />
 
 </head>
 
 <body>
 
-    <!-- SIDEBAR -->
+
+    <!-- =========================
+         SIDEBAR
+    ========================= -->
+
     <aside class="sidebar">
+
+
+        <!-- LOGO -->
 
         <div class="logo">
             Em<span>Fren</span>
         </div>
 
+
+        <!-- MENU -->
+
         <ul class="menu">
 
-            <li>
-                <a href="/" class="active">
-                    <span class="icon">⌂</span>
-                    <span>Inicio</span>
-                </a>
-            </li>
+
+            <!-- INICIO -->
 
             <li>
+
+                <a href="/"
+                   class="active">
+
+                    <span class="icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Inicio
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <!-- MI CUENTA -->
+
+            <li>
+
                 <a href="/MyAccount/Edit">
-                    <span class="icon">👤</span>
-                    <span>Mi cuenta</span>
+
+                    <span class="icon">
+                        👤
+                    </span>
+
+                    <span>
+                        Mi cuenta
+                    </span>
+
                 </a>
+
             </li>
 
+
+            <!-- PRODUCTOS COMPRADOS -->
+
             <li>
+
                 <a href="/Shop/ViewShopUser">
-                    <span class="icon">🛒</span>
-                    <span>Productos comprados</span>
+
+                    <span class="icon">
+                        🛒
+                    </span>
+
+                    <span>
+                        Productos comprados
+                    </span>
+
                 </a>
+
             </li>
 
+
+            <!-- COMPRAR PRODUCTOS -->
+
             <li>
+
                 <a href="/Shop/Articles">
-                    <span class="icon">🛍</span>
-                    <span>Comprar productos</span>
+
+                    <span class="icon">
+                        🛍
+                    </span>
+
+                    <span>
+                        Comprar productos
+                    </span>
+
                 </a>
+
             </li>
+
 
         </ul>
-
-        <!-- LOGOUT -->
-        <div class="logout">
-
-            <form action="/Users/Logout"
-                  method="post"
-                  class="logout-form">
-
-                @Html.AntiForgeryToken()
-
-                <button type="submit" class="logout-button">
-
-                    <span class="icon">↪</span>
-
-                    <span>Cerrar sesión</span>
-
-                </button>
-
-            </form>
-
-        </div>
 
     </aside>
 
 
-    <!-- MAIN -->
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
     <main class="main">
 
-        <!-- HEADER -->
+
+        <!-- =========================
+             HEADER
+        ========================= -->
+
         <header class="header">
 
+
             <!-- PAGE TITLE -->
-            <h1>Inicio</h1>
+
+            <h1>
+                Inicio
+            </h1>
 
 
-            <!-- RIGHT SIDE -->
+            <!-- =========================
+                 HEADER RIGHT
+            ========================= -->
+
             <div class="header-right">
 
-                <!-- NOTIFICATION -->
-                    <a href="/Notification/NotificationBuyer"
-                       class="notification"
-                       aria-label="Notificaciones">
 
-                        <span class="notification-bell">
-                            🔔
+                <!-- NOTIFICATIONS -->
+
+                <a href="/Notification/NotificationBuyer"
+                   class="notification"
+                   aria-label="Notificaciones">
+
+                    <span class="notification-bell">
+                        🔔
+                    </span>
+
+                    @if (unreadNotificationCount > 0)
+                    {
+                        <span class="notification-number">
+                            @unreadNotificationCount
                         </span>
+                    }
 
-                        @if (unreadNotificationCount > 0)
-                        {
-                            <span class="notification-number">
-                                @unreadNotificationCount
-                            </span>
-                        }
-
-                    </a>
+                </a>
 
 
                 <!-- USER -->
+
                 <div class="user-info">
 
                     <div class="user-name">
@@ -124,13 +187,47 @@
 
                 </div>
 
+
+                <!-- =========================
+                     LOGOUT
+                ========================= -->
+
+                <form action="/Users/Logout"
+                      method="post"
+                      class="logout-form">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="logout-button">
+
+                        <span class="logout-icon">
+                            ↪
+                        </span>
+
+                        <span>
+                            Cerrar sesión
+                        </span>
+
+                    </button>
+
+                </form>
+
+
             </div>
 
         </header>
 
 
-        <!-- CONTENT -->
+
+        <!-- =========================
+             CONTENT
+        ========================= -->
+
         <div class="content">
+
+
+            <!-- WELCOME -->
 
             <div class="welcome">
 
@@ -146,10 +243,16 @@
             </div>
 
 
-            <!-- MAIN OPTIONS -->
+
+            <!-- =========================
+                 MAIN OPTIONS
+            ========================= -->
+
             <div class="cards">
 
+
                 <!-- MY ACCOUNT -->
+
                 <div class="card">
 
                     <div class="card-icon">
@@ -166,14 +269,19 @@
                         de tu cuenta.
                     </p>
 
-                    <a href="/MyAccount/Edit" class="button">
+                    <a href="/MyAccount/Edit"
+                       class="button">
+
                         Ver mi cuenta
+
                     </a>
 
                 </div>
 
 
+
                 <!-- PURCHASED PRODUCTS -->
+
                 <div class="card">
 
                     <div class="card-icon">
@@ -189,14 +297,19 @@
                         adquiridos, cantidades y el total de cada compra.
                     </p>
 
-                    <a href="/Shop/ViewShopUser" class="button">
+                    <a href="/Shop/ViewShopUser"
+                       class="button">
+
                         Ver mis compras
+
                     </a>
 
                 </div>
 
 
+
                 <!-- BUY PRODUCTS -->
+
                 <div class="card">
 
                     <div class="card-icon">
@@ -212,48 +325,6 @@
                         los artículos que deseas y realiza una nueva compra.
                     </p>
 
-                    <a href="/Shop/Articles" class="button primary">
-                        Comprar productos
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <!-- RECENT PURCHASES -->
-            <!--<section class="section">
-
-                <div class="section-header">
-
-                    <h2>
-                        Mis compras recientes
-                    </h2>
-
-                    <a href="/purchased-products">
-                        Ver todas
-                    </a>
-
-                </div>
-
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        🛍
-                    </div>
-
-                    <h3>
-                        Aún no tienes compras
-                    </h3>
-
-                    <p>
-                        Cuando realices una compra,
-                        tus productos aparecerán aquí.
-                    </p>
-
-                    <br>
-
                     <a href="/Shop/Articles"
                        class="button primary">
 
@@ -263,11 +334,15 @@
 
                 </div>
 
-            </section>-->
+
+            </div>
+
 
         </div>
 
     </main>
 
+
 </body>
+
 </html>
