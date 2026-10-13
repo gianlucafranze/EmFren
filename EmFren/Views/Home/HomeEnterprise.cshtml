@@ -143,26 +143,22 @@
                 <!-- =========================
                      NOTIFICATIONS
                 ========================= -->
-                <div class="notification-wrapper">
+                <a href="/Notification/NotificationEnterprise"
+                   class="notification"
+                   aria-label="Notificaciones">
 
-                    <a href="/Notification/NotificationEnterprise"
-                       class="notification"
-                       aria-label="Notificaciones">
+                    <span class="notification-bell">
+                        🔔
+                    </span>
 
-                        <span class="notification-bell">
-                            🔔
+                    @if (unreadNotificationCount > 0)
+                    {
+                        <span class="notification-number">
+                            @unreadNotificationCount
                         </span>
+                    }
 
-                        @if (unreadNotificationCount > 0)
-                        {
-                            <span class="notification-number">
-                                @unreadNotificationCount
-                            </span>
-                        }
-
-                    </a>
-
-                </div>
+                </a>
 
 
                 <!-- =========================
